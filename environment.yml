@@ -1,0 +1,28 @@
+name: vespa2
+channels:
+  - conda-forge
+  - bioconda
+  - nvidia
+  - pytorch
+dependencies:
+  - python=3.10
+  - pip:
+      - dvc==3.17.0
+      - dvc-gdrive==2.20
+      - jaxtyping
+      - joblib-progress
+      - wandb
+  - funcy=1.17
+  - h5py
+  - joblib
+  - pytorch=2.0.1
+  - pytorch-cuda=11.8
+  - pandas
+  - polars
+  - beautifulsoup4
+  - typer
+  - pytest
+  - matplotlib
+  - seaborn
+  - biopython
+  - torchmetrics
