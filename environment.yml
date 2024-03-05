@@ -1,4 +1,4 @@
-name: vespa2
+name: vespag
 channels:
   - conda-forge
   - bioconda
