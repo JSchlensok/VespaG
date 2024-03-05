@@ -11,8 +11,8 @@ import typer
 from dvc.api import params_show
 from typing_extensions import Annotated
 
-from src.vespa2.style import create_paper_figure
-from src.vespa2.utils import setup_logger
+from src.vespag.style import create_paper_figure
+from src.vespag.utils import setup_logger
 
 
 def main(

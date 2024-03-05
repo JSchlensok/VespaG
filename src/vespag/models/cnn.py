@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 
-from src.vespa2.models.utils import construct_fnn
+from src.vespag.models.utils import construct_fnn
 
 """
 batch_size x L x 1536

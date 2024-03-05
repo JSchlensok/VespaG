@@ -15,9 +15,9 @@ from dvc.api import params_show
 from tqdm import tqdm
 from typing_extensions import Annotated
 
-from src.vespa2.utils import MeanModel, Mutation, get_device, get_precision
-from src.vespa2.utils import load_model as load_model_from_config
-from src.vespa2.utils import setup_logger
+from src.vespag.utils import MeanModel, Mutation, get_device, get_precision
+from src.vespag.utils import load_model as load_model_from_config
+from src.vespag.utils import setup_logger
 
 def load_model(config_key: str, params: dict, checkpoint_dir: Path, embedding_type: str) -> torch.nn.Module:
     architecture = params[config_key]["architecture"]
@@ -52,7 +52,8 @@ def main(
 
     params = params_show()
     alphabet = params["gemme"]["alphabet"]
-    mutation_df = pl.read_csv("data/test/mega_dataset/mutation_df.csv").filter(pl.col("mut_type") != "wt")
+    reference_file = "/home/schlensok/VESPA2/data/test/alphams_maves/reference.csv"
+    dms_directory = Path("/home/schlensok/VESPA2/data/test/alphams_maves/dms_data")
 
     if len(model_config_keys) == 1:
         logger.info("Loading model")
@@ -70,12 +71,15 @@ def main(
         model = MeanModel(*models)
 
     logger.info("Loading evaluation data")
+    reference_df = pl.read_csv(reference_file)
+
     embeddings = {
         key: torch.tensor(data[()], device=device).to(dtype=dtype)
         for key, data in h5py.File(embedding_file, "r").items()
     }
 
     records = []
+    wildtype_sequences = {rec.id.split('|')[1]: str(rec.seq) for rec in SeqIO.parse("data/test/alphams_maves/AM_MAVE.fasta", "fasta")}
     all_aas = set(alphabet)
 
     def score_mutation(preds: torch.Tensor, mutation_str: str) -> float:
@@ -85,26 +89,24 @@ def main(
             ])
 
     with torch.no_grad():
-        with progress.Progress(
-            *progress.Progress.get_default_columns(), progress.TimeElapsedColumn()
-        ) as pbar:
-            overall_progress = pbar.add_task("Overall", total=len(embeddings))
-            for unique_protein_id, emb in tqdm(embeddings.items()):
-                mutations = mutation_df.filter(pl.col("protein_id_unique") == unique_protein_id)
-                #protein_progress = pbar.add_task(unique_protein_id, total)
-                pred = model(emb).cpu().numpy()
-                records.extend([
-                    {
-                        "protein_id": row["protein_id"],
-                        "protein_id_unique": row["protein_id_unique"],
-                        "mutation": row["mut_type"],
-                        "VespaG": score_mutation(pred, row["mut_type"])
-                    }
-                    for row in mutations.iter_rows(named=True)
-                ])
-                pbar.advance(overall_progress)
-            pbar.remove_task(overall_progress)
+        for dms in tqdm(list(reference_df.iter_rows(named=True))):
+            screen_name = dms["screen_name"]
+            protein_name = dms["uniprot_name"]
+            protein_id = dms["uniprot_accession"]
+            embedding = embeddings[protein_id]
+            wt_seq = wildtype_sequences[protein_id]
 
+            pred = model(embedding).cpu().numpy()
+
+            records.extend([
+                {
+                "protein_id": protein_id,
+                "mutation": f"{wt_aa}{i+1}{to_aa}",
+                "VESPAg": score_mutation(pred, f"{wt_aa}{i+1}{to_aa}")}
+                for i, wt_aa in enumerate(wt_seq)
+                for to_aa in all_aas - {wt_aa}
+            ])
+    
     results_df = pl.from_records(records)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     results_df.write_csv(output_path)
@@ -116,3 +118,4 @@ def main(
 
 if __name__ == "__main__":
     typer.run(main)
+

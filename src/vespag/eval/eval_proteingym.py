@@ -12,9 +12,9 @@ import wandb
 from dvc.api import params_show
 from typing_extensions import Annotated
 
-from src.vespa2.utils import MeanModel, Mutation, get_device, get_precision
-from src.vespa2.utils import load_model as load_model_from_config
-from src.vespa2.utils import setup_logger
+from src.vespag.utils import MeanModel, Mutation, get_device, get_precision
+from src.vespag.utils import load_model as load_model_from_config
+from src.vespag.utils import setup_logger
 
 
 def load_model(config_key: str, params: dict, checkpoint_dir: Path, embedding_type: str) -> torch.nn.Module:
