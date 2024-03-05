@@ -72,11 +72,23 @@ def main(
             for protein_id in dataset.cluster_df["protein_id"]:
                 emb = dataset.protein_embeddings[protein_id]
                 ann = dataset.protein_annotations[protein_id]
-                #pred = ann.flatten()[torch.randperm(ann.numel())].reshape(ann.shape)
-                pred = ann[:,torch.randperm(ann.shape[1])]
-                nan_mask = torch.isnan(ann) | torch.isnan(pred)
-                loss = criterion(pred[~nan_mask], ann[~nan_mask])
-                records.append({"dataset": dataset_name, "protein_id": protein_id, "mse": loss})
+
+                matrix_shuffled_pred = ann.flatten()[torch.randperm(ann.numel())].reshape(ann.shape)
+                nan_mask = torch.isnan(ann) | torch.isnan(matrix_shuffled_pred)
+                matrix_shuffled_loss = criterion(matrix_shuffled_pred[~nan_mask], ann[~nan_mask])
+
+                column_shuffled_pred = ann[:,torch.randperm(ann.shape[1])]
+                nan_mask = torch.isnan(ann) | torch.isnan(column_shuffled_pred)
+                column_shuffled_loss = criterion(column_shuffled_pred[~nan_mask], ann[~nan_mask])
+
+                records.append(
+                  {
+                    "dataset": dataset_name,
+                    "protein_id": protein_id,
+                    "mse_matrix": matrix_shuffled_loss,
+                    "mse_column": column_shuffled_loss
+                  }
+                )
                 pbar.advance(overall_progress)
         """
         for dataset_name, dl in dataloaders.items():
