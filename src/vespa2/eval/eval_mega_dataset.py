@@ -40,6 +40,7 @@ def load_model(config_key: str, params: dict, checkpoint_dir: Path, embedding_ty
 def main(
         model_config_keys: Annotated[list[str], typer.Option("--model")],
         checkpoint_dirs: Annotated[list[Path], typer.Option("--checkpoint-dir")],
+        sequence_file: Annotated[Path, typer.Option("--sequence-file")],
         embedding_type: Annotated[str, typer.Option("--embedding-type")],
         embedding_file: Annotated[Path, typer.Option("--embedding-file")],
         output_path: Annotated[Path, typer.Option("--output-path", "-o")],
@@ -52,7 +53,7 @@ def main(
 
     params = params_show()
     alphabet = params["gemme"]["alphabet"]
-    mutation_df = pl.read_csv("data/test/mega_dataset/mutation_df.csv").filter(pl.col("mut_type") != "wt")
+    mutation_df = pl.read_csv("data/test/mega_dataset/mutations.csv")
 
     if len(model_config_keys) == 1:
         logger.info("Loading model")
@@ -77,6 +78,7 @@ def main(
 
     records = []
     all_aas = set(alphabet)
+    wt_sequences = {rec.id: rec.seq for rec in SeqIO.parse(sequence_file, "fasta")}
 
     def score_mutation(preds: torch.Tensor, mutation_str: str) -> float:
             return sum([
@@ -89,14 +91,24 @@ def main(
             *progress.Progress.get_default_columns(), progress.TimeElapsedColumn()
         ) as pbar:
             overall_progress = pbar.add_task("Overall", total=len(embeddings))
-            for unique_protein_id, emb in tqdm(embeddings.items()):
-                mutations = mutation_df.filter(pl.col("protein_id_unique") == unique_protein_id)
-                #protein_progress = pbar.add_task(unique_protein_id, total)
+            for wt_name, emb in embeddings.items():
+                #wt_seq = wt_sequences[wt_name]
                 pred = model(emb).cpu().numpy()
+                """
                 records.extend([
                     {
-                        "protein_id": row["protein_id"],
-                        "protein_id_unique": row["protein_id_unique"],
+                    "wt_name": wt_name,
+                    "mutation": f"{wt_aa}{i+1}{to_aa}",
+                    "VespaG": score_mutation(pred, f"{wt_aa}{i+1}{to_aa}")
+                    }
+                    for i, wt_aa in enumerate(wt_seq)
+                    for to_aa in all_aas - {wt_aa}
+                ])
+                """
+                mutations = mutation_df.filter(pl.col("WT_name") == wt_name)
+                records.extend([
+                    {
+                        "WT_name": row["WT_name"],
                         "mutation": row["mut_type"],
                         "VespaG": score_mutation(pred, row["mut_type"])
                     }
