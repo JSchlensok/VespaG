@@ -6,6 +6,7 @@ channels:
   - pytorch
 dependencies:
   - python=3.10
+  - pip
   - pip:
       - dvc==3.17.0
       - dvc-gdrive==2.20
