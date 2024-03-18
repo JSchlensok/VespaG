@@ -6,6 +6,7 @@ from typing import Union
 config_item = Union[str, int, list[int], float, Path]
 config_dict = dict[str, config_item]
 
+# TODO what do we actually need here
 
 class LossFunction(str, Enum):
     mse = "mse"
@@ -36,7 +37,6 @@ class ActivationFunction(str, Enum):
 class EmbeddingType(str, Enum):
     prott5 = "prott5"
     ankh = "ankh"
-
 
 class Score(str, Enum):
     effect = "effect"

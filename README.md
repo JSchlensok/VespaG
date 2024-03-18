@@ -10,3 +10,33 @@ To overcome the sparsity of experimental training data, we created a dataset of 
 Assessed on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://www.biorxiv.org/content/10.1101/2023.12.07.570727v1)) benchmark, **VespaG** matches state-of-the-art methods while being several orders of magnitude faster, predicting mutational landscapes for 20 thousand proteins in under an hour on a 32-core CPU. 
 
 More details on **VespaG** can be found in the corresponding [preprint](https://www.biorxiv.org/).
+
+
+[Public: to retrain, download data from zenodo, unzip in data folder (embeddings and processed GEMME provided)]
+structure:
+
+```bash
+VespaG
+|--data_new [rename!]
+    |--train
+        |--data
+            |--input
+            |--target
+                |--raw
+                |--processed
+        |--fasta
+        |--splits
+    |--test
+        |--data
+        |--fasta
+```
+
+[internal]
+**Training Steps:**
+
+preprocess
+1. Generate Embeddings for ESM (ProtT5) (.h5 file)
+2. Process GEMME preds (.h5 file)
+
+then:
+run from VespaG github

@@ -5,14 +5,13 @@ from jaxtyping import Float
 
 from src.vespag.models.utils import construct_fnn
 
-
 class FNN(torch.nn.Module):
     """
     Fully-connected neural network with arbitrary hidden layers and activation functions
 
     Attributes:
-        input_dim: Size of the input vectors (e.g. 1024 for ProtT5 embeddings, 1536 for ANKH embeddings). Default: 1024
-        output_dim: Size of the output vector (e.g. 1 for conservation prediction, 20 for GEMME scores). Default: 20
+        input_dim: Size of the input vectors (e.g. 1024 for ProtT5 embeddings, 1280 for ESM-2 embeddings). Default: 1280
+        output_dim: Size of the output vector (e.g. 20 for GEMME scores). Default: 20
         activation_function: Activation function to use for the hidden layers. Default: LeakyReLU
         output_activation_function: Activation function to use for the output layer, e.g. None for linear regression,
             Sigmoid for logistic regression. Default: None
@@ -20,14 +19,13 @@ class FNN(torch.nn.Module):
 
     Examples:
         gemme_prott5_linear_regression = FNN([], 1024, 20, None, None)
-        gemme_conservation_linear_regression = FNN([], 1024, 1, None, torch.nn.Sigmoid)
         gemme_prott5_fnn_2_layers = FNN([256, 64], 1024, 20, torch.nn.LeakyReLU, None)
     """
 
     def __init__(
             self,
             hidden_layer_sizes: List[int],
-            input_dim: int = 1024,
+            input_dim: int = 1280,
             output_dim: int = 20,
             activation_function: torch.nn.Module = torch.nn.LeakyReLU,
             output_activation_function: torch.nn.Module = None,
