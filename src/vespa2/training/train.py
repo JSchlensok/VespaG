@@ -67,16 +67,16 @@ def main(
     epochs = training_parameters["epochs"]
     val_every_epoch = training_parameters["val_every_epoch"]
     checkpoint_every_epoch = training_parameters["checkpoint_every_epoch"] or 999999
-    dataset_parameters = params["datasets"]
+    dataset_parameters = params["datasets"]["train"]
 
 
     logger.info("Loading training data")
     max_len = 4096 if embedding_type == "esm2" else 99999
     train_datasets = {
         dataset: PerResidueDataset(
-            dataset_parameters["train"][dataset]["embeddings"][embedding_type],
-            dataset_parameters["train"][dataset]["gemme"],
-            dataset_parameters["train"][dataset]["splits"]["train"] if not use_full_dataset else dataset_parameters["train"][dataset]["splits"]["full"],
+            dataset_parameters[dataset]["embeddings"][embedding_type],
+            dataset_parameters[dataset]["gemme"]["preprocessed"],
+            Path(dataset_parameters[dataset]["splits"]["train"]) if not use_full_dataset else Path(dataset_parameters["train"][dataset]["splits"]["full"]),
             precision,
             device,
             max_len,
@@ -121,8 +121,8 @@ def main(
         val_datasets = {
             dataset: PerResidueDataset(
                 dataset_parameters[dataset]["embeddings"][embedding_type],
-                dataset_parameters[dataset]["gemme_dir"],
-                dataset_parameters[dataset]["splits"]["val"],
+                dataset_parameters[dataset]["gemme"]["preprocessed"],
+                Path(dataset_parameters[dataset]["splits"]["val"]),
                 precision,
                 device,
                 max_len,

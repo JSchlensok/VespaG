@@ -6,6 +6,7 @@ import numpy as np
 import polars as pl
 import rich.progress as progress
 import torch
+from Bio import SeqIO
 from jaxtyping import Float
 
 from src.vespa2.utils import PrecisionType
@@ -27,15 +28,22 @@ class PerResidueDataset(torch.utils.data.Dataset):
         self.dtype = torch.float if precision == "float" else torch.half
         self.limit_cache = limit_cache
 
-        self.cluster_df = pl.read_csv(cluster_file)
+
+        if cluster_file.suffix == ".csv":
+          self.protein_ids = pl.read_csv(cluster_file).select("protein_id").to_series().to_list()
+        elif cluster_file.suffix == ".fasta":
+          self.protein_ids = [rec.id for rec in SeqIO.parse(cluster_file, "fasta")]
+        elif cluster_file.suffix == ".txt":
+          self.protein_ids = [line.strip() for line in cluster_file.open().readlines()]
+
         self.protein_embeddings = {
-            key: torch.tensor(np.array(data[()]), device=self.device, dtype=self.dtype)
+            key: torch.tensor(np.array(data[()][:max_len]), device=self.device, dtype=self.dtype)
             for key, data in progress.track(
                h5py.File(embedding_file, "r").items(),
                 description=f"Loading embeddings from {embedding_file}",
                 transient=True,
             )
-            if key in self.cluster_df["protein_id"]
+            if key in self.protein_ids
         }
         self.protein_annotations = {
             key: torch.tensor(np.array(data[()][:max_len]), device=self.device, dtype=self.dtype)
@@ -44,14 +52,14 @@ class PerResidueDataset(torch.utils.data.Dataset):
                 description=f"Loading annotations from {annotation_file}",
                 transient=True,
             )
-            if key in self.cluster_df["protein_id"]
+            if key in self.protein_ids
         }
 
         self.residue_embeddings = torch.cat(
             [
                 self.protein_embeddings[protein_id]
                 for protein_id in progress.track(
-                self.cluster_df["protein_id"],
+                self.protein_ids,
                 description="Pre-loading embeddings",
                 transient=True,
             )
@@ -61,7 +69,7 @@ class PerResidueDataset(torch.utils.data.Dataset):
             [
                 self.protein_annotations[protein_id]
                 for protein_id in progress.track(
-                self.cluster_df["protein_id"],
+                self.protein_ids,
                 description="Pre-loading annotations",
                 transient=True,
             )

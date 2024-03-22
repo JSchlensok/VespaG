@@ -33,14 +33,17 @@ stages:
     do:
       cmd: >-
         python -m src.vespa2.data.gemme.preprocess_gemme_annotations
-        ${item.gemme_archive}
-        data/train_v2/${key}/
+        ${item.gemme.archive}
+        data/train/${key}/gemme/
+        --h5-path ${item.gemme.preprocessed}
+        --fasta ${item.fasta}
       deps:
         - src/vespa2/data/gemme/preprocess_gemme_annotations.py
       params:
         - datasets
       outs:
-        - data/train_v2/${key}/
+        - data/train/${key}/gemme_predictions.h5
+        - data/train/${key}/gemme_predictions/
 
   embed-test-data-prott5:
     foreach: ${datasets.test}
@@ -89,7 +92,6 @@ stages:
       - src/vespa2/training/dataset.py
       - src/vespa2/training/trainer.py
       - src/vespa2/models
-      - data/train_v2/${item.dataset}/gemme_predictions.h5
     params:
       - datasets
       - random
