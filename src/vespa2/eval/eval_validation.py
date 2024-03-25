@@ -13,27 +13,8 @@ from dvc.api import params_show
 from typing_extensions import Annotated
 
 from src.vespa2.training.dataset import PerResidueDataset
-from src.vespa2.utils import MeanModel, get_device, get_precision
-from src.vespa2.utils import load_model as load_model_from_config
-from src.vespa2.utils import setup_logger
+from src.vespa2.utils import MeanModel, get_device, get_precision, load_model, setup_logger
 
-
-def load_model(config_key: str, params: dict, checkpoint_dir: Path, embedding_type: str) -> torch.nn.Module:
-    architecture = params[config_key]["architecture"]
-    model_parameters = params[config_key]["model_parameters"]
-    model = load_model_from_config(architecture, model_parameters, embedding_type)
-
-    with open(checkpoint_dir / "wandb_run_id.txt", "r") as f:
-        wandb_run_id = f.read()
-    api = wandb.Api()
-    artifact = api.artifact(
-        f"jschlensok/vespa2/model-{wandb_run_id}:best", type="model"
-    )
-    artifact_dir = artifact.download()
-    checkpoint_file = next(Path(artifact_dir).glob("state_dict.pt"))
-    model.load_state_dict(torch.load(checkpoint_file))
-
-    return model
 
 # dms_reference_file and protein_reference_file can take URLs as well as paths, but Typer doesn't support Union types yet, hence the str annotation
 def main(

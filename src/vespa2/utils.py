@@ -53,26 +53,16 @@ def save_async(obj, pool: mp.Pool, path: Path, mkdir: bool = True):
     pool.apply_async(torch.save, (obj, path))
 
 
-def load_model(architecture: str, model_parameters: dict, embedding_type: str):
-    if architecture == "fnn":
-        model = FNN(
-            hidden_layer_sizes=model_parameters["hidden_dims"],
-            input_dim=get_embedding_dim(embedding_type),
-            dropout_rate=model_parameters["dropout_rate"]
-        )
-    elif architecture == "cnn":
-        model = MinimalCNN(
-            input_dim=get_embedding_dim(embedding_type),
-            n_channels=model_parameters["n_channels"],
-            kernel_size=model_parameters["kernel_size"],
-            padding=model_parameters["padding"],
-            fnn_hidden_layers=model_parameters["fully_connected_layers"],
-            cnn_dropout_rate=model_parameters["dropout"]["cnn"],
-            fnn_dropout_rate=model_parameters["dropout"]["fnn"]
-        )
-    else:
-        model = None
-        # TODO
+def load_model(config_key: str, params: dict, checkpoint_dir: Path, embedding_type: str) -> torch.nn.Module:
+    architecture = params[config_key]["architecture"]
+    model_parameters = params[config_key]["model_parameters"]
+    model = load_model_from_config(architecture, model_parameters, embedding_type)
+
+    with open(checkpoint_dir / "wandb_run_id.txt", "r") as f:
+        wandb_run_id = f.read()
+    checkpoint_files = list(checkpoint_dir.iterdir())
+    latest_checkpoint = sorted(checkpoint_files, key=lambda dir: int(dir.stem.split('-')[-1]))[-1]
+    model.load_state_dict(torch.load(latest_checkpoint_file))
 
     return model
 
