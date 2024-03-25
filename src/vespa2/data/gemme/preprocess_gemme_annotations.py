@@ -40,8 +40,8 @@ def main(
             TimeElapsedColumn()
         ) as progress:
 
-            task = progress.add_task(f"Extracting {gemme_prediction_archive} to {output_dir}", total=None)
-            subprocess.run(["tar", "-xzvf", str(gemme_prediction_archive), "--strip-components=1", "-C", str(gemme_output_dir)], capture_output=True)
+                task = progress.add_task(f"Extracting {gemme_prediction_archive} to {output_dir}", total=None)
+                subprocess.run(["tar", "-xzvf", str(gemme_prediction_archive), "--strip-components=1", "-C", str(gemme_output_dir)], capture_output=True)
     else:
         shutil.copytree(gemme_dir, gemme_output_dir, dirs_exist_ok=True)
     
@@ -115,13 +115,13 @@ def main(
           query_protein = [rec for rec in unprocessed_fasta_records if rec.id == dir.stem][0]
 
         if status == "missing prediction file":
-            missing_preds.append({"protein_id": query_protein.id, "folder": dir.stem})
+            missing_preds.append({"protein_id": protein_id, "folder": dir.stem})
         elif status == "too many NAs":
             pass
         else:
             records.append(query_protein)
         
-        protein_names.append({"folder": dir.stem, "protein_id": query_protein.id})
+        protein_names.append({"folder": dir.stem, "protein_id": protein_id})
 
     with joblib_progress(
         f"Preprocessing GEMME predictions",
