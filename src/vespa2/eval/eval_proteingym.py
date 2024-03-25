@@ -24,15 +24,8 @@ def load_model(config_key: str, params: dict, checkpoint_dir: Path, embedding_ty
 
     with open(checkpoint_dir / "wandb_run_id.txt", "r") as f:
         wandb_run_id = f.read()
-    """
-    api = wandb.Api()
-    artifact = api.artifact(
-        f"jschlensok/vespa2/model-{wandb_run_id}:best", type="model"
-    )
-    artifact_dir = artifact.download()
-    checkpoint_file = next(Path(artifact_dir).glob("state_dict.pt"))
-    """
-    checkpoint_file = "./checkpoints/all/esm2/fnn_1_layer/naive_sampling/final/epoch-200/state_dict.pt"
+    # TODO load dynamically
+    checkpoint_file = checkpoint_dir / "epoch-200/state_dict.pt"
     model.load_state_dict(torch.load(checkpoint_file))
 
     return model
