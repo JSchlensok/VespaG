@@ -96,7 +96,7 @@ def main(
             protein_id = dms["UniProt_ID"]
             dms_id = dms["DMS_id"]
             wildtype_sequence = dms["target_seq"]
-            embedding = embeddings[protein_id]
+            embedding = embeddings[dms_id]
 
             pbar.update(overall_progress, description=dms_id)
 
