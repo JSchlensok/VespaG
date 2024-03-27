@@ -19,24 +19,28 @@ structure:
 VespaG
 |--data_new [rename!]
     |--train
+        |--<taxon>
+            |--<taxon>.fasta
+            |--<taxon>_gemme.h5
+            |--<taxon>_esm2.h5
+            |--<taxon>_prott5.h5
+            |--<taxon>_train.txt
+            |--<taxon>_val.txt
+    |--test
         |--data
             |--input
             |--target
-                |--raw
-                |--processed
-        |--fasta
-        |--splits
-    |--test
-        |--data
         |--fasta
 ```
 
-[internal]
 **Training Steps:**
 
-preprocess
+[internal] preprocess
 1. Generate Embeddings for ESM (ProtT5) (.h5 file)
 2. Process GEMME preds (.h5 file)
 
+[external] download from zenodo
+
 then:
+
 run from VespaG github
