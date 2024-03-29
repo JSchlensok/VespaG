@@ -32,7 +32,7 @@ def load_model(config_key: str, params: dict, checkpoint_dir: Path, embedding_ty
     artifact_dir = artifact.download()
     checkpoint_file = next(Path(artifact_dir).glob("state_dict.pt"))
     """
-    checkpoint_file = "./state_dict_v2.pt"
+    checkpoint_file = "./model_weights/state_dict_v2.pt"
     model.load_state_dict(torch.load(checkpoint_file))
 
     return model
@@ -160,8 +160,12 @@ def main(
 
     if pred_output_path:
         pred_output_path.parent.mkdir(parents=True, exist_ok=True)
-        results_df = pl.concat(raw_preds)
-        results_df.write_csv(pred_output_path)
+        for item in raw_preds:
+            dms_id = item['DMS_id']
+            output_file = './data/test' / dms_id / ".csv"
+            results_df.write_csv(pred_output_path)
+        # results_df = pl.concat(raw_preds)
+        # results_df.write_csv(pred_output_path)
 
     gc.collect()
     torch.cuda.empty_cache()

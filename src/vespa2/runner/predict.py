@@ -1,37 +1,30 @@
 from typing import Optional
 
-from src.vespa2.runner.train import *
+# from src.vespa2.runner.train import *
 from src.vespa2.runner.type_hinting import *
 from src.vespa2.runner.utils import *
 from src.vespa2.utils import get_device
-from src.vespa2.utils import load_model as load_model_from_config
+from src.vespa2.utils import load_model_from_config
 
 
 import h5py
-import tqdm
+from tqdm import tqdm
 import torch
 from pathlib import Path
+from Bio import SeqIO
 
 
-def load_model(config_key: str, params: dict, checkpoint_dir: Path, embedding_type: str) -> torch.nn.Module:
-    architecture = params[config_key]["architecture"]
-    model_parameters = params[config_key]["model_parameters"]
+# def load_model(config_key: str, params: dict, checkpoint_dir: Path, embedding_type: str) -> torch.nn.Module:
+def load_model() -> torch.nn.Module:
+    architecture = 'fnn'
+    model_parameters = {'hidden_dims': [256], 'dropout_rate': 0.2}
+    embedding_type = 'esm2'
     model = load_model_from_config(architecture, model_parameters, embedding_type)
 
-    with open(checkpoint_dir / "wandb_run_id.txt", "r") as f:
-        wandb_run_id = f.read()
-    """
-    api = wandb.Api()
-    artifact = api.artifact(
-        f"jschlensok/vespa2/model-{wandb_run_id}:best", type="model"
-    )
-    artifact_dir = artifact.download()
-    checkpoint_file = next(Path(artifact_dir).glob("state_dict.pt"))
-    """
-    checkpoint_file = "./checkpoints/all/esm2/fnn_1_layer/naive_sampling/final/epoch-200/state_dict.pt"
+    checkpoint_file = "./model_weights/state_dict_v2.pt"
     model.load_state_dict(torch.load(checkpoint_file))
 
-    return model
+    return model.eval()
 
 
 def predict(
@@ -40,13 +33,14 @@ def predict(
         fasta_file: Optional[Path] = None,
         mutation_file: Optional[Path] = None,
         id_map: Optional[Path] = None,
-        model: Architecture = "mean",
-        embedding_type: EmbeddingType = "prott5",
-        single_csv: bool = False,
+        model: Architecture = "fnn",
+        embedding_type: EmbeddingType = "esm2",
+        single_csv: bool = True,
         no_csv: bool = False,
         h5_output: Optional[Path] = None,
         one_based_mutations: Optional[bool] = False,
-        wandb_logdir: Path = Path("/mnt/project/schlensok/VESPA2/logs/vespa2")
+        idx: Optional[str] = '1idx',
+        # wandb_logdir: Path = Path("/mnt/project/schlensok/VESPA2/logs/vespa2")
 ) -> None:
     if embeddings_file is None:
         # TODO generate embeddings
@@ -76,17 +70,18 @@ def predict(
             for protein_id, sequence in tqdm(sequences.items(), desc="Generating full mutational landscape")}
 
     # TODO load best model for given architecture & embedding type
-    if model in ["fnn", "cnn"]:
-        model = ModelLoader(wandb_logdir).load_best(model.value.lower(), embedding_type.value.lower())
-    elif model == "mean":
-        fnn = ModelLoader(wandb_logdir).load_best("fnn", embedding_type.value.lower())
-        cnn = ModelLoader(wandb_logdir).load_best("cnn", embedding_type.value.lower())
-        model = MeanModel(fnn, cnn)
+    # if model in ["fnn", "cnn"]:
+    #     model = ModelLoader(wandb_logdir).load_best(model.value.lower(), embedding_type.value.lower())
+    # elif model == "mean":
+    #     fnn = ModelLoader(wandb_logdir).load_best("fnn", embedding_type.value.lower())
+    #     cnn = ModelLoader(wandb_logdir).load_best("cnn", embedding_type.value.lower())
+    #     model = MeanModel(fnn, cnn)
 
+    model = load_model()
     model = model.to(device, dtype=torch.float32)
 
     # inference loop
-    gemme_scores = {}
+    vespag_scores = {}
     scores_per_protein = {}
     for id, embedding in (pbar := tqdm(embeddings.items(), desc="Generating predictions")):
         pbar.set_postfix({"current_protein": id})
@@ -94,9 +89,13 @@ def predict(
         if fasta_file:
             y = mask_non_mutations(y, sequences[id])
         if h5_output:
-            gemme_scores[id] = y.detach()
+            vespag_scores[id] = y.detach()
+        # scores_per_protein[id] = {
+        #     mutation: compute_mutation_score(y, mutation)
+        #     for mutation in mutations_per_protein[id]
+        # }
         scores_per_protein[id] = {
-            mutation: compute_mutation_score(y, mutation)
+            f'{str(mutation)[0]}{int(str(mutation)[1])+1}{str(mutation)[2]}': compute_mutation_score(y, mutation)
             for mutation in mutations_per_protein[id]
         }
 
@@ -113,11 +112,23 @@ def predict(
         else:
             # TODO verify that output is directory
             for protein_id, mutations in tqdm(scores_per_protein.items(), desc="Generating output files"):
-                output_file = output / protein_id / ".csv"
+                output_file = Path(output, protein_id + ".csv")
                 with output_file.open("w+") as f:
+                    f.writelines("Mutation, VespaG\n")
                     f.writelines([f"{str(sav)},{score}\n" for sav, score in mutations.items()])
 
     if h5_output:
         with h5py.File(h5_output, "w") as f:
-            for id, gemme_prediction in tqdm(gemme_scores.items(), desc="Generating H5 output file"):
-                f.create_dataset(id, data=gemme_prediction)
+            for id, vespag_prediction in tqdm(vespag_scores.items(), desc="Generating H5 output file"):
+                f.create_dataset(id, data=vespag_prediction)
+
+
+if __name__ == '__main__':
+    predict(embeddings_file= 'data/test/proteingym_217_esm2.h5',
+        output= 'data/test/pg217_1idx',
+        fasta_file= 'data/test/proteingym_217.fasta',
+        model = "fnn",
+        embedding_type = "esm2",
+        single_csv= True,
+        no_csv= False,
+        )

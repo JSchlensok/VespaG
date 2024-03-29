@@ -53,7 +53,7 @@ def save_async(obj, pool: mp.Pool, path: Path, mkdir: bool = True):
     pool.apply_async(torch.save, (obj, path))
 
 
-def load_model(architecture: str, model_parameters: dict, embedding_type: str):
+def load_model_from_config(architecture: str, model_parameters: dict, embedding_type: str):
     if architecture == "fnn":
         model = FNN(
             hidden_layer_sizes=model_parameters["hidden_dims"],

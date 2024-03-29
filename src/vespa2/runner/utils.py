@@ -7,7 +7,7 @@ import wandb
 from torchtyping import TensorType
 
 from src.vespa2.models import FNN, MinimalCNN, CombinedCNN
-from src.vespa2.pipeline.mutations import SAV, Mutation
+from src.vespa2.runner.mutations import SAV, Mutation
 from src.vespa2.runner.type_hinting import ActivationFunction, LossFunction, Optimizer, Architecture, EmbeddingType
 
 AMINO_ACIDS = "ACDEFGHIKLMNPQRSTVWY"
