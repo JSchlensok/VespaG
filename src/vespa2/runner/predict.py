@@ -4,6 +4,34 @@ from src.vespa2.runner.train import *
 from src.vespa2.runner.type_hinting import *
 from src.vespa2.runner.utils import *
 from src.vespa2.utils import get_device
+from src.vespa2.utils import load_model as load_model_from_config
+
+
+import h5py
+import tqdm
+import torch
+from pathlib import Path
+
+
+def load_model(config_key: str, params: dict, checkpoint_dir: Path, embedding_type: str) -> torch.nn.Module:
+    architecture = params[config_key]["architecture"]
+    model_parameters = params[config_key]["model_parameters"]
+    model = load_model_from_config(architecture, model_parameters, embedding_type)
+
+    with open(checkpoint_dir / "wandb_run_id.txt", "r") as f:
+        wandb_run_id = f.read()
+    """
+    api = wandb.Api()
+    artifact = api.artifact(
+        f"jschlensok/vespa2/model-{wandb_run_id}:best", type="model"
+    )
+    artifact_dir = artifact.download()
+    checkpoint_file = next(Path(artifact_dir).glob("state_dict.pt"))
+    """
+    checkpoint_file = "./checkpoints/all/esm2/fnn_1_layer/naive_sampling/final/epoch-200/state_dict.pt"
+    model.load_state_dict(torch.load(checkpoint_file))
+
+    return model
 
 
 def predict(
