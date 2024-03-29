@@ -1,18 +1,15 @@
 from typing import Optional
-
-# from src.vespa2.runner.train import *
-from src.vespag.runner.type_hinting import *
-from src.vespag.runner.utils import *
-from src.vespag.utils import get_device
-from src.vespag.utils import load_model_from_config
-from src.vespag.runner.embeddings import get_esm2_embeddings
-
-
 import h5py
 from tqdm import tqdm
 import torch
 from pathlib import Path
 from Bio import SeqIO
+
+from src.vespag.runner.type_hinting import *
+from src.vespag.runner.utils import *
+from src.vespag.utils import get_device
+from src.vespag.utils import load_model_from_config
+from src.vespag.runner.embeddings import get_esm2_embeddings
 
 
 # def load_model(config_key: str, params: dict, checkpoint_dir: Path, embedding_type: str) -> torch.nn.Module:
