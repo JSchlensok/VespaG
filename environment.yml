@@ -13,6 +13,7 @@ dependencies:
       - jaxtyping
       - joblib-progress
       - wandb
+      - transformers
   - funcy=1.17
   - h5py
   - joblib

@@ -10,3 +10,9 @@ To overcome the sparsity of experimental training data, we created a dataset of 
 Assessed on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://www.biorxiv.org/content/10.1101/2023.12.07.570727v1)) benchmark, **VespaG** matches state-of-the-art methods while being several orders of magnitude faster, predicting mutational landscapes for 20 thousand proteins in under an hour on a 32-core CPU. 
 
 More details on **VespaG** can be found in the corresponding [preprint](https://www.biorxiv.org/).
+
+### Quick Start - Running Inference with VespaG
+1. Install necessary dependencies (f.e., with `conda env create -f environment.yml`)
+2. Run `python -m src.vespag.runner.predict` ... 
+
+(needs input fasta and , see somewhere else for optional)

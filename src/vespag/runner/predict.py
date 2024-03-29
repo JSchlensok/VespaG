@@ -26,8 +26,8 @@ def load_model() -> torch.nn.Module:
 
 
 def predict(
-        out_path: Path,
         fasta_file: Path,
+        out_path: Optional[Path] = './data/output',
         embeddings_file: Optional[Path] = None,
         mutation_file: Optional[Path] = None,
         id_map: Optional[Path] = None,
