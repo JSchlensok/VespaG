@@ -3,7 +3,7 @@ from typing import List
 import torch
 from jaxtyping import Float
 
-from src.vespa2.models.utils import construct_fnn
+from src.vespag.models.utils import construct_fnn
 
 
 class FNN(torch.nn.Module):

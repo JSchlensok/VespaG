@@ -12,7 +12,7 @@ import wandb
 from dvc.api import params_show
 from typing_extensions import Annotated
 
-from src.vespa2.utils import (
+from src.vespag.utils import (
     get_device,
     get_precision,
     load_model,

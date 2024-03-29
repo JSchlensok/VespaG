@@ -1,10 +1,10 @@
 from typing import Optional
 
 # from src.vespa2.runner.train import *
-from src.vespa2.runner.type_hinting import *
-from src.vespa2.runner.utils import *
-from src.vespa2.utils import get_device
-from src.vespa2.utils import load_model_from_config
+from src.vespag.runner.type_hinting import *
+from src.vespag.runner.utils import *
+from src.vespag.utils import get_device
+from src.vespag.utils import load_model_from_config
 
 
 import h5py

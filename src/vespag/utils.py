@@ -9,7 +9,7 @@ import torch
 import torch.multiprocessing as mp
 from rich.logging import RichHandler
 
-from src.vespa2.models import FNN, MinimalCNN
+from src.vespag.models import FNN, MinimalCNN
 
 EmbeddingType = Literal["prott5", "esm2"]
 PrecisionType = Literal["half", "float"]

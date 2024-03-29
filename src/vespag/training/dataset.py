@@ -8,7 +8,7 @@ import rich.progress as progress
 import torch
 from jaxtyping import Float
 
-from src.vespa2.utils import PrecisionType
+from src.vespag.utils import PrecisionType
 
 
 class PerResidueDataset(torch.utils.data.Dataset):
