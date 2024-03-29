@@ -9,12 +9,12 @@ from Bio import SeqIO
 import h5py
 
 
-def get_embeddings(
+def get_esm2_embeddings(
         fasta_path: Path, 
+        out_path: Path,
         model_name: str= "facebook/esm2_t36_3B_UR50D", 
         maxlen: Optional[int]= 4096,
-        out_path: Path,
-        ):
+    )-> None:
     """    
     Returns:
     - numpy.ndarray: A matrix where each row is the embedding of a token in the text.
@@ -30,15 +30,18 @@ def get_embeddings(
     with torch.no_grad():
         outputs = model(**inputs)
     
-    last_hidden_states = outputs.last_hidden_state
+    last_hidden_states = outputs.last_hidden_state[:, 1:-1, :].squeeze(0)
     x = last_hidden_states.detach()
 
-    # with h5py.File(out_path, "w") as hdf:
-    #         data = torch.load(embedding_file)
-    #         label = data["label"].split('|')[1]
-    #         embedding = next(iter(data["representations"].values()))
-    #         hdf.create_dataset(name=label, data=embedding)
-    #         os.remove(embedding_file)
+    with h5py.File(out_path, "w") as hdf:
+        for label, embedding in zip(ids, x):
+            hdf.create_dataset(name=label, data=embedding)
 
-    # # Return embeddings after removing <cls> and <eos> tokens and converting to numpy.
-    # return outputs.last_hidden_state[:, 1:-1, :].squeeze(0).numpy()
+    return {label: emb for label, emb in zip(ids, x)}
+
+
+if __name__ == '__main__':
+    get_esm2_embeddings(
+        fasta_path='/mnt/project/marquet/Variants/VespaG/VespaG/data/test/test.fasta', 
+        out_path='/mnt/project/marquet/Variants/VespaG/VespaG/data/test/test.h5',
+        )

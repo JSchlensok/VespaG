@@ -124,11 +124,19 @@ def predict(
 
 
 if __name__ == '__main__':
-    predict(embeddings_file= 'data/test/proteingym_217_esm2.h5',
-        output= 'data/test/pg217_1idx',
-        fasta_file= 'data/test/proteingym_217.fasta',
+    predict(embeddings_file= 'data/test/test.h5',
+        output= 'data/test/test',
+        fasta_file= 'data/test/test.fasta',
         model = "fnn",
         embedding_type = "esm2",
         single_csv= True,
         no_csv= False,
         )
+    # predict(embeddings_file= 'data/test/proteingym_217_esm2.h5',
+    #     output= 'data/test/pg217_1idx',
+    #     fasta_file= 'data/test/proteingym_217.fasta',
+    #     model = "fnn",
+    #     embedding_type = "esm2",
+    #     single_csv= True,
+    #     no_csv= False,
+    #     )
