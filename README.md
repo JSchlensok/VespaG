@@ -15,4 +15,4 @@ More details on **VespaG** can be found in the corresponding [preprint](https://
 1. Install necessary dependencies (f.e., with `conda env create -f environment.yml`)
 2. Run `python -m src.vespag.runner.predict` ... 
 
-(needs input fasta and , see somewhere else for optional)
+(needs input fasta, creates embeddings (gpu?), saves csv output in folder data/output by default, see somewhere below for optional)
