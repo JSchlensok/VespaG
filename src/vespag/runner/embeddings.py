@@ -18,27 +18,29 @@ def get_esm2_embeddings(
     )-> None:
     from transformers import AutoTokenizer, AutoModel
 
+    print(f'Generating ESM-2 embeddings for {fasta_path}')
+
     device = get_device()
 
     ids = [str(record.id) for record in SeqIO.parse(fasta_path, "fasta")]
     seqs = [str(record.seq) for record in SeqIO.parse(fasta_path, "fasta")]
     
-    tokenizer = AutoTokenizer.from_pretrained(model_name).to(device)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModel.from_pretrained(model_name).to(device)
     
     inputs = tokenizer(seqs, return_tensors="pt", truncation=True, padding=True, max_length=maxlen).to(device) 
     with torch.no_grad():
         outputs = model(**inputs)
     
-    x = torch.tensor(outputs.last_hidden_state[:, 1:-1, :].squeeze(0), dtype=torch.float32)
-    # last_hidden_states = outputs.last_hidden_state[:, 1:-1, :].squeeze(0)
-    # x = last_hidden_states.detach()
+    # x = torch.tensor(outputs.last_hidden_state[:, 1:-1, :].squeeze(0), dtype=torch.float32)
+    last_hidden_states = outputs.last_hidden_state[:, 1:-1, :].squeeze(0)
+    x = last_hidden_states.detach().cpu()
 
     with h5py.File(out_path + '/esm2_embeddings.h5', "w") as hdf:
         for label, embedding in zip(ids, x):
             hdf.create_dataset(name=label, data=embedding)
 
-    return {label: emb for label, emb in zip(ids, x)}
+    return {label: emb for label, emb in zip(ids, last_hidden_states)}
 
 # TODO finish h5file creation (padding + length)
 # https://github.com/agemagician/ProtTrans/blob/master/Embedding/prott5_embedder.py

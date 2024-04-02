@@ -104,7 +104,7 @@ def predict(
             }
         # optional: prepare h5 file
         if h5_output:
-            vespag_scores[id] = y.detach()
+            vespag_scores[id] = y.detach().cpu()
 
     # write h5 file
     if h5_output:
@@ -114,9 +114,9 @@ def predict(
 
     # write csv output (default: single csv file for each mutational landscape of protein sequence)
     if not no_csv:
-        if single_csv:
+        if not single_csv:
             # TODO verify that out_path is directory
-            for protein_id, mutations in tqdm(scores_per_protein.items(), desc="Generating output files"):
+            for protein_id, mutations in tqdm(scores_per_protein.items(), desc="Generating csv output files"):
                 output_file = Path(out_path, protein_id + ".csv")
                 with output_file.open("w+") as f:
                     f.writelines("Mutation, VespaG\n")
@@ -129,7 +129,7 @@ def predict(
                 f.writelines([line for line in tqdm([
                     f"{protein_id}_{str(sav)},{score}\n"
                     for protein_id, mutations in scores_per_protein.items()
-                    for sav, score in mutations.items()], desc="Generating output file")
+                    for sav, score in mutations.items()], desc="Generating csv output file")
                               ])
 
 
@@ -149,20 +149,20 @@ def create_arg_parser():
     parser.add_argument( '-e', '--embeddings', required=False, type=str, 
                     help='A path to pre-generated ESM-2 input embeddings. If not provided, embeddings will be saved in "./data/output/esm2_embeddings.h5"')
     # Optional positional argument
-    parser.add_argument('--h5_output', required=False, type=str,
-                    default=None,
+    parser.add_argument('--h5_output', required=False, action='store_true',
+                    # default=None,
                     help='Whether a file containing all predictions in HDF5 format should be saved.' )
     # Optional positional argument
-    parser.add_argument('--single_csv', required=False, type=str,
-                    default=None,
+    parser.add_argument('--single_csv', required=False, action='store_true',
+                    # default=None,
                     help='Whether to return one CSV file for all proteins instead of per-protein CSV files.' )
     # Optional positional argument
-    parser.add_argument('--no_csv', required=False, type=str,
-                    default=None,
+    parser.add_argument('--no_csv', required=False, action='store_true',
+                    # default=None,
                     help='Whether no CSV output should be produced.' )
     # Optional argument
-    parser.add_argument('--zero_idx', type=bool, 
-                    default=False,
+    parser.add_argument('--zero_idx', required=False, action='store_true', 
+                    # default=False,
                     help="Whether to enumerate the sequence starting at 0. Default is starting at 1.")
     return parser
 
@@ -175,7 +175,7 @@ def main():
     #required
     seq_path   = Path(args.input)
     #optional
-    out_path   = Path(args.output) if args.output is not None else None
+    out_path   = Path(args.output) if args.output is not None else './data/output'
     emb_path   = Path(args.embeddings) if args.embeddings is not None else None
     h5_output = args.h5_output if args.h5_output is not None else None
     no_csv = args.no_csv if args.no_csv is not None else None
@@ -193,19 +193,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # predict(embeddings_file= 'data/test/test.h5',
-    #     output= 'data/test/test',
-    #     fasta_file= 'data/test/test.fasta',
-    #     model = "fnn",
-    #     embedding_type = "esm2",
-    #     single_csv= True,
-    #     no_csv= False,
-    #     )
-    # predict(embeddings_file= 'data/test/proteingym_217_esm2.h5',
-    #     output= 'data/test/pg217_1idx',
-    #     fasta_file= 'data/test/proteingym_217.fasta',
-    #     model = "fnn",
-    #     embedding_type = "esm2",
-    #     single_csv= True,
-    #     no_csv= False,
-    #     )
