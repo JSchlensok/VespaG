@@ -13,6 +13,14 @@ More details on **VespaG** can be found in the corresponding [preprint](https://
 
 ### Quick Start - Running Inference with VespaG
 1. Install necessary dependencies (f.e., with `conda env create -f environment.yml`)
-2. Run `python -m src.vespag.runner.predict` ... 
+2. Run `python -m src.vespag.runner.predict`. In short, this script needs an input fasta file, creates ESM-2 embeddings if none are provided, saves a csv output in folder `data/output` by default. You can use the following arguments:
+    - `-h` for help
+    - **required**: `-i INPUT` A path to a fasta-formatted text file containing protein sequence(s). 
+    - optional: `-o OUTPUT` A path for saving the created CSV files. Default directory is `./data/output`.
+    - optional: `-e EMBEDDINGS` A path to pre-generated ESM-2 input embeddings. If not provided, embeddings will be saved in `./data/output/esm2_embeddings.h5`
+    - optional: `--h5_output H5_OUTPUT` Whether a file containing all predictions in HDF5 format should be saved.
+    - optional: `--single_csv SINGLE_CSV` Whether to return one CSV file for all proteins instead of per-protein CSV files.
+    - optional: `--no_csv NO_CSV` Whether no CSV output should be produced.
+    - optional: `--zero_idx ZERO_IDX` Whether to enumerate the sequence starting at 0. Default is starting at 1. 
 
 (needs input fasta, creates embeddings (gpu?), saves csv output in folder data/output by default, see somewhere below for optional)

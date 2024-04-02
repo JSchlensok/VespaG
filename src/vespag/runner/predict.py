@@ -3,7 +3,7 @@ import h5py
 from tqdm import tqdm
 import torch
 from pathlib import Path
-import argparse
+import argparse, sys
 from Bio import SeqIO
 
 from src.vespag.runner.type_hinting import *
@@ -136,7 +136,7 @@ def predict(
 def create_arg_parser():
     """"Creates and returns the ArgumentParser object."""
     # Instantiate the parser
-    parser = argparse.ArgumentParser(description=( 
+    parser = argparse.ArgumentParser(prog='predict', description=( 
             'predict.py generates VespaG variant effect score predictions'+
             ' for a given file containing sequence(s) in FASTA-format.') )
     # Required positional argument
@@ -169,6 +169,8 @@ def create_arg_parser():
 def main():
     parser     = create_arg_parser()
     args       = parser.parse_args()
+
+    parser.parse_args(args=None if sys.argv[1:] else ['--help'])
     
     #required
     seq_path   = Path(args.input)
@@ -176,7 +178,7 @@ def main():
     out_path   = Path(args.output) if args.output is not None else None
     emb_path   = Path(args.embeddings) if args.embeddings is not None else None
     h5_output = args.h5_output if args.h5_output is not None else None
-    no_csv = args.no_csv if args.zerono_csv_idx is not None else None
+    no_csv = args.no_csv if args.no_csv is not None else None
     single_csv = args.single_csv if args.single_csv is not None else None
     zero_idx = args.zero_idx if args.zero_idx is not None else None
     
