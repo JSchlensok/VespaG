@@ -22,5 +22,3 @@ More details on **VespaG** can be found in the corresponding [preprint](https://
     - optional: `--single_csv SINGLE_CSV` Whether to return one CSV file for all proteins instead of per-protein CSV files.
     - optional: `--no_csv NO_CSV` Whether no CSV output should be produced.
     - optional: `--zero_idx ZERO_IDX` Whether to enumerate the sequence starting at 0. Default is starting at 1. 
-
-(needs input fasta, creates embeddings (gpu?), saves csv output in folder data/output by default, see somewhere below for optional)
