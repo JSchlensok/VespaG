@@ -37,6 +37,13 @@ def read_mutation_file(mutation_file: Path, one_indexed: bool=False) -> dict[str
 
     return mutations_per_protein
 
+def one_idx_mutation(input_string):
+    index = next(i for i, char in enumerate(input_string) if char.isdigit())
+    prefix, number_str, suffix = input_string[:index], input_string[index:-1], input_string[-1]
+    incremented_number = str(int(number_str) + 1)
+    return prefix + incremented_number + suffix
+
+
 def compute_mutation_score(y: TensorType["length", 20], mutation: Union[Mutation, SAV], alphabet: str=AMINO_ACIDS) -> float:
     if isinstance(mutation, Mutation):
         return sum([y[sav.position][alphabet.index(sav.to_aa)].item() for sav in mutation])

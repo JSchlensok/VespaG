@@ -13,7 +13,6 @@ from src.vespag.utils import load_model_from_config
 from src.vespag.runner.embeddings import get_esm2_embeddings
 
 
-
 # def load_model(config_key: str, params: dict, checkpoint_dir: Path, embedding_type: str) -> torch.nn.Module:
 def load_model() -> torch.nn.Module:
     architecture = 'fnn'
@@ -51,6 +50,7 @@ def predict(
 
     # compute embeddings
     if embeddings_file is None:
+        print(f'Generating ESM-2 embeddings for: {fasta_file}')
         embeddings = get_esm2_embeddings(fasta_file, out_path)
     # or load precomputed embeddings
     else:
@@ -99,7 +99,8 @@ def predict(
             }
         else:
             scores_per_protein[id] = {
-                f'{str(mutation)[0]}{int(str(mutation)[1])+1}{str(mutation)[2]}': compute_mutation_score(y, mutation)
+                one_idx_mutation(str(mutation)): compute_mutation_score(y, mutation)
+                # f'{str(mutation)[0]}{int(str(mutation)[1:-2])+1}{str(mutation)[-1]}': compute_mutation_score(y, mutation)
                 for mutation in mutations_per_protein[id]
             }
         # optional: prepare h5 file

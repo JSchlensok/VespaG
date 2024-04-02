@@ -18,8 +18,6 @@ def get_esm2_embeddings(
     )-> None:
     from transformers import AutoTokenizer, AutoModel
 
-    print(f'Generating ESM-2 embeddings for {fasta_path}')
-
     device = get_device()
 
     ids = [str(record.id) for record in SeqIO.parse(fasta_path, "fasta")]
