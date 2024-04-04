@@ -109,7 +109,7 @@ def predict(
 
     # write h5 file
     if h5_output:
-        with h5py.File(out_path + '/vespag_scores_all.h5', "w") as f:
+        with h5py.File(str(out_path) + '/vespag_scores_all.h5', "w") as f:
             for id, vespag_prediction in tqdm(vespag_scores.items(), desc="Generating H5 output file"):
                 f.create_dataset(id, data=vespag_prediction)
 
@@ -182,6 +182,8 @@ def main():
     no_csv = args.no_csv if args.no_csv is not None else None
     single_csv = args.single_csv if args.single_csv is not None else None
     zero_idx = args.zero_idx if args.zero_idx is not None else None
+
+    print('-- Starting VespaG prediction --')
     
     predict(fasta_file=seq_path, 
             out_path=out_path,

@@ -31,10 +31,10 @@ def get_esm2_embeddings(
         outputs = model(**inputs)
     
     # x = torch.tensor(outputs.last_hidden_state[:, 1:-1, :].squeeze(0), dtype=torch.float32)
-    last_hidden_states = outputs.last_hidden_state[:, 1:-1, :].squeeze(0)
+    last_hidden_states = outputs.last_hidden_state[:, 1:-1, :]#.squeeze(0)
     x = last_hidden_states.detach().cpu()
 
-    with h5py.File(out_path + '/esm2_embeddings.h5', "w") as hdf:
+    with h5py.File(str(out_path) + '/esm2_embeddings.h5', "w") as hdf:
         for label, embedding in zip(ids, x):
             hdf.create_dataset(name=label, data=embedding)
 
