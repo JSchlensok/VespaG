@@ -7,6 +7,7 @@
 /plots/
 /speed_benchmarking/
 /workflows/
+**/*.sh
 
 src/**/__pycache__
 **/.DS_store
