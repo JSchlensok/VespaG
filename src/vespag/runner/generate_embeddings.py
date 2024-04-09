@@ -5,7 +5,7 @@ import typer
 from Bio import SeqIO
 from typing_extensions import Annotated
 
-from src.vespag.data.embeddings import Embedder, save_embeddings
+from src.vespag.data.embeddings import Embedder
 from src.vespag.runner.type_hinting import EmbeddingType
 
 model_names = {
@@ -52,3 +52,4 @@ def main(
 
 if __name__ == "__main__":
     typer.run(main)
+
