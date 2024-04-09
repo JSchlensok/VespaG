@@ -1,33 +1,4 @@
 stages:
-  embed-training-data-esm2:
-    foreach: ${datasets.train}
-    do:
-      cmd: >-
-        src/vespa2/data/embeddings/generate_esm2_embeddings.sh
-        data/train_v2/${key}/preprocessed.fasta
-        data/train_v2/${key}/esm2_embeddings.h5
-        --split-ids
-      deps:
-        - src/vespa2/data/embeddings/generate_esm2_embeddings.sh
-        - src/vespa2/data/embeddings/merge_esm2_embeddings.py
-        - data/train_v2/${key}/preprocessed.fasta
-      outs:
-        -  data/train_v2/${key}/esm2_embeddings.h5
-
-  embed-training-data-prott5:
-    foreach: ${datasets.train}
-    do:
-      cmd: >-
-        src/vespa2/data/embeddings/generate_prott5_embeddings.sh
-        data/train_v2/${key}/preprocessed.fasta
-        data/train_v2/${key}/prott5_embeddings.h5
-        data/prott5_cache/
-      deps:
-        - src/vespa2/data/embeddings/generate_prott5_embeddings.sh
-        - data/train_v2/${key}/preprocessed.fasta
-      outs:
-        -  data/train_v2/${key}/prott5_embeddings.h5
-
   preprocess-gemme-annotations:
     foreach: ${datasets.train}
     do:
@@ -42,33 +13,37 @@ stages:
       outs:
         - data/train_v2/${key}/
 
-  embed-test-data-prott5:
-    foreach: ${datasets.test}
-    do:
-      cmd: >-
-        src/vespa2/data/embeddings/generate_prott5_embeddings.sh
-        ${item.fasta}
-        data/test/${key}/prott5_embeddings.h5
-        data/prott5_cache/
-      deps:
-        - src/vespa2/data/embeddings/generate_prott5_embeddings.sh
-        - ${item.fasta}
-      outs:
-        - data/test/${key}/prott5_embeddings.h5
+  embed-training-data:
+    matrix:
+      embedding_type: [ prott5, esm2 ]
+      dataset: ${datasets.train}
+    cmd: >-
+      python -m src.vespag.runner.generate_embeddings
+      data/train/${item.dataset}/preprocessed.fasta
+      data/train/${item.dataset}/${item.embedding_type}_embeddings.h5
+      -c data/huggingface_cache/${item.embedding_type}
+    deps:
+      - src/vespag/data/embeddings.py
+      - src/vespag/runner/generate_embeddings.py
+      - data/train/${item.dataset}/preprocessed.fasta
+    outs:
+      - data/train/${item.dataset}/${item.embedding_type}_embeddings.h5
 
-  embed-test-data-esm2:
-    foreach: ${datasets.test}
-    do:
-      cmd: >-
-        src/vespa2/data/embeddings/generate_esm2_embeddings.sh
-        ${item.fasta}
-        data/test/${key}/esm2_embeddings.h5
-      deps:
-        - src/vespa2/data/embeddings/generate_esm2_embeddings.sh
-        - src/vespa2/data/embeddings/merge_esm2_embeddings.py
-        - ${item.fasta}
-      outs:
-        - data/test/${key}/esm2_embeddings.h5
+  embed-test-data:
+    matrix:
+      embedding_type: [ prott5, esm2 ]
+      dataset: ${datasets.test}
+    cmd: >-
+      python -m src.vespag.runner.generate_embeddings
+      ${item.fasta}
+      data/test/${item.dataset}/${item.embedding_type}_embeddings.h5
+      -c data/huggingface_cache/${item.embedding_type}
+    deps:
+      - src/vespag/data/embeddings.py
+      - src/vespag/runner/generate_embeddings.py
+      - ${item.fasta}
+    outs:
+      - data/test/${item.dataset}/${item.embedding_type}_embeddings.h5
 
   train:
     matrix:

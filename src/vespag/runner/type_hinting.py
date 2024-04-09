@@ -34,8 +34,8 @@ class ActivationFunction(str, Enum):
 
 
 class EmbeddingType(str, Enum):
+    esm2 = "esm2"
     prott5 = "prott5"
-    ankh = "ankh"
 
 
 class Score(str, Enum):
