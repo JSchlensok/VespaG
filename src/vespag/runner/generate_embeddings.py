@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Union
 
 import typer
 from Bio import SeqIO
@@ -35,18 +34,18 @@ def main(
         ),
     ] = EmbeddingType.esm2,
     pretrained_path: Annotated[
-        Union[Path, str],
+        str,
         typer.Option(
-            "--pretrained-path", help="Path or URL of pretrained transformer."
+            "--pretrained-path", help="Path or URL of pretrained transformer"
         ),
     ] = None,
 ):
     if embedding_type and not pretrained_path:
         pretrained_path = model_names[embedding_type]
 
-    sequences = {rec.id: str(rec.seq) for rec in SeqIO.parse(input, "fasta")}
+    sequences = {rec.id: str(rec.seq) for rec in SeqIO.parse(input_fasta_file, "fasta")}
     embedder = Embedder(pretrained_path, cache_dir)
-    embeddings = Embedder.embed(sequences)
+    embeddings = embedder.embed(sequences)
     Embedder.save_embeddings(embeddings, output_h5_file)
 
 

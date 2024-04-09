@@ -18,19 +18,19 @@ class Embedder:
         device = get_device()
         self.device = device
 
-        if "t5" in model_name:
+        if "t5" in pretrained_path:
             tokenizer_class = T5Tokenizer
             encoder_class = T5EncoderModel
         else:
             tokenizer_class = AutoTokenizer
             encoder_class = AutoModel
 
-        params = {"model_name": pretrained_path}
+        kwargs = {}
         if cache_dir:
-            params["cache_dir"] = cache_dir
+            kwargs["cache_dir"] = cache_dir
 
-        self.tokenizer = tokenizer_class.from_pretrained(**params, do_lower_case=False)
-        self.encoder = encoder_class.from_pretrained(**params).to(device)
+        self.tokenizer = tokenizer_class.from_pretrained(pretrained_path, **kwargs, do_lower_case=False)
+        self.encoder = encoder_class.from_pretrained(pretrained_path, **kwargs).to(device)
         self.encoder = (
             self.encoder.half()
             if device == torch.device("cuda:0")
@@ -56,6 +56,7 @@ class Embedder:
         return batches
 
     def embed(
+        self,
         sequences: dict[str, str], max_batch_length: int = 4096
     ) -> dict[str, torch.tensor]:
         batches = self.batch(sequences, max_batch_length)
@@ -78,8 +79,8 @@ class Embedder:
                     padding="longest",
                     return_tensors="pt",
                     max_length=max_batch_length,
-                ).to(device)
-                raw_embeddings = encoder(**input_tokens)
+                ).to(self.device)
+                raw_embeddings = self.encoder(**input_tokens)
                 embeddings.update(
                     {
                         id: raw_embeddings.last_hidden_state[i, 1 : len(seq) + 1]
