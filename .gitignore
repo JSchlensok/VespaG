@@ -2,7 +2,7 @@
 artifacts/
 Celine_GEMME/
 checkpoints/
-data/
+/data/
 !data/train/
 eval/
 plots/
