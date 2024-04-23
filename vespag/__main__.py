@@ -23,7 +23,6 @@ def predict(
     no_csv: Annotated[bool, typer.Option("--no-csv/--csv", help="Whether no CSV output should be produced at all")] = False,
     h5_output: Annotated[bool, typer.Option("--h5-output/--no-h5-output", help="Whether a file containing predictions in HDF5 format should be created")] = False,
     zero_based_mutations: Annotated[bool, typer.Option("--zero-idx/--one-idx", help="Whether to enumerate the sequence starting at 0.")] = False,
-    measure_time: Annotated[bool, typer.Option("--measure-time")] = False
 ) -> None:
     id_map_file = None
     generate_predictions(
@@ -35,8 +34,7 @@ def predict(
         single_csv,
         no_csv,
         h5_output,
-        zero_based_mutations,
-        measure_time
+        zero_based_mutations
     )
 
 @app.command()
