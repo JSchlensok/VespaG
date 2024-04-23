@@ -26,6 +26,7 @@ import seaborn as sns
 # SOFTWARE.
 #
 
+
 @pl.api.register_dataframe_namespace("sns")
 @pl.api.register_lazyframe_namespace("sns")
 @dataclass
@@ -48,8 +49,7 @@ class SeabornPlotting:
             kwargs[key] = expr.meta.output_name()
 
         return (
-            self.df
-            .select(list(exprs.values()))
+            self.df.select(list(exprs.values()))
             .pipe(maybe_collect)
             .to_pandas()
             .pipe(func, **kwargs)

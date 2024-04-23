@@ -6,8 +6,7 @@ __all__ = [
     "AMINO_ACIDS",
     "compute_mutation_score",
     "DEFAULT_MODEL_PARAMETERS",
-    "get_device"
-    "get_embedding_dim",
+    "get_device" "get_embedding_dim",
     "get_precision",
     "load_model",
     "mask_non_mutations",
@@ -16,5 +15,5 @@ __all__ = [
     "SAV",
     "save_async",
     "SeabornPlotting",
-    "setup_logger"
+    "setup_logger",
 ]

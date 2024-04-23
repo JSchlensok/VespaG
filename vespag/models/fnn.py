@@ -22,13 +22,13 @@ class FNN(torch.nn.Module):
     """
 
     def __init__(
-            self,
-            hidden_layer_sizes: list[int],
-            input_dim: int = 2560,
-            output_dim: int = 20,
-            activation_function: torch.nn.Module = torch.nn.LeakyReLU,
-            output_activation_function: torch.nn.Module = None,
-            dropout_rate: float = None,
+        self,
+        hidden_layer_sizes: list[int],
+        input_dim: int = 2560,
+        output_dim: int = 20,
+        activation_function: torch.nn.Module = torch.nn.LeakyReLU,
+        output_activation_function: torch.nn.Module = None,
+        dropout_rate: float = None,
     ):
 
         super(FNN, self).__init__()
@@ -46,6 +46,6 @@ class FNN(torch.nn.Module):
                 torch.nn.init.zeros_(layer.bias.data)
 
     def forward(
-            self, X: Float[torch.Tensor, "batch_size length input_dim"]
+        self, X: Float[torch.Tensor, "batch_size length input_dim"]
     ) -> Float[torch.Tensor, "batch_size length output_dim"]:
         return self.net(X).squeeze(-1)

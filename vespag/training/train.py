@@ -1,8 +1,8 @@
 import gc
+import logging
 import os
 from pathlib import Path
 
-import logging
 import rich.progress as progress
 import torch
 import torch.multiprocessing as mp
@@ -12,21 +12,14 @@ import wandb
 from dvc.api import params_show
 from typing_extensions import Annotated
 
-from vespag.utils import (
-    get_device,
-    get_precision,
-    load_model,
-    setup_logger,
-)
+from vespag.utils import get_device, get_precision, load_model, setup_logger
+
 from .dataset import PerResidueDataset
 from .trainer import Trainer
 
 
 def capitalize_embedding_type(embedding_type: str) -> str:
-    return {
-        "prott5": "ProtT5",
-        "esm2": "ESM2"
-    }[embedding_type]
+    return {"prott5": "ProtT5", "esm2": "ESM2"}[embedding_type]
 
 
 def capitalize_dataset(dataset: str) -> str:
@@ -36,20 +29,20 @@ def capitalize_dataset(dataset: str) -> str:
         "bodo-saltans": "Bodo-Saltans",
         "all": "All",
         "virus": "Virus",
-        "droso": "Droso"
+        "droso": "Droso",
     }[dataset]
 
 
 def train(
-        model_config_key: Annotated[str, typer.Option("--model")],
-        datasets: Annotated[list[str], typer.Option("--dataset")],
-        output_dir: Annotated[Path, typer.Option("--output-dir", "-o")],
-        embedding_type: Annotated[str, typer.Option("--embedding-type", "-e")],
-        compute_full_train_loss: Annotated[bool, typer.Option("--full-train-loss")] = False,
-        sampling_strategy: Annotated[str, typer.Option("--sampling-strategy")] = "basic",
-        wandb_config: Annotated[tuple[str, str], typer.Option("--wandb")] = None,
-        limit_cache: Annotated[bool, typer.Option("--limit-cache")] = False,
-        use_full_dataset: Annotated[bool, typer.Option("--use-full-dataset")] = False
+    model_config_key: Annotated[str, typer.Option("--model")],
+    datasets: Annotated[list[str], typer.Option("--dataset")],
+    output_dir: Annotated[Path, typer.Option("--output-dir", "-o")],
+    embedding_type: Annotated[str, typer.Option("--embedding-type", "-e")],
+    compute_full_train_loss: Annotated[bool, typer.Option("--full-train-loss")] = False,
+    sampling_strategy: Annotated[str, typer.Option("--sampling-strategy")] = "basic",
+    wandb_config: Annotated[tuple[str, str], typer.Option("--wandb")] = None,
+    limit_cache: Annotated[bool, typer.Option("--limit-cache")] = False,
+    use_full_dataset: Annotated[bool, typer.Option("--use-full-dataset")] = False,
 ):
     logger = setup_logger()
     wandb_logger = logging.getLogger("wandb")
@@ -70,18 +63,21 @@ def train(
     checkpoint_every_epoch = training_parameters["checkpoint_every_epoch"] or 999999
     dataset_parameters = params["datasets"]
 
-
     logger.info("Loading training data")
     max_len = 4096 if embedding_type == "esm2" else 99999
     train_datasets = {
         dataset: PerResidueDataset(
             dataset_parameters["train"][dataset]["embeddings"][embedding_type],
             dataset_parameters["train"][dataset]["gemme"],
-            dataset_parameters["train"][dataset]["splits"]["train"] if not use_full_dataset else dataset_parameters["train"][dataset]["splits"]["full"],
+            (
+                dataset_parameters["train"][dataset]["splits"]["train"]
+                if not use_full_dataset
+                else dataset_parameters["train"][dataset]["splits"]["full"]
+            ),
             precision,
             device,
             max_len,
-            limit_cache
+            limit_cache,
         )
         for dataset in datasets
     }
@@ -89,9 +85,7 @@ def train(
 
     if sampling_strategy == "basic":
         train_dl = torch.utils.data.DataLoader(
-            big_train_dataset,
-            batch_size=training_batch_size,
-            shuffle=True
+            big_train_dataset, batch_size=training_batch_size, shuffle=True
         )
     else:
         # TODO implement properly
@@ -109,13 +103,19 @@ def train(
             sampler=torch.utils.data.WeightedRandomSampler(
                 train_weights, epoch_size, replacement=True
             ),
-            shuffle=True
+            shuffle=True,
         )
 
-    train_eval_dls = {
-        name: torch.utils.data.DataLoader(dataset, batch_size=validation_batch_size, shuffle=False)
-        for name, dataset in train_datasets.items()
-    } if not use_full_dataset else None
+    train_eval_dls = (
+        {
+            name: torch.utils.data.DataLoader(
+                dataset, batch_size=validation_batch_size, shuffle=False
+            )
+            for name, dataset in train_datasets.items()
+        }
+        if not use_full_dataset
+        else None
+    )
 
     logger.info("Loading validation data")
     if not use_full_dataset:
@@ -127,12 +127,14 @@ def train(
                 precision,
                 device,
                 max_len,
-                limit_cache
+                limit_cache,
             )
             for dataset in datasets
         }
         val_dls = {
-            name: torch.utils.data.DataLoader(dataset, batch_size=validation_batch_size, shuffle=False)
+            name: torch.utils.data.DataLoader(
+                dataset, batch_size=validation_batch_size, shuffle=False
+            )
             for name, dataset in val_datasets.items()
         }
     else:
@@ -146,16 +148,20 @@ def train(
 
     criterion = torch.nn.MSELoss()
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
-    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=epochs / 25, factor=0.33)
+    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, patience=epochs / 25, factor=0.33
+    )
 
     if wandb_config:
         logger.info("Setting up WandB")
-        config = {
-            "datasets": datasets,
-            **params["models"][model_config_key]
-        }
+        config = {"datasets": datasets, **params["models"][model_config_key]}
         run_name = f"{'+'.join([capitalize_dataset(dataset) for dataset in datasets])} {model_config_key.upper()} {capitalize_embedding_type(embedding_type)}"
-        run = wandb.init(entity=wandb_config[0], project=wandb_config[1], config=config, name=run_name)
+        run = wandb.init(
+            entity=wandb_config[0],
+            project=wandb_config[1],
+            config=config,
+            name=run_name,
+        )
         logger.info(f"Saving WandB run ID to {output_dir}/wandb_run_id.txt")
         output_dir.mkdir(parents=True, exist_ok=True)
         with open(output_dir / "wandb_run_id.txt", "w+") as f:
@@ -188,10 +194,10 @@ def train(
     mp.set_start_method("spawn", force=True)
 
     with progress.Progress(
-            *progress.Progress.get_default_columns(), progress.TimeElapsedColumn()
+        *progress.Progress.get_default_columns(), progress.TimeElapsedColumn()
     ) as pbar, mp.Pool(threads) as pool:
         print()
-        progress_task_id = pbar.add_task(f"Training", total=epochs)
+        progress_task_id = pbar.add_task("Training", total=epochs)
         trainer = Trainer(
             run.id,
             model,
@@ -211,7 +217,7 @@ def train(
         trainer.on_train_start()
         for epoch in range(epochs):
             trainer.train_epoch()
-            if (epoch+1) % val_every_epoch == 0 and not use_full_dataset:
+            if (epoch + 1) % val_every_epoch == 0 and not use_full_dataset:
                 trainer.val_epoch()
                 if compute_full_train_loss:
                     trainer.train_eval_epoch()
@@ -226,4 +232,4 @@ def train(
 
 
 if __name__ == "__main__":
-    app()
+    typer.run(train)

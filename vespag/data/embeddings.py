@@ -1,5 +1,4 @@
 import re
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Union
 
@@ -13,7 +12,6 @@ from typing_extensions import Annotated
 
 from vespag.utils import get_device
 from vespag.utils.type_hinting import EmbeddingType
-
 
 model_names = {
     "esm2": "facebook/esm2_t36_3B_UR50D",
@@ -39,8 +37,12 @@ class Embedder:
         if cache_dir:
             kwargs["cache_dir"] = cache_dir
 
-        self.tokenizer = tokenizer_class.from_pretrained(pretrained_path, **kwargs, do_lower_case=False)
-        self.encoder = encoder_class.from_pretrained(pretrained_path, **kwargs).to(device)
+        self.tokenizer = tokenizer_class.from_pretrained(
+            pretrained_path, **kwargs, do_lower_case=False
+        )
+        self.encoder = encoder_class.from_pretrained(pretrained_path, **kwargs).to(
+            device
+        )
         self.encoder = (
             self.encoder.half()
             if device == torch.device("cuda:0")
@@ -66,8 +68,7 @@ class Embedder:
         return batches
 
     def embed(
-        self,
-        sequences: dict[str, str], max_batch_length: int = 4096
+        self, sequences: dict[str, str], max_batch_length: int = 4096
     ) -> dict[str, torch.tensor]:
         batches = self.batch(sequences, max_batch_length)
 
@@ -132,9 +133,7 @@ def generate_embeddings(
     ] = EmbeddingType.esm2,
     pretrained_path: Annotated[
         str,
-        typer.Option(
-            "--pretrained-path", help="Path or URL of pretrained transformer"
-        ),
+        typer.Option("--pretrained-path", help="Path or URL of pretrained transformer"),
     ] = None,
 ):
     if embedding_type and not pretrained_path:
@@ -147,4 +146,4 @@ def generate_embeddings(
 
 
 if __name__ == "__main__":
-    app()
+    typer.run(generate_embeddings)

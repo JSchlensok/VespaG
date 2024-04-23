@@ -4,12 +4,12 @@ import torch
 
 
 def construct_fnn(
-        hidden_layer_sizes: list[int],
-        input_dim: int = 1024,
-        output_dim: int = 20,
-        activation_function: torch.nn.Module = torch.nn.LeakyReLU,
-        output_activation_function: torch.nn.Module = None,
-        dropout_rate: float = None
+    hidden_layer_sizes: list[int],
+    input_dim: int = 1024,
+    output_dim: int = 20,
+    activation_function: torch.nn.Module = torch.nn.LeakyReLU,
+    output_activation_function: torch.nn.Module = None,
+    dropout_rate: float = None,
 ):
     layer_sizes = deepcopy(hidden_layer_sizes)
 
