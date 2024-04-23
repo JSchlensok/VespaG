@@ -19,6 +19,7 @@ dependencies:
   - funcy=1.17
   - h5py
   - joblib
+  - MKL=2024.0
   - numpy
   - pytorch=2.0.1
   - pytorch-cuda=11.8
