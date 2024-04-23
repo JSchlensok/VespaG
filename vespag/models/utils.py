@@ -33,3 +33,12 @@ def construct_fnn(
         layers.append(output_activation_function())
 
     return torch.nn.Sequential(*layers)
+
+
+class MeanModel(torch.nn.Module):
+    def __init__(self, *models: torch.nn.Module):
+        super(MeanModel, self).__init__()
+        self.models = list(models)
+
+    def forward(self, x):
+        return sum([model(x) for model in self.models]) / len(self.models)

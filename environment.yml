@@ -9,21 +9,22 @@ dependencies:
   - pip
   - pip:
       - dvc==3.17.0
-      - dvc-gdrive==2.20
       - jaxtyping
       - joblib-progress
-      - wandb
+      - rich
+      - tqdm
       - transformers
+      - typing_extensions
+      - wandb
   - funcy=1.17
   - h5py
   - joblib
+  - numpy
   - pytorch=2.0.1
   - pytorch-cuda=11.8
   - pandas
   - polars
-  - beautifulsoup4
   - typer
-  - pytest
   - matplotlib
   - seaborn
   - biopython

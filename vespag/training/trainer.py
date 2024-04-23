@@ -7,7 +7,7 @@ import torch
 import torch.multiprocessing as mp
 import wandb
 
-from src.vespag.utils import save_async
+from vespag.utils import save_async
 
 
 class Trainer:

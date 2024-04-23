@@ -12,7 +12,7 @@ import wandb
 from dvc.api import params_show
 from typing_extensions import Annotated
 
-from src.vespag.utils import (
+from vespag.utils import (
     get_device,
     get_precision,
     load_model,
@@ -39,7 +39,8 @@ def capitalize_dataset(dataset: str) -> str:
         "droso": "Droso"
     }[dataset]
 
-def main(
+
+def train(
         model_config_key: Annotated[str, typer.Option("--model")],
         datasets: Annotated[list[str], typer.Option("--dataset")],
         output_dir: Annotated[Path, typer.Option("--output-dir", "-o")],
@@ -225,4 +226,4 @@ def main(
 
 
 if __name__ == "__main__":
-    typer.run(main)
+    app()

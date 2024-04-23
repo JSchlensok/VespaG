@@ -1,9 +1,7 @@
-from typing import List
-
 import torch
 from jaxtyping import Float
 
-from src.vespag.models.utils import construct_fnn
+from .utils import construct_fnn
 
 
 class FNN(torch.nn.Module):
@@ -26,7 +24,7 @@ class FNN(torch.nn.Module):
 
     def __init__(
             self,
-            hidden_layer_sizes: List[int],
+            hidden_layer_sizes: list[int],
             input_dim: int = 1024,
             output_dim: int = 20,
             activation_function: torch.nn.Module = torch.nn.LeakyReLU,

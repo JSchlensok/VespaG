@@ -1,13 +1,12 @@
 .dvc/
+.vscode/
 artifacts/
-Celine_GEMME/
 checkpoints/
 /data/
 !data/train/
 eval/
 plots/
-speed_benchmarking/
 workflows/
 
-src/**/__pycache__
+vespag/**/__pycache__
 **/.DS_store
