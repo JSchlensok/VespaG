@@ -23,6 +23,5 @@ More details on **VespaG** can be found in the corresponding [preprint](https://
 - `--no-csv`: Whether no CSV output should be produced. [default: False]
 - `--h5-output`: Whether a file containing predictions in HDF5 format should be created. [default: False]
 - `--zero-idx`: Whether to enumerate protein sequences (both in- and output) starting at 0. [default: False]
-```
 
 Kindly note that data pre-processing, model training, and evaluation are currently not supported in the public GitHub repository.
