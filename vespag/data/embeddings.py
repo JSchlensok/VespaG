@@ -46,7 +46,7 @@ class Embedder:
         self.encoder = (
             self.encoder.half()
             if device == torch.device("cuda:0")
-            else self.encoder.double()
+            else self.encoder.float()
         )
 
     @staticmethod
@@ -96,6 +96,7 @@ class Embedder:
                     {
                         id: raw_embeddings.last_hidden_state[i, 1 : len(seq) + 1]
                         .detach()
+                        .float()
                         .cpu()
                         for i, (id, seq) in enumerate(batch.items())
                     }
