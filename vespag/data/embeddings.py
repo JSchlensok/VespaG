@@ -109,7 +109,7 @@ class Embedder:
         h5_path.parent.mkdir(exist_ok=True, parents=True)
         with h5py.File(h5_path, "w") as f:
             for id, emb in embeddings.items():
-                f.create_dataset(id, data=emb.cpu().numpy())
+                f.create_dataset(id, data=emb.numpy())
 
 
 def generate_embeddings(
