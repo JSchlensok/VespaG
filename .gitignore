@@ -1,10 +1,12 @@
 .dvc/
+.*_cache/
 .vscode/
 artifacts/
 checkpoints/
 /data/
 !data/train/
 eval/
+output/
 plots/
 workflows/
 
