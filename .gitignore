@@ -2,8 +2,10 @@
 artifacts/
 Celine_GEMME/
 checkpoints/
-data/
+src/vespag/data/
+data/test/proteingym_217_esm2.h5
 !data/train/
+!data/example/
 eval/
 plots/
 speed_benchmarking/
