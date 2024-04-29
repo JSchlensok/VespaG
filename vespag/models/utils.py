@@ -4,12 +4,12 @@ import torch
 
 
 def construct_fnn(
-        hidden_layer_sizes: list[int],
-        input_dim: int = 1024,
-        output_dim: int = 20,
-        activation_function: torch.nn.Module = torch.nn.LeakyReLU,
-        output_activation_function: torch.nn.Module = None,
-        dropout_rate: float = None
+    hidden_layer_sizes: list[int],
+    input_dim: int = 1024,
+    output_dim: int = 20,
+    activation_function: torch.nn.Module = torch.nn.LeakyReLU,
+    output_activation_function: torch.nn.Module = None,
+    dropout_rate: float = None,
 ):
     layer_sizes = deepcopy(hidden_layer_sizes)
 
@@ -33,3 +33,12 @@ def construct_fnn(
         layers.append(output_activation_function())
 
     return torch.nn.Sequential(*layers)
+
+
+class MeanModel(torch.nn.Module):
+    def __init__(self, *models: torch.nn.Module):
+        super(MeanModel, self).__init__()
+        self.models = list(models)
+
+    def forward(self, x):
+        return sum([model(x) for model in self.models]) / len(self.models)

@@ -1,36 +1,9 @@
 import functools as ft
 from dataclasses import dataclass
-from typing import Literal, Union
+from typing import Union
 
-import matplotlib.pyplot as plt
 import polars as pl
 import seaborn as sns
-
-textwidth = 455.244
-inches_per_pt = 1 / 72.27
-golden_ratio = (5**.5 - 1) / 2
-COLOR_PALETTE = ["#e60049", "#0bb4ff", "#50e991", "#e6d800", "#9b19f5", "#ffa300", "#dc0ab4", "#b3d4ff", "#00bfa0"]
-
-def create_paper_figure(
-    width: float=1,
-    height_ratio: float=golden_ratio,
-    subplots: tuple[int, int]=(1, 1),
-    colorblind: bool=False,
-    context: Literal["paper", "notebook", "talk", "poster"]="paper",
-    **kwargs
-):
-    fig_width_pt = textwidth * width
-    fig_width_in = fig_width_pt * inches_per_pt
-    fig_height_in = fig_width_in * height_ratio
-
-    fig, axes = plt.subplots(*subplots, figsize=(fig_width_in, fig_height_in), dpi=600, **kwargs)
-    sns.set_theme()
-    color_palette = sns.color_palette(COLOR_PALETTE) if not colorblind else "colorblind"
-    sns.set_palette(color_palette)
-    sns.set_context(context)
-
-    return fig, axes
-
 
 # Copyright (c) 2023 Christopher Prohm
 #
@@ -52,6 +25,7 @@ def create_paper_figure(
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+
 
 @pl.api.register_dataframe_namespace("sns")
 @pl.api.register_lazyframe_namespace("sns")
@@ -75,8 +49,7 @@ class SeabornPlotting:
             kwargs[key] = expr.meta.output_name()
 
         return (
-            self.df
-            .select(list(exprs.values()))
+            self.df.select(list(exprs.values()))
             .pipe(maybe_collect)
             .to_pandas()
             .pipe(func, **kwargs)

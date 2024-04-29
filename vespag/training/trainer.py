@@ -7,26 +7,26 @@ import torch
 import torch.multiprocessing as mp
 import wandb
 
-from src.vespag.utils import save_async
+from vespag.utils import save_async
 
 
 class Trainer:
     def __init__(
-            self,
-            run: str,
-            model: torch.nn.Module,
-            device: torch.device,
-            pool: mp.Pool,
-            train_dl: torch.utils.data.DataLoader,
-            train_eval_dls: dict[str, torch.utils.data.DataLoader],
-            val_dls: dict[str, torch.utils.data.DataLoader],
-            optimizer: torch.optim.Optimizer,
-            scheduler,
-            criterion,
-            progress_bar: progress.Progress,
-            output_dir: Path,
-            logger: logging.Logger = None,
-            use_wandb: bool = True,
+        self,
+        run: str,
+        model: torch.nn.Module,
+        device: torch.device,
+        pool: mp.Pool,
+        train_dl: torch.utils.data.DataLoader,
+        train_eval_dls: dict[str, torch.utils.data.DataLoader],
+        val_dls: dict[str, torch.utils.data.DataLoader],
+        optimizer: torch.optim.Optimizer,
+        scheduler,
+        criterion,
+        progress_bar: progress.Progress,
+        output_dir: Path,
+        logger: logging.Logger = None,
+        use_wandb: bool = True,
     ):
         self.run = run
         self.device = device
@@ -96,7 +96,7 @@ class Trainer:
 
     @torch.no_grad()
     def _infer(
-            self, dl: torch.utils.data.DataLoader, progress_id: progress.TaskID
+        self, dl: torch.utils.data.DataLoader, progress_id: progress.TaskID
     ) -> tuple[torch.Tensor, torch.Tensor]:
         all_annotations = []
         all_preds = []
@@ -228,7 +228,10 @@ class Trainer:
         del all_annotations
         if self.use_wandb:
             wandb.log(
-                {"epoch": self.epoch, "train/learning_rate": self.optimizer.param_groups[0]["lr"]}
+                {
+                    "epoch": self.epoch,
+                    "train/learning_rate": self.optimizer.param_groups[0]["lr"],
+                }
             )
         self.scheduler.step(loss)
 
@@ -253,7 +256,9 @@ class Trainer:
 
     def save_state_dict(self, alias: str) -> None:
         if self.logger:
-            self.logger.info(f"Saving checkpoint to {self.output_dir}/{alias}/state_dict.pt")
+            self.logger.info(
+                f"Saving checkpoint to {self.output_dir}/{alias}/state_dict.pt"
+            )
         checkpoint_path = self.output_dir / f"{alias}/state_dict.pt"
         save_async(
             {key: value.cpu() for key, value in self.model.state_dict().items()},
@@ -273,6 +278,8 @@ class Trainer:
                 wandb.log_artifact(latest_artifact, aliases=["latest", "best"])
             else:
                 wandb.log_artifact(latest_artifact, aliases=["latest"])
-                best_artifact = wandb.Artifact(name=f"model-{self.run}", type="model", metadata=self.best_metadata)
+                best_artifact = wandb.Artifact(
+                    name=f"model-{self.run}", type="model", metadata=self.best_metadata
+                )
                 best_artifact.add_dir(self.output_dir / f"epoch-{self.best_epoch}")
                 wandb.log_artifact(best_artifact, aliases=["best"])

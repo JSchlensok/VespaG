@@ -1,15 +1,17 @@
 .dvc/
+.*_cache/
+.vscode/
 artifacts/
-Celine_GEMME/
 checkpoints/
-src/vespag/data/
+/data/
+/src/vespag/data/
 data/test/proteingym_217_esm2.h5
 !data/train/
 !data/example/
 eval/
+output/
 plots/
-speed_benchmarking/
 workflows/
 
-src/**/__pycache__
+vespag/**/__pycache__
 **/.DS_store
