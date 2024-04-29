@@ -9,19 +9,43 @@ To overcome the sparsity of experimental training data, we created a dataset of 
 
 Assessed on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://www.biorxiv.org/content/10.1101/2023.12.07.570727v1)) benchmark, **VespaG** matches state-of-the-art methods while being several orders of magnitude faster, predicting the entire single-site mutational landscape for a human proteome in under a half hour on a consumer-grade laptop.
 
-More details on **VespaG** can be found in the corresponding [preprint](https://www.biorxiv.org/).
+More details on **VespaG** can be found in the corresponding [preprint](https://doi.org/10.1101/2024.04.24.590982).
 
-### Quick Start - Running Inference with VespaG
+## Quick Start
+### Running Inference with VespaG
 1. Install necessary dependencies: `conda env create -f environment.yml`
-2. Run `python -m vespag predict` with the following options:
-- `--input/-i`: Path to FASTA-formatted file containing protein sequence(s) (**required**).
-- `--output/-o`:Path for saving created CSV and/or H5 files. Defaults to `./output`. [default: None]
-- `--embeddings/-e`: Path to pre-generated ESM2 (`esm2_t36_3B_UR50D`) input embeddings. Embeddings will be generated from scratch if no path is provided. **Please note that embedding generation on CPU is extremely slow and not recommended.** [default: None]
-- `--mutation-file`: CSV file specifying specific mutations to score. If not provided, the whole single-site mutational landscape of all input proteins will be scored. [default: None]
-- `--id-map`: CSV file mapping embedding IDs (first column) to FASTA IDs (second column) if they're different. Does not have to cover cases with identical IDs. [default: None]
-- `--single-csv`: Whether to return one CSV file for all proteins instead of a single file for each protein [default: False]
-- `--no-csv`: Whether no CSV output should be produced. [default: False]
-- `--h5-output`: Whether a file containing predictions in HDF5 format should be created. [default: False]
-- `--zero-idx`: Whether to enumerate protein sequences (both in- and output) starting at 0. [default: False]
+2. Run `python -m vespag predict` with the following options:  
+**Required:**
+- `--input/-i`: Path to FASTA-formatted file containing protein sequence(s).  
+**Optional:**
+- `--output/-o`:Path for saving created CSV and/or H5 files. Defaults to `./output`.
+- `--embeddings/-e`: Path to pre-generated ESM2 (`esm2_t36_3B_UR50D`) input embeddings. Embeddings will be generated from scratch if no path is provided and saved in `./output`. **Please note that embedding generation on CPU is extremely slow and not recommended.**
+- `--mutation-file`: CSV file specifying specific mutations to score. If not provided, the whole single-site mutational landscape of all input proteins will be scored.
+- `--id-map`: CSV file mapping embedding IDs (first column) to FASTA IDs (second column) if they're different. Does not have to cover cases with identical IDs.
+- `--single-csv`: Whether to return one CSV file for all proteins instead of a single file for each protein.
+- `--no-csv`: Whether no CSV output should be produced.
+- `--h5-output`: Whether a file containing predictions in HDF5 format should be created.
+- `--zero-idx`: Whether to enumerate protein sequences (both in- and output) starting at 0.
 
-Kindly note that data pre-processing, model training, and evaluation are currently not supported in the public GitHub repository.
+#### Examples
+
+After installing the dependencies above and cloning the **VespaG** repo, you can try out the following examples:
+- Run VespaG without precomputed embeddings for the example fasta file with 3 sequences in `data/example/example.fasta`: 
+    - `python -m vespag predict -i data/example/example.fasta`. This will save a CSV file for each sequence in the folder `./output`
+- Run VespaG with precomputed embeddings for the example fasta file with 3 sequences in `data/example/example.fasta`: 
+    - `python -m vespag predict -i data/example/example.fasta -e output/esm2_embeddings.h5 --single-csv`. This will save a single CSV file for all sequences in the folder `./output`
+
+Kindly note that we are working on making data pre-processing, model training, and evaluation available in the public GitHub repository as soon as possible.
+
+#### Preprint Citation
+
+```
+@article{vespag,
+	author = {Celine Marquet and Julius Schlensok and Marina Abakarova and Burkhard Rost and Elodie Laine},
+	title = {VespaG: Expert-guided protein Language Models enable accurate and blazingly fast fitness prediction},
+	year = {2024},
+	doi = {10.1101/2024.04.24.590982},
+	publisher = {Cold Spring Harbor Laboratory},
+	URL = {https://www.biorxiv.org/content/early/2024/04/28/2024.04.24.590982},
+	journal = {bioRxiv}}
+```
