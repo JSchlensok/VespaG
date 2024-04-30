@@ -1,18 +1,25 @@
+# Local stuff
 .dvc/
-.*_cache/
 .vscode/
+.*_cache/
+
+# Local outputs
 artifacts/
 checkpoints/
-/data/
-/src/vespag/data/
-data/test/proteingym_217_esm2.h5
-!data/train/
-!data/example/
 eval/
 output/
 plots/
 workflows/
 
+# Large data
+# The default needs to ignore all files with an extension instead of folders as it is not possible to re-include a file if a parent directory of that file is excluded.
+data/**/*.*
+!data/example
+!data/train/*.fasta
+!data/test/*.csv
+!data/test/*.fasta
+
+# Python artifacts
 src/vespag/**/__pycache__
 vespag/**/__pycache__
 **/.DS_store
