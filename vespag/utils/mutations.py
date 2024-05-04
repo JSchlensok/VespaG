@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Union
 
 import polars as pl
+import rich
 import torch
 from jaxtyping import Float
 
@@ -94,7 +95,12 @@ def compute_mutation_score(
     y: Float[torch.Tensor, "length 20"],
     mutation: Union[Mutation, SAV],
     alphabet: str = AMINO_ACIDS,
+    pbar: rich.progress.Progress = None,
+    progress_id: int = None,
 ) -> float:
+    if pbar:
+        pbar.advance(progress_id)
+
     if isinstance(mutation, Mutation):
         return sum(
             [y[sav.position][alphabet.index(sav.to_aa)].item() for sav in mutation]

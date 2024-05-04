@@ -1,14 +1,16 @@
 import csv
 import os
+import warnings
 from pathlib import Path
 from typing import Optional
 
 import h5py
 import numpy as np
+import rich.progress as progress
 import torch
 import typer
 from Bio import SeqIO
-from tqdm import tqdm
+from tqdm.rich import tqdm
 from typing_extensions import Annotated
 
 from vespag.data.embeddings import Embedder
@@ -92,6 +94,7 @@ def predict(
     ] = True,
 ) -> None:
     logger = setup_logger()
+    warnings.filterwarnings("ignore", message="rich is experimental/alpha")
 
     output_path = output_path or Path.cwd() / "output"
     if not output_path.exists():
@@ -153,16 +156,36 @@ def predict(
     logger.info("Generating predictions")
     vespag_scores = {}
     scores_per_protein = {}
-    pad_length = max([len(id) for id in embeddings.keys()])
-    for id, sequence in (pbar := tqdm(sequences.items(), leave=False)):
-        pbar.set_description(f"Current protein: {id}".ljust(pad_length + 20))
-        embedding = embeddings[id]
-        y = model(embedding)
-        y = mask_non_mutations(y, sequence)
+    with progress.Progress(
+        progress.TextColumn("[progress.description]Generating predictions"),
+        progress.BarColumn(),
+        progress.TaskProgressColumn(),
+        progress.TimeElapsedColumn(),
+        progress.TextColumn("Current protein: {task.description}"),
+    ) as pbar, torch.no_grad():
+        overall_progress = pbar.add_task(
+            "Generating predictions",
+            total=sum([len(mutations) for mutations in mutations_per_protein.values()]),
+        )
+        for id, sequence in sequences.items():
+            pbar.update(overall_progress, description=id)
+            embedding = embeddings[id]
+            y = model(embedding)
+            y = mask_non_mutations(y, sequence)
 
             if normalize_scores:
                 y = torch.sigmoid(y)
 
+            scores_per_protein[id] = {
+                mutation: compute_mutation_score(
+                    y, mutation, pbar=pbar, progress_id=overall_progress
+                )
+                for mutation in mutations_per_protein[id]
+            }
+            if h5_output:
+                vespag_scores[id] = y.detach().numpy()
+
+        pbar.remove_task(overall_progress)
     if h5_output:
         h5_output_path = output_path / "vespag_scores_all.h5"
         logger.info(f"Serializing predictions to {h5_output_path}")
