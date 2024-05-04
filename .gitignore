@@ -4,12 +4,12 @@
 .*_cache/
 
 # Local outputs
-artifacts/
-checkpoints/
-eval/
-output/
-plots/
-workflows/
+/artifacts/
+/checkpoints/
+/eval/
+/output/
+/plots/
+/workflows/
 
 # Large data
 # The default needs to ignore all files with an extension instead of folders as it is not possible to re-include a file if a parent directory of that file is excluded.
