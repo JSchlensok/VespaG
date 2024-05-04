@@ -83,6 +83,12 @@ def predict(
             help="Whether to enumerate the sequence starting at 0.",
         ),
     ] = False,
+    normalize_scores: Annotated[
+        bool,
+        typer.Option(
+            "--normalize/--dont-normalize", help="Whether to normalize scores to [0, 1]"
+        ),
+    ] = True,
 ) -> None:
     logger = setup_logger()
 
@@ -153,12 +159,8 @@ def predict(
         y = model(embedding)
         y = mask_non_mutations(y, sequence)
 
-        scores_per_protein[id] = {
-            mutation: compute_mutation_score(y, mutation)
-            for mutation in mutations_per_protein[id]
-        }
-        if h5_output:
-            vespag_scores[id] = y.detach().numpy()
+            if normalize_scores:
+                y = torch.sigmoid(y)
 
     if h5_output:
         h5_output_path = output_path / "vespag_scores_all.h5"

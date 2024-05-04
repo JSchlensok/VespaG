@@ -78,6 +78,12 @@ def predict(
             help="Whether to enumerate the sequence starting at 0.",
         ),
     ] = False,
+    normalize_scores: Annotated[
+        bool,
+        typer.Option(
+            "--normalize/--dont-normalize", help="Whether to normalize scores to [0, 1]"
+        ),
+    ] = True,
 ) -> None:
     id_map_file = None
     generate_predictions(
@@ -90,6 +96,7 @@ def predict(
         no_csv,
         h5_output,
         zero_based_mutations,
+        normalize_scores,
     )
 
 
