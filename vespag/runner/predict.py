@@ -46,7 +46,8 @@ def predict(
     mutation_file: Annotated[
         Path,
         typer.Option(
-            "--mutation-file", help="CSV file specifying specific mutations to score"
+            "--mutation-file",
+            help="CSV file specifying specific mutations to score for each protein",
         ),
     ] = None,
     id_map_file: Annotated[
@@ -175,20 +176,20 @@ def predict(
             for protein_id, mutations in tqdm(scores_per_protein.items(), leave=False):
                 output_file = output_path / (protein_id + ".csv")
                 with output_file.open("w+") as f:
-                    f.write("Mutation, VespaG\n")
+                    f.write("Mutation,VespaG\n")
                     f.writelines(
                         [f"{str(sav)},{score}\n" for sav, score in mutations.items()]
                     )
         else:
             output_file = output_path / "vespag_scores_all.csv"
             with output_file.open("w+") as f:
-                f.write("Mutation, VespaG\n")
+                f.write("Protein,Mutation,VespaG\n")
                 f.writelines(
                     [
                         line
                         for line in tqdm(
                             [
-                                f"{protein_id}_{str(sav)},{score}\n"
+                                f"{protein_id},{str(sav)},{score}\n"
                                 for protein_id, mutations in scores_per_protein.items()
                                 for sav, score in mutations.items()
                             ],

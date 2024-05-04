@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Union
 
+import polars as pl
 import torch
 from jaxtyping import Float
 
@@ -81,10 +82,9 @@ def read_mutation_file(
     mutation_file: Path, one_indexed: bool = False
 ) -> dict[str, list[SAV]]:
     mutations_per_protein = defaultdict(list)
-    for line in mutation_file.open().readlines():
-        protein_id, sav_string = line.split("_")
-        mutations_per_protein[protein_id].append(
-            SAV.from_sav_string(sav_string, one_indexed)
+    for row in pl.read_csv(mutation_file).iter_rows():
+        mutations_per_protein[row[0]].append(
+            Mutation.from_mutation_string(row[1], one_indexed)
         )
 
     return mutations_per_protein
