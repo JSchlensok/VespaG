@@ -137,12 +137,13 @@ def predict(
         )
         Embedder.save_embeddings(embeddings, embedding_output_path)
 
-    logger.info("Generating mutational landscape")
     if mutation_file:
+        logger.info("Parsing mutational landscape")
         mutations_per_protein = read_mutation_file(
             mutation_file, one_indexed=not zero_based_mutations
         )
     else:
+        logger.info("Generating mutational landscape")
         mutations_per_protein = {
             protein_id: [
                 SAV(i, wildtype_aa, other_aa, not zero_based_mutations)
