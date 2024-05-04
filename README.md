@@ -26,6 +26,7 @@ More details on **VespaG** can be found in the corresponding [preprint](https://
 - `--no-csv`: Whether no CSV output should be produced.
 - `--h5-output`: Whether a file containing predictions in HDF5 format should be created.
 - `--zero-idx`: Whether to enumerate protein sequences (both in- and output) starting at 0.
+- `--normalize`: Whether to normalize predicted scores to [0,1] interval by applying a sigmoid to the predicted GEMME substitution scores (which are on a broader spectrum of about [-10,2], although some predicted values fall out of this)
 
 #### Examples
 
@@ -35,10 +36,22 @@ After installing the dependencies above and cloning the **VespaG** repo, you can
 - Run VespaG with precomputed embeddings for the example fasta file with 3 sequences in `data/example/example.fasta`: 
     - `python -m vespag predict -i data/example/example.fasta -e output/esm2_embeddings.h5 --single-csv`. This will save a single CSV file for all sequences in the folder `./output`
 
-Kindly note that we are working on making data pre-processing, model training, and evaluation available in the public GitHub repository as soon as possible.
+Kindly note that we are working on making data pre-processing and model training available in the public GitHub repository as soon as possible.
 
-#### Preprint Citation
+### Evaluation
+You can reproduce our evaluation using the `eval` subcommand, which pre-processes data into a format usable by VespaG, runs `predict`, and computes performance metrics.
 
+#### ProteinGym217
+Based on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://www.biorxiv.org/content/10.1101/2023.12.07.570727v1)) DMS substitutions benchmark, dubbed _ProteinGym217_ by us. Run it with `python -m vespag eval proteingym`, with the following options:
+**Required**
+- `--reference-file`: Path to ProteinGym reference file
+- `--dms-directory`: Path to directory containing per-DMS score files in CSV format
+**Optional:**
+- `--output/-o`:Path for saving created CSV with scores for all assays and variants as well as a CSV with Spearman correlation coefficients for each DMS. Defaults to `./output/proteingym217`.
+- `--embeddings/-e`, `--id-map`, `--normalize-scores`: identical to `predict`, used for the internal call to it.
+
+## Preprint Citation
+If you find VespaG helpful in your work, please be so kind as to cite our pre-print:
 ```
 @article{vespag,
 	author = {Celine Marquet and Julius Schlensok and Marina Abakarova and Burkhard Rost and Elodie Laine},

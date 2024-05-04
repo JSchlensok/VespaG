@@ -5,11 +5,14 @@ import typer
 from typing_extensions import Annotated
 
 from .data.embeddings import generate_embeddings
+from .eval import eval
 from .runner.predict import predict as generate_predictions
 from .training.train import train as run_training
 from .utils.type_hinting import EmbeddingType
 
 app = typer.Typer()
+
+app.add_typer(eval.app, name="eval")
 
 
 @app.command()
