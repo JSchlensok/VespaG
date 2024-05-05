@@ -93,6 +93,9 @@ def proteingym(
         normalize_scores=normalize_scores,
     )
 
+    mutation_file.unlink()
+    sequence_file.unlink()
+
     prediction_file = output_path / "vespag_scores_all.csv"
     all_preds = pl.read_csv(prediction_file)
 
