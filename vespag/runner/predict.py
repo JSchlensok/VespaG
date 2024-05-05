@@ -174,12 +174,13 @@ def predict(
             y = model(embedding)
             y = mask_non_mutations(y, sequence)
 
-            if normalize_scores:
-                y = torch.sigmoid(y)
-
             scores_per_protein[id] = {
                 mutation: compute_mutation_score(
-                    y, mutation, pbar=pbar, progress_id=overall_progress
+                    y,
+                    mutation,
+                    pbar=pbar,
+                    progress_id=overall_progress,
+                    normalize=normalize_scores,
                 )
                 for mutation in mutations_per_protein[id]
             }

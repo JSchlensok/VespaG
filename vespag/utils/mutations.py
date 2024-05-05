@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -95,6 +96,7 @@ def compute_mutation_score(
     y: Float[torch.Tensor, "length 20"],
     mutation: Union[Mutation, SAV],
     alphabet: str = AMINO_ACIDS,
+    normalize: bool = False,
     pbar: rich.progress.Progress = None,
     progress_id: int = None,
 ) -> float:
@@ -102,8 +104,12 @@ def compute_mutation_score(
         pbar.advance(progress_id)
 
     if isinstance(mutation, Mutation):
-        return sum(
+        score = sum(
             [y[sav.position][alphabet.index(sav.to_aa)].item() for sav in mutation]
         )
     else:
-        return y[mutation.position][alphabet.index(mutation.to_aa)].item()
+        score = y[mutation.position][alphabet.index(mutation.to_aa)].item()
+
+    if normalize:
+        score = 1 / (1 + math.exp(-score))
+    return score
