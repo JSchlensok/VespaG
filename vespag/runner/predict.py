@@ -14,9 +14,17 @@ from tqdm.rich import tqdm
 from typing_extensions import Annotated
 
 from vespag.data.embeddings import Embedder
-from vespag.utils import (AMINO_ACIDS, DEFAULT_MODEL_PARAMETERS, SAV,
-                          compute_mutation_score, get_device, load_model,
-                          mask_non_mutations, read_mutation_file, setup_logger)
+from vespag.utils import (
+    AMINO_ACIDS,
+    DEFAULT_MODEL_PARAMETERS,
+    SAV,
+    compute_mutation_score,
+    get_device,
+    load_model,
+    mask_non_mutations,
+    read_mutation_file,
+    setup_logger,
+)
 from vespag.utils.type_hinting import *
 
 

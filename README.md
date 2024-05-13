@@ -43,12 +43,12 @@ You can reproduce our evaluation using the `eval` subcommand, which pre-processe
 
 #### ProteinGym217
 Based on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://www.biorxiv.org/content/10.1101/2023.12.07.570727v1)) DMS substitutions benchmark, dubbed _ProteinGym217_ by us. Run it with `python -m vespag eval proteingym`, with the following options:
-**Required**
-- `--reference-file`: Path to ProteinGym reference file
-- `--dms-directory`: Path to directory containing per-DMS score files in CSV format
 **Optional:**
-- `--output/-o`:Path for saving created CSV with scores for all assays and variants as well as a CSV with Spearman correlation coefficients for each DMS. Defaults to `./output/proteingym217`.
+- `--reference-file`: Path to ProteinGym reference file. Will download to `data/test/proteingym217/reference.csv` or `data/test/proteingym87/reference.csv` if not provided.
+- `--dms-directory`: Path to directory containing per-DMS score files in CSV format. Will download to `data/test/proteingym217/raw_dms_files/` or `data/test/proteingym87/raw_dms_files/` if not provided.
+- `--output/-o`:Path for saving created CSV with scores for all assays and variants as well as a CSV with Spearman correlation coefficients for each DMS. Defaults to `./output/proteingym217` or `./output/proteingym87`.
 - `--embeddings/-e`, `--id-map`, `--normalize-scores`: identical to `predict`, used for the internal call to it.
+- `--v1` if you want to get a result for the first iteration of ProteinGym with 87 assays.
 
 ## Preprint Citation
 If you find VespaG helpful in your work, please be so kind as to cite our pre-print:
