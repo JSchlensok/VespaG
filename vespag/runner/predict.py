@@ -117,7 +117,7 @@ def predict(
     if embedding_file:
         logger.info(f"Loading pre-computed embeddings from {embedding_file}")
         embeddings = {
-            id: torch.from_numpy(np.array(emb[()], dtype=np.float32)).to(device)
+            id: torch.from_numpy(np.array(emb[()], dtype=np.float32))
             for id, emb in tqdm(
                 h5py.File(embedding_file).items(),
                 desc="Loading embeddings",
@@ -179,7 +179,7 @@ def predict(
         for id, sequence in sequences.items():
             pbar.update(overall_progress, description=id)
             embedding = embeddings[id]
-            y = model(embedding)
+            y = model(embedding).to(device)
             y = mask_non_mutations(y, sequence)
 
             scores_per_protein[id] = {
