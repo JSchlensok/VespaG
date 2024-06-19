@@ -13,20 +13,20 @@ More details on **VespaG** can be found in the corresponding [preprint](https://
 
 ## Quick Start
 ### Running Inference with VespaG
-1. Install necessary dependencies: `conda env create -f environment.yml -n VespaG` and `conda activate VespaG`
+1. Install necessary dependencies using `conda` (or, interchangeably, `mamba` or `micromamba`): `conda env create -f environment.yml -n vespag` and `conda activate vespag`
 2. Run `python -m vespag predict` with the following options:  
 **Required:**
 - `--input/-i`: Path to FASTA-formatted file containing protein sequence(s).  
 **Optional:**
 - `--output/-o`:Path for saving created CSV and/or H5 files. Defaults to `./output`.
-- `--embeddings/-e`: Path to pre-generated ESM2 (`esm2_t36_3B_UR50D`) input embeddings. Embeddings will be generated from scratch if no path is provided and saved in `./output`. **Please note that embedding generation on CPU is extremely slow and not recommended.**
+- `--embeddings/-e`: Path to pre-computed ESM2 (`esm2_t36_3B_UR50D`) input embeddings. Embeddings will be generated from scratch if no path is provided and saved in `./output`. **Please note that embedding generation on CPU is extremely slow and not recommended.**
 - `--mutation-file`: CSV file specifying specific mutations to score. If not provided, the whole single-site mutational landscape of all input proteins will be scored.
 - `--id-map`: CSV file mapping embedding IDs (first column) to FASTA IDs (second column) if they're different. Does not have to cover cases with identical IDs.
 - `--single-csv`: Whether to return one CSV file for all proteins instead of a single file for each protein.
 - `--no-csv`: Whether no CSV output should be produced.
 - `--h5-output`: Whether a file containing predictions in HDF5 format should be created.
 - `--zero-idx`: Whether to enumerate protein sequences (both in- and output) starting at 0.
-- `--normalize`: Whether to normalize predicted scores to [0,1] interval by applying a sigmoid to the predicted GEMME substitution scores (which are on a broader spectrum of about [-10,2], although some predicted values fall out of this)
+- `--normalize`: Whether to normalize predicted scores to [0,1] interval by applying a sigmoid to the predicted GEMME substitution scores (which are on a broader spectrum of about [-10,2], although some predicted values fall out of this).
 
 #### Examples
 
