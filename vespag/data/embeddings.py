@@ -18,6 +18,7 @@ model_names = {
     "prott5": "Rostlab/prot_t5_xl_uniref50",
 }
 
+# TODO implement generation of overlapping embeddings
 
 class Embedder:
     def __init__(

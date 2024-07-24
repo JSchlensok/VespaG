@@ -1,58 +1,67 @@
 datasets:
   train:
-    human:
-      fasta: data/train/human/sequences.fasta
+    human5k:
+      fasta: data/train/human5k/sequences.fasta
       embeddings:
         prott5: data/train/human/prott5_embeddings.h5
         esm2: data/train/human/esm2_embeddings.h5
-      gemme_archive: data/train/zipped/human_fasta.tar.gz
+      gemme: 
+        raw: data/train/human5k/gemme_predictions/
+        processed: data/train/human5k/gemme_predictions.h5
       splits:
         train: data/train/human/splits/train_full.csv
         val: data/train/human/splits/val_full.csv
-    droso:
+    droso4k:
       fasta: data/train/droso/sequences.fasta
       embeddings:
         prott5: data/train/droso/prott5_embeddings.h5
         esm2: data/train/droso/esm2_embeddings.h5
-      gemme_archive: data/train/zipped/droso_fasta.tar.gz
+      gemme: 
+        raw: data/train/droso4k/gemme_predictions/
+        processed: data/train/droso4k/gemme_predictions.h5
       splits:
         train: data/train/droso/splits/train_full.csv
         val: data/train/droso/splits/val_full.csv
-    ecoli:
+    ecoli2k:
       fasta: data/train/ecoli/sequences.fasta
       embeddings:
         prott5: data/train/ecoli/prott5_embeddings.h5
         esm2: data/train/ecoli/esm2_embeddings.h5
-      gemme_archive: data/train/zipped/ecoli_fasta.tar.gz
+      gemme:
+        raw: data/train/ecoli2k/gemme_predictions/
+        processed: data/train/ecoli2k/gemme_predictions.h5
       splits:
         train: data/train/ecoli/splits/train_full.csv
         val: data/train/ecoli/splits/val_full.csv
-    virus:
-      fasta: data/train/virus/sequences.fasta
+    virus1k:
+      fasta: data/train/virus1k/sequences.fasta
       embeddings:
-        prott5: data/train/virus/backup/prott5_embeddings.h5
-        esm2: data/train/virus/backup/esm2_embeddings.h5
-      gemme_archive: data/train/zipped/virus_fasta.tar.gz
+        prott5: data/train/virus1k/prott5_embeddings.h5
+        esm2: data/train/virus1k/esm2_embeddings.h5
+      gemme:
+        raw: data/train/virus1k/gemme_predictions/
+        processed: data/train/virus1k/gemme_predictions.h5
       splits:
-        train: data/train/virus/backup/splits/train_full.csv
-        val: data/train/virus/backup/splits/val_full.csv
-    all:
+        train: data/train/virus1k/splits/train_full.csv
+        val: data/train/virus1k/splits/val_full.csv
+    all9k:
       fasta: data/train/all/sequences.fasta
       embeddings:
         prott5: data/train/all/prott5_embeddings.h5
         esm2: data/train/all/esm2_embeddings.h5
-      gemme_archive: data/train/zipped/all_fasta.tar.gz
+      gemme: 
+        raw: data/train/all9k/gemme_predictions/
+        processed: data/train/all9k/gemme_predictions.h5
       splits:
-        full: data/train/all/splits/full.csv
         train: data/train/all/splits/train_full.csv
         val: data/train/all/splits/val_full.csv
   test:
-    mega_dataset:
-      fasta: data/test/mega_dataset/dataset3_unique_sequences.fasta
-    mega_dataset_v1_rasp:
-      fasta: data/test/mega_dataset_v1_rasp/rasp_unique_sequences.fasta
-    proteingym_substitutions:
-      fasta: data/test/proteingym_substitutions/unique_proteins.fasta
+    proteingym87:
+      fasta: data/test/proteingym87/unique_proteins.fasta
+    proteingym217:
+      fasta: data/test/proteingym217/proteingym_217.fasta
+    megadataset146:
+      fasta: data/test/stabilitydenovo146/mega_denovo_146_sequences.fasta
 
 gemme:
   alphabet: "ACDEFGHIKLMNPQRSTVWY"
@@ -141,3 +150,7 @@ models:
       epochs: 200
       val_every_epoch: 1
       checkpoint_every_epoch: ~
+
+wandb:
+  username: <username>
+  project: <project>

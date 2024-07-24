@@ -7,12 +7,10 @@ import rich.progress as progress
 import torch
 import torch.multiprocessing as mp
 import torch.optim.lr_scheduler
-import typer
 import wandb
 from dvc.api import params_show
-from typing_extensions import Annotated
 
-from vespag.utils import get_device, get_precision, load_model, setup_logger
+from vespag.utils import get_device, get_precision, load_model_from_config, setup_logger
 
 from .dataset import PerResidueDataset
 from .trainer import Trainer
@@ -22,27 +20,16 @@ def capitalize_embedding_type(embedding_type: str) -> str:
     return {"prott5": "ProtT5", "esm2": "ESM2"}[embedding_type]
 
 
-def capitalize_dataset(dataset: str) -> str:
-    return {
-        "human": "Human",
-        "ecoli": "Ecoli",
-        "bodo-saltans": "Bodo-Saltans",
-        "all": "All",
-        "virus": "Virus",
-        "droso": "Droso",
-    }[dataset]
-
-
 def train(
-    model_config_key: Annotated[str, typer.Option("--model")],
-    datasets: Annotated[list[str], typer.Option("--dataset")],
-    output_dir: Annotated[Path, typer.Option("--output-dir", "-o")],
-    embedding_type: Annotated[str, typer.Option("--embedding-type", "-e")],
-    compute_full_train_loss: Annotated[bool, typer.Option("--full-train-loss")] = False,
-    sampling_strategy: Annotated[str, typer.Option("--sampling-strategy")] = "basic",
-    wandb_config: Annotated[tuple[str, str], typer.Option("--wandb")] = None,
-    limit_cache: Annotated[bool, typer.Option("--limit-cache")] = False,
-    use_full_dataset: Annotated[bool, typer.Option("--use-full-dataset")] = False,
+    model_config_key: str,
+    datasets: list[str],
+    output_dir: Path,
+    embedding_type: str,
+    compute_full_train_loss: bool=False,
+    sampling_strategy: str="basic",
+    wandb_config: tuple[str, str]=None,
+    limit_cache: bool=False,
+    use_full_dataset: bool=False
 ):
     logger = setup_logger()
     wandb_logger = logging.getLogger("wandb")
@@ -121,9 +108,9 @@ def train(
     if not use_full_dataset:
         val_datasets = {
             dataset: PerResidueDataset(
-                dataset_parameters[dataset]["embeddings"][embedding_type],
-                dataset_parameters[dataset]["gemme_dir"],
-                dataset_parameters[dataset]["splits"]["val"],
+                dataset_parameters["train"][dataset]["embeddings"][embedding_type],
+                dataset_parameters["train"][dataset]["gemme"],
+                dataset_parameters["train"][dataset]["splits"]["val"],
                 precision,
                 device,
                 max_len,
@@ -142,12 +129,13 @@ def train(
 
     architecture = params["models"][model_config_key]["architecture"]
     model_parameters = params["models"][model_config_key]["model_parameters"]
-    model = load_model(architecture, model_parameters, embedding_type)
+    model = load_model_from_config(architecture, model_parameters, embedding_type).to(device)
 
-    model = model.cuda()
-
+    # TODO parametrize
     criterion = torch.nn.MSELoss()
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+
+    # TODO pull out to param file
     lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, patience=epochs / 25, factor=0.33
     )
@@ -155,7 +143,7 @@ def train(
     if wandb_config:
         logger.info("Setting up WandB")
         config = {"datasets": datasets, **params["models"][model_config_key]}
-        run_name = f"{'+'.join([capitalize_dataset(dataset) for dataset in datasets])} {model_config_key.upper()} {capitalize_embedding_type(embedding_type)}"
+        run_name = f"{'+'.join([dataset_name.capitalize() for dataset_name in datasets])} {model_config_key.upper()} {capitalize_embedding_type(embedding_type)}"
         run = wandb.init(
             entity=wandb_config[0],
             project=wandb_config[1],
@@ -229,7 +217,3 @@ def train(
     gc.collect()
     torch.cuda.empty_cache()
     wandb.finish()
-
-
-if __name__ == "__main__":
-    typer.run(train)

@@ -2,6 +2,8 @@
 .dvc/
 .vscode/
 .*_cache/
+.wandb/
+**temp**
 
 # Local outputs
 /artifacts/
@@ -23,3 +25,6 @@ data/**/*.*
 src/vespag/**/__pycache__
 vespag/**/__pycache__
 **/.DS_store
+
+# macOS clutter
+**/_MACOSX/

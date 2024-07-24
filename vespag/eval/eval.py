@@ -10,8 +10,9 @@ from Bio.SeqRecord import SeqRecord
 from tqdm.rich import tqdm
 from typing_extensions import Annotated
 
-from vespag.runner.predict import predict
-from vespag.utils import PROTEINGYM_CHANGED_FILENAMES, download, setup_logger, unzip
+from vespag.predict import generate_predictions
+from vespag.utils import download, setup_logger, unzip
+from vespag.utils.proteingym import PROTEINGYM_CHANGED_FILENAMES
 
 app = typer.Typer()
 
@@ -134,7 +135,7 @@ def proteingym(
     ).write_csv(mutation_file)
 
     logger.info("Generating predictions")
-    predict(
+    generate_predictions(
         fasta_file=sequence_file,
         output_path=output_path,
         embedding_file=embedding_file,

@@ -5,14 +5,14 @@ stages:
       dataset: ${datasets.train}
     cmd: >-
       python -m vespag embed
-      data/train/${item.dataset}/preprocessed.fasta
+      data/train/${item.dataset}/sequences.fasta
       data/train/${item.dataset}/${item.embedding_type}_embeddings.h5
       -c data/huggingface_cache/${item.embedding_type}
       -e ${item.embedding_type}
     deps:
-      - src/vespag/data/embeddings.py
-      - src/vespag/runner/generate_embeddings.py
-      - data/train/${item.dataset}/preprocessed.fasta
+      - vespag/data/embeddings.py
+      - vespag/__main__.py
+      - data/test/${item.dataset}/sequences.fasta
     outs:
       - data/train/${item.dataset}/${item.embedding_type}_embeddings.h5
 
@@ -22,16 +22,21 @@ stages:
       dataset: ${datasets.test}
     cmd: >-
       python -m vespag embed
-      ${item.fasta}
+      data/test/${item.dataset}/sequences.fasta
       data/test/${item.dataset}/${item.embedding_type}_embeddings.h5
       -c data/huggingface_cache/${item.embedding_type}
       -e ${item.embedding_type}
     deps:
-      - src/vespag/data/embeddings.py
-      - src/vespag/runner/generate_embeddings.py
-      - ${item.fasta}
+      - vespag/data/embeddings.py
+      - vespag/__main__.py
+      - data/test/${item.dataset}/sequences.fasta
     outs:
       - data/test/${item.dataset}/${item.embedding_type}_embeddings.h5
+
+  preprocess-gemme-annotations:
+    foreach: ${datasets.train}
+    do:
+      cmd: python -m vespag.data.gemme load ${item.gemme.raw} ${item.gemme.processed}
 
   train:
     matrix:
@@ -44,7 +49,7 @@ stages:
       --dataset ${item.dataset}
       -o ./checkpoints/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/
       -e ${item.embedding_type}
-      --wandb jschlensok vespa2
+      --wandb ${wandb.username} ${wandb.project}
       --full-train-loss
       --sampling-strategy ${training.single_taxon.sampling_strategy}
     deps:
@@ -52,7 +57,7 @@ stages:
       - vespag/training/dataset.py
       - vespag/training/trainer.py
       - vespag/models
-      - data/train_v2/${item.dataset}/gemme_predictions.h5
+      - data/train/${item.dataset}/gemme_predictions.h5
     params:
       - datasets
       - random
@@ -60,178 +65,3 @@ stages:
       - models
     outs:
       - checkpoints/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/
-
-  evaluate-proteingym:
-    matrix:
-      model: ${models}
-      embedding_type: [ prott5, esm2 ]
-      dataset: ${datasets.train}
-    cmd: >-
-      python -m vespag.eval.eval_proteingym
-      --model ${item.model}
-      --checkpoint-dir checkpoints/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/
-      --embedding-type ${item.embedding_type}
-      --embedding-file data/test/proteingym_substitutions/${item.embedding_type}_embeddings.h5
-      --spearman-output eval/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/proteingym/per_dms.csv
-      --pred-output eval/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/proteingym/raw_preds.csv
-    deps:
-      - vespag/eval/eval_proteingym.py
-      - vespag/models
-      - vespag/utils.py
-      - checkpoints/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/
-      - data/test/proteingym_substitutions/${item.embedding_type}_embeddings.h5
-      - data/test/proteingym_substitutions/reference.csv
-    params:
-      - eval
-      - gemme
-      - models
-    outs:
-      - eval/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/proteingym/per_dms.csv
-      - eval/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/proteingym/raw_preds.csv
-
-  evaluate-mean-model-proteingym:
-    matrix:
-      embedding_type: [ prott5, esm2 ]
-      dataset: ${datasets.train}
-    cmd: >-
-      python -m vespag.eval.eval_proteingym
-      --model fnn
-      --checkpoint-dir checkpoints/${item.dataset}/${item.embedding_type}/fnn/naive_sampling/
-      --model cnn
-      --checkpoint-dir checkpoints/${item.dataset}/${item.embedding_type}/cnn/naive_sampling/
-      --embedding-type ${item.embedding_type}
-      --embedding-file data/test/proteingym_substitutions/${item.embedding_type}_embeddings.h5
-      -spearman-output eval/${item.dataset}/${item.embedding_type}/fnn_cnn_mean/naive_sampling/proteingym/per_dms.csv
-      -pred-output eval/${item.dataset}/${item.embedding_type}/fnn_cnn_mean/naive_sampling/proteingym/raw_preds.csv
-    deps:
-      - vespag/eval/eval_proteingym.py
-      - vespag/models
-      - vespag/utils.py
-      - checkpoints/${item.dataset}/${item.embedding_type}/fnn/naive_sampling/
-      - checkpoints/${item.dataset}/${item.embedding_type}/cnn/naive_sampling/
-      - data/test/proteingym_substitutions/${item.embedding_type}_embeddings.h5
-      - data/test/proteingym_substitutions/reference.csv
-    params:
-      - eval
-      - gemme
-      - models
-    outs:
-      - eval/${item.dataset}/${item.embedding_type}/fnn_cnn_mean/naive_sampling/proteingym/per_dms.csv
-      - eval/${item.dataset}/${item.embedding_type}/fnn_cnn_mean/naive_sampling/proteingym/raw_preds.csv
-
-  evaluate-validation:
-    matrix:
-      model: [ fnn, cnn, fnn_1_layer ]
-      embedding_type: [ prott5, esm2 ]
-      dataset: ${datasets.train}
-    cmd: >-
-      python -m vespag.eval.eval_validation
-      --model ${item.model}
-      --checkpoint-dir checkpoints/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/
-      --embedding-type ${item.embedding_type}
-      -o eval/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/validation/validation_loss.csv
-    deps:
-      - vespag/eval/eval_validation.py
-      - vespag/models
-      - vespag/utils.py
-      - checkpoints/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/
-    params:
-      - eval
-      - datasets
-      - models
-    outs:
-      - eval/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/validation/validation_loss.csv
-
-  evaluate-baseline-validation:
-    matrix:
-      embedding_type: [ prott5, esm2 ]
-    cmd: >-
-      python -m vespag.eval.eval_validation_baseline
-      --embedding-type ${item.embedding_type}
-      -o eval/baselines/${item.embedding_type}/validation_loss.csv
-    deps:
-      - vespag/eval/eval_validation_baseline.py
-      - vespag/utils.py
-    params:
-      - eval
-      - datasets
-    outs:
-      - eval/baselines/${item.embedding_type}/validation_loss.csv
-
-  evaluate-mean-model-validation:
-    matrix:
-      embedding_type: [ prott5, esm2 ]
-      dataset: ${datasets.train}
-    cmd: >-
-      python -m vespag.eval.eval_validation
-      --model fnn
-      --checkpoint-dir checkpoints/${item.dataset}/${item.embedding_type}/fnn/naive_sampling/
-      --model cnn
-      --checkpoint-dir checkpoints/${item.dataset}/${item.embedding_type}/cnn/naive_sampling/
-      --embedding-type ${item.embedding_type}
-      -o eval/${item.dataset}/${item.embedding_type}/fnn_cnn_mean/naive_sampling/validation/validation_loss.csv
-    deps:
-      - vespag/eval/eval_validation.py
-      - vespag/models
-      - vespag/utils.py
-      - checkpoints/${item.dataset}/${item.embedding_type}/fnn/naive_sampling/
-      - checkpoints/${item.dataset}/${item.embedding_type}/cnn/naive_sampling/
-    params:
-      - eval
-      - datasets
-      - models
-    outs:
-      - eval/${item.dataset}/${item.embedding_type}/fnn_cnn_mean/naive_sampling/validation/validation_loss.csv
-
-  evaluate-mega_dataset:
-    matrix:
-      model: ${models}
-      embedding_type: [ prott5, esm2 ]
-      dataset: ${datasets.train}
-    cmd: >-
-      python -m vespag.eval.eval_mega_dataset
-      --model ${item.model}
-      --checkpoint-dir checkpoints/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/
-      --sequence-file data/test/mega_dataset/dataset3_unique_sequences.fasta
-      --embedding-type ${item.embedding_type}
-      --embedding-file data/test/mega_dataset/${item.embedding_type}_embeddings.h5
-      -o eval/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/mega_dataset/vespag_mega_dataset_all.csv
-    deps:
-      - vespag/eval/eval_mega_dataset.py
-      - vespag/models
-      - vespag/utils.py
-      - checkpoints/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/
-      - data/test/mega_dataset/mutations.csv
-    params:
-      - eval
-      - gemme
-      - models
-    outs:
-      - eval/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/mega_dataset/vespag_mega_dataset_all.csv
-
-  evaluate-mega_dataset_v1_rasp:
-    matrix:
-      model: ${models}
-      embedding_type: [ prott5, esm2 ]
-      dataset: ${datasets.train}
-    cmd: >-
-      python -m vespag.eval.eval_mega_dataset_v1_rasp
-      --model ${item.model}
-      --checkpoint-dir checkpoints/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/
-      --sequence-file data/test/mega_dataset_v1_rasp/rasp_unique_sequences.fasta
-      --embedding-type ${item.embedding_type}
-      --embedding-file data/test/mega_dataset_v1_rasp/${item.embedding_type}_embeddings.h5
-      -o eval/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/mega_dataset/vespag_mega_dataset_v1_rasp_all.csv
-    deps:
-      - vespag/eval/eval_mega_dataset_v1_rasp.py
-      - vespag/models
-      - vespag/utils.py
-      - checkpoints/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/
-      - data/test/mega_dataset_v1_rasp/rasp_unique_sequences.fasta
-      - data/test/mega_dataset_v1_rasp/rasp_variants.csv
-    params:
-      - eval
-      - gemme
-      - models
-    outs:
-      - eval/${item.dataset}/${item.embedding_type}/${item.model}/naive_sampling/mega_dataset/vespag_mega_dataset_v1_rasp_all.csv

@@ -36,7 +36,12 @@ After installing the dependencies above and cloning the **VespaG** repo, you can
 - Run VespaG with precomputed embeddings for the example fasta file with 3 sequences in `data/example/example.fasta`: 
     - `python -m vespag predict -i data/example/example.fasta -e output/esm2_embeddings.h5 --single-csv`. This will save a single CSV file for all sequences in the folder `./output`
 
-Kindly note that we are working on making data pre-processing and model training available in the public GitHub repository as soon as possible.
+### Re-training VespaG
+VespaG uses [DVC](https://dvc.org/) for pipeline orchestration and [WandB](https://wandb.ai/) for experiment tracking. 
+
+Using WandB is optional; a username and project for WandB can be specified in `params.yaml`.
+
+Using DVC is non-optional, because we assume that you know what you're doing if you want to retrain VespaG. There is a `dvc.yaml` file in place that contains stages for generating pLM embeddings from FASTA files, but you can also download pre-computed embeddings and GEMME scores from [our Zenodo repository](https://doi.org/10.5281/zenodo.11085958). Adjust paths in `params.yaml` to your context, and feel free to play around with model parameters. You can simply run a training run using `dvc repro -s train@<model_type>-{esm2|prott5}-<dataset>`, with `<model_type>` and `<dataset>` each corresponding to a named block in `params.yaml`.
 
 ### Evaluation
 You can reproduce our evaluation using the `eval` subcommand, which pre-processes data into a format usable by VespaG, runs `predict`, and computes performance metrics.

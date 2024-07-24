@@ -8,7 +8,7 @@ dependencies:
   - python=3.10
   - pip
   - pip:
-      - dvc==3.17.0
+      - dvc==3.52.0
       - jaxtyping
       - joblib-progress
       - rich
