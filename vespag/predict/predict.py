@@ -30,6 +30,7 @@ def generate_predictions(
     output_path: Path,
     embedding_file: Path=None,
     mutation_file: Path=None,
+    id_map_file: Path=None,
     single_csv: bool=False,
     no_csv: bool=False,
     h5_output: bool=False,
