@@ -11,7 +11,7 @@ import rich
 import torch
 from jaxtyping import Float
 
-from .utils import AMINO_ACIDS
+from .utils import GEMME_ALPHABET
 
 
 @dataclass
@@ -74,7 +74,7 @@ def mask_non_mutations(
     """
     gemme_prediction[
         torch.arange(len(wildtype_sequence)),
-        torch.tensor([AMINO_ACIDS.index(aa) for aa in wildtype_sequence]),
+        torch.tensor([GEMME_ALPHABET.index(aa) for aa in wildtype_sequence]),
     ] = 0.0
 
     return gemme_prediction
@@ -93,9 +93,9 @@ def read_mutation_file(
 
 
 def compute_mutation_score(
-    y: Float[torch.Tensor, "length 20"],
+    substitution_score_matrix: Float[torch.Tensor, "length 20"],
     mutation: Union[Mutation, SAV],
-    alphabet: str = AMINO_ACIDS,
+    alphabet: str = GEMME_ALPHABET,
     normalize: bool = False,
     pbar: rich.progress.Progress = None,
     progress_id: int = None,
@@ -105,10 +105,10 @@ def compute_mutation_score(
 
     if isinstance(mutation, Mutation):
         score = sum(
-            [y[sav.position][alphabet.index(sav.to_aa)].item() for sav in mutation]
+            [substitution_score_matrix[sav.position][alphabet.index(sav.to_aa)].item() for sav in mutation]
         )
     else:
-        score = y[mutation.position][alphabet.index(mutation.to_aa)].item()
+        score = substitution_score_matrix[mutation.position][alphabet.index(mutation.to_aa)].item()
 
     if normalize:
         score = 1 / (1 + math.exp(-score))
