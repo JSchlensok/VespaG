@@ -114,8 +114,8 @@ def generate_predictions(
         )
         for id, sequence in sequences.items():
             pbar.update(overall_progress, description=id)
-            embedding = embeddings[id]
-            y = model(embedding).to(device)
+            embedding = embeddings[id].to(device)
+            y = model(embedding)
             y = mask_non_mutations(y, sequence)
 
             scores_per_protein[id] = {
