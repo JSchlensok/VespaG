@@ -26,6 +26,7 @@ DEFAULT_MODEL_PARAMETERS = {
     "embedding_type": "esm2",
 }
 
+MODEL_VERSION = "v2"
 
 
 def save_async(obj, pool: mp.Pool, path: Path, mkdir: bool = True):
@@ -62,7 +63,7 @@ def load_model(
     embedding_type: EmbeddingType,
     checkpoint_file: Path = None,
 ) -> torch.nn.Module:
-    checkpoint_file = checkpoint_file or Path.cwd() / "model_weights/state_dict_v2.pt"
+    checkpoint_file = checkpoint_file or Path.cwd() / f"model_weights/{MODEL_VERSION}/{embedding_type}.pt"
     model = load_model_from_config(architecture, model_parameters, embedding_type)
     model.load_state_dict(torch.load(checkpoint_file))
     return model

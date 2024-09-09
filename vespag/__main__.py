@@ -78,7 +78,7 @@ def predict(
         bool,
         typer.Option(
             "--zero-idx/--one-idx",
-            help="Whether to enumerate the sequence starting at 0.",
+            help="Whether to enumerate the sequence starting at 0",
         ),
     ] = False,
     normalize_scores: Annotated[
@@ -87,6 +87,12 @@ def predict(
             "--normalize/--dont-normalize", help="Whether to normalize scores to [0, 1]"
         ),
     ] = True,
+    embedding_type: Annotated[
+        EmbeddingType,
+        typer.Option(
+            "--embedding-type", help="Type of pLM used for generating embeddings"
+        )
+    ] = "esm2"
 ) -> None:
     id_map_file = None
     generate_predictions(
@@ -100,6 +106,7 @@ def predict(
         h5_output,
         zero_based_mutations,
         normalize_scores,
+        embedding_type
     )
 
 

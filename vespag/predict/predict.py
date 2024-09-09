@@ -35,7 +35,8 @@ def generate_predictions(
     no_csv: bool=False,
     h5_output: bool=False,
     zero_based_mutations: bool=False,
-    normalize_scores: bool=True
+    normalize_scores: bool=True,
+    embedding_type: EmbeddingType="esm2"
 ) -> None:
     logger = setup_logger()
     warnings.filterwarnings("ignore", message="rich is experimental/alpha")
@@ -46,7 +47,9 @@ def generate_predictions(
         output_path.mkdir(parents=True)
 
     device = get_device()
-    model = load_model(**DEFAULT_MODEL_PARAMETERS).eval().to(device, dtype=torch.float)
+    params = DEFAULT_MODEL_PARAMETERS
+    params["embedding_type"] = embedding_type
+    model = load_model(**params).eval().to(device, dtype=torch.float)
 
     sequences = {rec.id: str(rec.seq) for rec in SeqIO.parse(fasta_file, "fasta")}
 
