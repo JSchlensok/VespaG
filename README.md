@@ -13,7 +13,10 @@ More details on **VespaG** can be found in the corresponding [preprint](https://
 
 ## Quick Start
 ### Running Inference with VespaG
-1. Install necessary dependencies using `conda` (or, interchangeably, `mamba` or `micromamba`): `conda env create -f environment.yml -n vespag` and `conda activate vespag`
+1. Install necessary dependencies using `conda` (or, interchangeably, `mamba` or `micromamba`):
+	1. `conda env create -n vespag python==3.12 poetry==1.8.3`
+	2. `conda activate vespag`
+	3. `poetry install`
 2. Run `python -m vespag predict` with the following options:  
 **Required:**
 - `--input/-i`: Path to FASTA-formatted file containing protein sequence(s).  

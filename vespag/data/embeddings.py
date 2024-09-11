@@ -8,7 +8,7 @@ import torch
 import typer
 from Bio import SeqIO
 from transformers import AutoModel, AutoTokenizer, T5EncoderModel, T5Tokenizer
-from typing_extensions import Annotated
+from typing import Annotated
 
 from vespag.utils import get_device
 from vespag.utils.type_hinting import EmbeddingType

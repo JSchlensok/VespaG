@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional
 
 import typer
-from typing_extensions import Annotated
+from typing import Annotated
 
 from .data.embeddings import generate_embeddings
 from .eval import eval

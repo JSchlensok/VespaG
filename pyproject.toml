@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "vespag"
+version = "0.1.0"
+description = "Accurate and blazingly fast protein fitness prediction using protein language models"
+authors = ["Julius Schlensok <julius@schlensok.org>"]
+license = "GPL-3.0"
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+biopython = "1.83"
+dvc = "3.52.0"
+h5py = "3.11.0"
+jaxtyping = "*"
+matplotlib = "3.8.4"
+MKL = {markers = "sys_platform != 'darwin'", version = "2024.0"}
+numpy = "1.26.4"
+pandas = "2.2.2"
+polars = "0.20.21"
+rich = "13.7.1"
+seaborn = "0.13.2"
+torch = "2.1.1"
+tqdm = "*"
+typer = "0.12.3"
+transformers = "*"
+wandb = "*"
+
+[tools.poetry.dev-dependencies]

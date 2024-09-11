@@ -4,7 +4,7 @@ import h5py
 import pandas as pd
 import typer
 from rich import progress
-from typing_extensions import Annotated
+from typing import Annotated
 
 app = typer.Typer()
 

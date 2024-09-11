@@ -8,7 +8,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from tqdm.rich import tqdm
-from typing_extensions import Annotated
+from typing import Annotated
 
 from vespag.predict import generate_predictions
 from vespag.utils import download, setup_logger, unzip
