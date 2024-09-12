@@ -11,13 +11,14 @@ Assessed on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https:
 
 More details on **VespaG** can be found in the corresponding [preprint](https://doi.org/10.1101/2024.04.24.590982).
 
-## Quick Start
-### Running Inference with VespaG
-1. Install necessary dependencies using `conda` (or, interchangeably, `mamba` or `micromamba`):
-	1. `conda env create -n vespag python==3.12 poetry==1.8.3`
-	2. `conda activate vespag`
-	3. `poetry install`
-2. Run `python -m vespag predict` with the following options:  
+### Installation
+1. `conda env create -n vespag python==3.10 poetry==1.8.3` (exchange `conda` for `mamba`, `miniconda` or `micromamba` as you like)
+2. `conda activate vespag`
+3. `export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring`
+4. `poetry install`
+
+### Quick Start: Running Inference with VespaG
+Run `python -m vespag predict` with the following options:  
 **Required:**
 - `--input/-i`: Path to FASTA-formatted file containing protein sequence(s).  
 **Optional:**
@@ -31,8 +32,7 @@ More details on **VespaG** can be found in the corresponding [preprint](https://
 - `--zero-idx`: Whether to enumerate protein sequences (both in- and output) starting at 0.
 - `--normalize`: Whether to normalize predicted scores to [0,1] interval by applying a sigmoid to the predicted GEMME substitution scores (which are on a broader spectrum of about [-10,2], although some predicted values fall out of this).
 
-#### Examples
-
+### Examples
 After installing the dependencies above and cloning the **VespaG** repo, you can try out the following examples:
 - Run VespaG without precomputed embeddings for the example fasta file with 3 sequences in `data/example/example.fasta`: 
     - `python -m vespag predict -i data/example/example.fasta`. This will save a CSV file for each sequence in the folder `./output`
