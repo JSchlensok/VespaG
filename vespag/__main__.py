@@ -81,10 +81,16 @@ def predict(
             help="Whether to enumerate the sequence starting at 0",
         ),
     ] = False,
+    transform_scores: Annotated[
+        bool,
+        typer.Option(
+            "--transform/--dont-transform", help="Whether to transform scores to same distribution as GEMME scores"
+        ),
+    ] = True,
     normalize_scores: Annotated[
         bool,
         typer.Option(
-            "--normalize/--dont-normalize", help="Whether to normalize scores to same distribution as GEMME scores"
+            "--normalize/--dont-normalize", help="Whether to transform scores to [0, 1] range"
         ),
     ] = True,
     embedding_type: Annotated[

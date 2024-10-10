@@ -35,6 +35,7 @@ def generate_predictions(
     no_csv: bool=False,
     h5_output: bool=False,
     zero_based_mutations: bool=False,
+    transform_scores: bool=True,
     normalize_scores: bool=True,
     embedding_type: EmbeddingType="esm2"
 ) -> None:
@@ -127,6 +128,7 @@ def generate_predictions(
                     mutation,
                     pbar=pbar,
                     progress_id=overall_progress,
+                    transform=transform_scores,
                     normalize=normalize_scores,
                 )
                 for mutation in mutations_per_protein[id]

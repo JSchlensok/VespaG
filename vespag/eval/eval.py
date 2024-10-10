@@ -51,10 +51,16 @@ def proteingym(
             help="CSV file mapping embedding IDs to FASTA IDs if they're different",
         ),
     ] = None,
+    transform_scores: Annotated[
+        bool,
+        typer.Option(
+            "--transform/--dont-transform", help="Whether to transform scores to same distribution as GEMME scores"
+        ),
+    ] = True,
     normalize_scores: Annotated[
         bool,
         typer.Option(
-            "--normalize/--dont-normalize", help="Whether to transform scores to same distribution as GEMME scores"
+            "--normalize/--dont-normalize", help="Whether to transform scores to [0, 1] range"
         ),
     ] = True,
     legacy_mode: Annotated[
@@ -142,6 +148,7 @@ def proteingym(
         mutation_file=mutation_file,
         id_map_file=id_map_file,
         single_csv=True,
+        transform_scores=transform_scores,
         normalize_scores=normalize_scores,
     )
 

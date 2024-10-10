@@ -148,8 +148,15 @@ def read_gemme_table(txt_file: Path) -> np.ndarray:
 raw_score_cdf = np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=',')
 sorted_gemme_scores = np.loadtxt("data/score_transformation/sorted_gemme_scores.csv", delimiter=',')
 
-def transform_score(score: float) -> float:
-    """Transform a raw VespaG score by mapping it to a known distribution of GEMME scores through its quantile.
+def transform_score(score: float, transform: bool = True, normalize: bool = True) -> float:
+    """Apply transformations to raw VespaG scores.
+    
+    - Transform distribution by mapping it to a known distribution of GEMME scores through its quantile
+    - Apply a sigmoid to limit it to [0, 1]
     """
-    quantile = (raw_score_cdf <= score).mean()
-    return np.interp(quantile, np.linspace(0, 1, len(sorted_gemme_scores)), sorted_gemme_scores)
+    if transform:
+        quantile = (raw_score_cdf <= score).mean()
+        score = np.interp(quantile, np.linspace(0, 1, len(sorted_gemme_scores)), sorted_gemme_scores)
+    if normalize:
+        score = 1 / (1 + np.exp(-score))
+    return score
