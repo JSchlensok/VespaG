@@ -11,7 +11,7 @@ import rich
 import torch
 from jaxtyping import Float
 
-from .utils import GEMME_ALPHABET
+from .utils import GEMME_ALPHABET, transform_score
 
 
 @dataclass
@@ -96,20 +96,26 @@ def compute_mutation_score(
     substitution_score_matrix: Float[torch.Tensor, "length 20"],
     mutation: Union[Mutation, SAV],
     alphabet: str = GEMME_ALPHABET,
-    normalize: bool = False,
+    normalize: bool = True,
     pbar: rich.progress.Progress = None,
     progress_id: int = None,
 ) -> float:
     if pbar:
         pbar.advance(progress_id)
 
-    if isinstance(mutation, Mutation):
-        score = sum(
-            [substitution_score_matrix[sav.position][alphabet.index(sav.to_aa)].item() for sav in mutation]
-        )
-    else:
-        score = substitution_score_matrix[mutation.position][alphabet.index(mutation.to_aa)].item()
-
     if normalize:
-        score = 1 / (1 + math.exp(-score))
+        if isinstance(mutation, Mutation):
+            score = sum(
+                [transform_score(substitution_score_matrix[sav.position][alphabet.index(sav.to_aa)].item()) for sav in mutation]
+            )
+        else:
+            score = transform_score(substitution_score_matrix[mutation.position][alphabet.index(mutation.to_aa)].item())
+    else:
+        if isinstance(mutation, Mutation):
+            score = sum(
+                [substitution_score_matrix[sav.position][alphabet.index(sav.to_aa)].item() for sav in mutation]
+            )
+        else:
+            score = substitution_score_matrix[mutation.position][alphabet.index(mutation.to_aa)].item()
+
     return score

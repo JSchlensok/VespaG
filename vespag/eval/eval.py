@@ -26,7 +26,7 @@ def proteingym(
             "--output",
             help="Output path. Defaults to ./output/proteingym217 or ./output/proteingym87",
         ),
-    ],
+    ] = None,
     dms_reference_file: Annotated[
         Path, typer.Option("--reference-file", help="Path of DMS reference file")
     ] = None,
@@ -54,7 +54,7 @@ def proteingym(
     normalize_scores: Annotated[
         bool,
         typer.Option(
-            "--normalize/--dont-normalize", help="Whether to normalize scores to [0, 1]"
+            "--normalize/--dont-normalize", help="Whether to transform scores to same distribution as GEMME scores"
         ),
     ] = True,
     legacy_mode: Annotated[
@@ -168,5 +168,5 @@ def proteingym(
     result_csv_path = output_path / "VespaG_Spearman_per_DMS.csv"
     result_df = pl.from_records(records)
     logger.info(f"Writing results to {result_csv_path}")
-    logger.info(f"Mean Spearman r: {result_df['spearman'].mean():.3f}")
+    logger.info(f"Mean Spearman r: {result_df['spearman'].mean():.5f}")
     result_df.write_csv(result_csv_path)

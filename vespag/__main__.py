@@ -84,7 +84,7 @@ def predict(
     normalize_scores: Annotated[
         bool,
         typer.Option(
-            "--normalize/--dont-normalize", help="Whether to normalize scores to [0, 1]"
+            "--normalize/--dont-normalize", help="Whether to normalize scores to same distribution as GEMME scores"
         ),
     ] = True,
     embedding_type: Annotated[

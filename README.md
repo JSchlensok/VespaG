@@ -30,7 +30,7 @@ Run `python -m vespag predict` with the following options:
 - `--no-csv`: Whether no CSV output should be produced.
 - `--h5-output`: Whether a file containing predictions in HDF5 format should be created.
 - `--zero-idx`: Whether to enumerate protein sequences (both in- and output) starting at 0.
-- `--normalize`: Whether to normalize predicted scores to [0,1] interval by applying a sigmoid to the predicted GEMME substitution scores (which are on a broader spectrum of about [-10,2], although some predicted values fall out of this).
+- `--normalize`: Whether to transform predicted scores to the same distribution as GEMME substitution scores, which fall into a narrower range than VespaG scores, to ease comparability
 
 ### Examples
 After installing the dependencies above and cloning the **VespaG** repo, you can try out the following examples:

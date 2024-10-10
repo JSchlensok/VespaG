@@ -5,6 +5,7 @@ import zipfile
 from pathlib import Path
 from typing import Literal
 
+import numpy as np
 import pandas as pd
 import requests
 import rich.progress as progress
@@ -141,5 +142,14 @@ def unzip(
             pbar.remove_task(extraction_progress)
 
 def read_gemme_table(txt_file: Path) -> np.ndarray:
-    df = pd.read_csv(txt_file, sep=" ")
+    df = pd.read_csv(txt_file, sep=" ").fillna(0)
     return df.to_numpy()
+
+raw_score_cdf = np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=',')
+sorted_gemme_scores = np.loadtxt("data/score_transformation/sorted_gemme_scores.csv", delimiter=',')
+
+def transform_score(score: float) -> float:
+    """Transform a raw VespaG score by mapping it to a known distribution of GEMME scores through its quantile.
+    """
+    quantile = (raw_score_cdf <= score).mean()
+    return np.interp(quantile, np.linspace(0, 1, len(sorted_gemme_scores)), sorted_gemme_scores)
