@@ -10,7 +10,7 @@ import rich
 import torch
 from jaxtyping import Float
 
-from .utils import GEMME_ALPHABET, transform_score
+from .utils import GEMME_ALPHABET, normalize_score, transform_score
 
 
 @dataclass
@@ -104,8 +104,18 @@ def compute_mutation_score(
         pbar.advance(progress_id)
 
     if isinstance(mutation, Mutation):
-        return sum(
-            [transform_score(substitution_score_matrix[sav.position][alphabet.index(sav.to_aa)].item(), transform=transform, normalize=normalize) for sav in mutation]
-        )
+        raw_scores = [
+            substitution_score_matrix[sav.position][alphabet.index(sav.to_aa)].item() for sav in mutation
+        ]
     else:
-        return transform_score(substitution_score_matrix[mutation.position][alphabet.index(mutation.to_aa)].item(), transform=transform, normalize=normalize)
+        raw_scores = [substitution_score_matrix[mutation.position][alphabet.index(mutation.to_aa)].item()]
+    
+    if transform:
+        raw_scores = [transform_score(score) for score in raw_scores]
+
+    score = sum(raw_scores)
+
+    if normalize:
+        score = normalize_score(score)
+
+    return score
