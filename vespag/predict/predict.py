@@ -28,16 +28,16 @@ from vespag.utils.type_hinting import *
 def generate_predictions(
     fasta_file: Path,
     output_path: Path,
-    embedding_file: Path=None,
-    mutation_file: Path=None,
-    id_map_file: Path=None,
-    single_csv: bool=False,
-    no_csv: bool=False,
-    h5_output: bool=False,
-    zero_based_mutations: bool=False,
-    transform_scores: bool=True,
-    normalize_scores: bool=True,
-    embedding_type: EmbeddingType="esm2"
+    embedding_file: Path = None,
+    mutation_file: Path = None,
+    id_map_file: Path = None,
+    single_csv: bool = False,
+    no_csv: bool = False,
+    h5_output: bool = False,
+    zero_based_mutations: bool = False,
+    transform_scores: bool = True,
+    normalize_scores: bool = True,
+    embedding_type: EmbeddingType = "esm2",
 ) -> None:
     logger = setup_logger()
     warnings.filterwarnings("ignore", message="rich is experimental/alpha")

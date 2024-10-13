@@ -22,7 +22,7 @@ METHOD_COLORS = {
     "ESM-2 (3B)": GRAY,
     "SaProt (650M)": COIN,
     "AlphaMissense": CHARCOAL,
-    "PoET": IRON
+    "PoET": IRON,
 }
 
 MULTILINE_LABELS = {

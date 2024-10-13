@@ -25,11 +25,11 @@ def train(
     datasets: list[str],
     output_dir: Path,
     embedding_type: str,
-    compute_full_train_loss: bool=False,
-    sampling_strategy: str="basic",
-    wandb_config: tuple[str, str]=None,
-    limit_cache: bool=False,
-    use_full_dataset: bool=False
+    compute_full_train_loss: bool = False,
+    sampling_strategy: str = "basic",
+    wandb_config: tuple[str, str] = None,
+    limit_cache: bool = False,
+    use_full_dataset: bool = False,
 ):
     logger = setup_logger()
     wandb_logger = logging.getLogger("wandb")
@@ -129,7 +129,9 @@ def train(
 
     architecture = params["models"][model_config_key]["architecture"]
     model_parameters = params["models"][model_config_key]["model_parameters"]
-    model = load_model_from_config(architecture, model_parameters, embedding_type).to(device)
+    model = load_model_from_config(architecture, model_parameters, embedding_type).to(
+        device
+    )
 
     # TODO parametrize
     criterion = torch.nn.MSELoss()

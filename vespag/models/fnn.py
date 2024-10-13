@@ -30,7 +30,6 @@ class FNN(torch.nn.Module):
         output_activation_function: torch.nn.Module = None,
         dropout_rate: float = None,
     ):
-
         super(FNN, self).__init__()
         self.net = construct_fnn(
             hidden_layer_sizes,

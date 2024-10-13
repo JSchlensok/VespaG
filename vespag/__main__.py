@@ -84,21 +84,23 @@ def predict(
     transform_scores: Annotated[
         bool,
         typer.Option(
-            "--transform/--dont-transform", help="Whether to transform scores to same distribution as GEMME scores"
+            "--transform/--dont-transform",
+            help="Whether to transform scores to same distribution as GEMME scores",
         ),
     ] = True,
     normalize_scores: Annotated[
         bool,
         typer.Option(
-            "--normalize/--dont-normalize", help="Whether to transform scores to [0, 1] range"
+            "--normalize/--dont-normalize",
+            help="Whether to transform scores to [0, 1] range",
         ),
     ] = True,
     embedding_type: Annotated[
         EmbeddingType,
         typer.Option(
             "--embedding-type", help="Type of pLM used for generating embeddings"
-        )
-    ] = "esm2"
+        ),
+    ] = "esm2",
 ) -> None:
     id_map_file = None
     generate_predictions(
@@ -112,7 +114,7 @@ def predict(
         h5_output,
         zero_based_mutations,
         normalize_scores,
-        embedding_type
+        embedding_type,
     )
 
 

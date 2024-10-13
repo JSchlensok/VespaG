@@ -65,7 +65,10 @@ def load_model(
     embedding_type: EmbeddingType,
     checkpoint_file: Path = None,
 ) -> torch.nn.Module:
-    checkpoint_file = checkpoint_file or Path.cwd() / f"model_weights/{MODEL_VERSION}/{embedding_type}.pt"
+    checkpoint_file = (
+        checkpoint_file
+        or Path.cwd() / f"model_weights/{MODEL_VERSION}/{embedding_type}.pt"
+    )
     model = load_model_from_config(architecture, model_parameters, embedding_type)
     model.load_state_dict(torch.load(checkpoint_file))
     return model
@@ -142,22 +145,27 @@ def unzip(
         if remove_bar:
             pbar.remove_task(extraction_progress)
 
+
 def read_gemme_table(txt_file: Path) -> np.ndarray:
     df = pd.read_csv(txt_file, sep=" ").fillna(0)
     return df.to_numpy()
 
-raw_score_cdf = np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=',')
-sorted_gemme_scores = np.loadtxt("data/score_transformation/sorted_gemme_scores.csv", delimiter=',')
+
+raw_score_cdf = np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=",")
+sorted_gemme_scores = np.loadtxt(
+    "data/score_transformation/sorted_gemme_scores.csv", delimiter=","
+)
+
 
 def transform_score(score: float) -> float:
-    """Transform VespaG score distribution by mapping it to a known distribution of GEMME scores through its quantile
-    """
+    """Transform VespaG score distribution by mapping it to a known distribution of GEMME scores through its quantile"""
     quantile = (raw_score_cdf <= score).mean()
-    score = np.interp(quantile, np.linspace(0, 1, len(sorted_gemme_scores)), sorted_gemme_scores)
+    score = np.interp(
+        quantile, np.linspace(0, 1, len(sorted_gemme_scores)), sorted_gemme_scores
+    )
     return score
 
 
 def normalize_score(score: float) -> float:
-    """Normalize VespaG score to [0, 1] range.
-    """
+    """Normalize VespaG score to [0, 1] range."""
     return 1 / (1 + math.exp(-score))

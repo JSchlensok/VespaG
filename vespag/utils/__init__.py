@@ -18,5 +18,5 @@ __all__ = [
     "save_async",
     "setup_logger",
     "unzip",
-    "VESPA_ALPHABET"
+    "VESPA_ALPHABET",
 ]

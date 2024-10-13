@@ -54,13 +54,15 @@ def proteingym(
     transform_scores: Annotated[
         bool,
         typer.Option(
-            "--transform/--dont-transform", help="Whether to transform scores to same distribution as GEMME scores"
+            "--transform/--dont-transform",
+            help="Whether to transform scores to same distribution as GEMME scores",
         ),
     ] = True,
     normalize_scores: Annotated[
         bool,
         typer.Option(
-            "--normalize/--dont-normalize", help="Whether to transform scores to [0, 1] range"
+            "--normalize/--dont-normalize",
+            help="Whether to transform scores to [0, 1] range",
         ),
     ] = True,
     legacy_mode: Annotated[

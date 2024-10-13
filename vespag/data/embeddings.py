@@ -20,6 +20,7 @@ model_names = {
 
 # TODO implement generation of overlapping embeddings
 
+
 class Embedder:
     def __init__(
         self, pretrained_path: Union[Path, str], cache_dir: Path = None

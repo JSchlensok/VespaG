@@ -105,11 +105,16 @@ def compute_mutation_score(
 
     if isinstance(mutation, Mutation):
         raw_scores = [
-            substitution_score_matrix[sav.position][alphabet.index(sav.to_aa)].item() for sav in mutation
+            substitution_score_matrix[sav.position][alphabet.index(sav.to_aa)].item()
+            for sav in mutation
         ]
     else:
-        raw_scores = [substitution_score_matrix[mutation.position][alphabet.index(mutation.to_aa)].item()]
-    
+        raw_scores = [
+            substitution_score_matrix[mutation.position][
+                alphabet.index(mutation.to_aa)
+            ].item()
+        ]
+
     if transform:
         raw_scores = [transform_score(score) for score in raw_scores]
 
