@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import logging
-import zipfile
 import math
+import zipfile
 from pathlib import Path
 from typing import Literal
 

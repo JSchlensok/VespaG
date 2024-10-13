@@ -1,4 +1,4 @@
-from vespag.utils import load_model, DEFAULT_MODEL_PARAMETERS
+from vespag.utils import DEFAULT_MODEL_PARAMETERS, load_model
 from vespag.utils.type_hinting import EmbeddingType
 
 dependencies = ["torch"]

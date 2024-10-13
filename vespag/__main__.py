@@ -1,8 +1,7 @@
 from pathlib import Path
-from typing import Optional
+from typing import Annotated, Optional
 
 import typer
-from typing import Annotated
 
 from .data.embeddings import generate_embeddings
 from .eval import eval

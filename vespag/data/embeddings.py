@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from typing import Union
+from typing import Annotated, Union
 
 import h5py
 import rich.progress as progress
@@ -8,7 +8,6 @@ import torch
 import typer
 from Bio import SeqIO
 from transformers import AutoModel, AutoTokenizer, T5EncoderModel, T5Tokenizer
-from typing import Annotated
 
 from vespag.utils import get_device
 from vespag.utils.type_hinting import EmbeddingType

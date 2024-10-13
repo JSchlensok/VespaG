@@ -1,5 +1,6 @@
 import warnings
 from pathlib import Path
+from typing import Annotated
 
 import polars as pl
 import typer
@@ -8,7 +9,6 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from tqdm.rich import tqdm
-from typing import Annotated
 
 from vespag.predict import generate_predictions
 from vespag.utils import download, setup_logger, unzip
