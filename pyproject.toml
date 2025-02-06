@@ -40,7 +40,7 @@ optional = true
 [tool.pytest.ini_options]
 testpaths = "tests"
 pythonpath = "."
-addopts = "--cov --cov-report term-missing"
+addopts = "--cov=vespag --cov-report term-missing"
 
 [tool.ruff]
 include = [
