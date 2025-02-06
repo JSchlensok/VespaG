@@ -6,6 +6,7 @@ import polars as pl
 import rich.progress as progress
 import torch
 from jaxtyping import Float
+from typeguard import typeguard_ignore
 
 from vespag.utils.type_hinting import PrecisionType
 
@@ -37,9 +38,7 @@ class PerResidueDataset(torch.utils.data.Dataset):
             if key in self.cluster_df["protein_id"]
         }
         self.protein_annotations = {
-            key: torch.tensor(
-                np.array(data[()][:max_len]), device=self.device, dtype=self.dtype
-            )
+            key: torch.tensor(np.array(data[()][:max_len]), device=self.device, dtype=self.dtype)
             for key, data in progress.track(
                 h5py.File(annotation_file, "r").items(),
                 description=f"Loading annotations from {annotation_file}",
@@ -69,11 +68,8 @@ class PerResidueDataset(torch.utils.data.Dataset):
             ]
         )
 
-    def __getitem__(
-        self, idx
-    ) -> tuple[
-        Float[torch.Tensor, "length embedding_dim"], Float[torch.Tensor, "length 20"]
-    ]:
+    @typeguard_ignore # https://docs.kidger.site/jaxtyping/faq/#is-jaxtyping-compatible-with-static-type-checkers-like-mypypyrightpytype
+    def __getitem__(self, idx) -> tuple[Float[torch.Tensor, "length embedding_dim"], Float[torch.Tensor, "length 20"]]:
         embedding = self.residue_embeddings[idx]
         annotation = self.residue_annotations[idx]
         if self.precision == "half":

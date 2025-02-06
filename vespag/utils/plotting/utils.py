@@ -3,9 +3,7 @@ from typing import Union
 import matplotlib as mpl
 
 
-def label_bars(
-    ax: mpl.axes.Axes, digits: int = 3, fontsize: Union[str, int] = "small"
-) -> None:
+def label_bars(ax: mpl.axes.Axes, digits: int = 3, fontsize: str | int = "small") -> None:
     for c in ax.containers:
         ax.bar_label(
             c,

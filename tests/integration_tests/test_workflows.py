@@ -6,12 +6,9 @@ from vespag.__main__ import app
 
 runner = CliRunner()
 
+
 def test_predict(output_dir, fasta, score_files):
-    result = runner.invoke(app, [
-        "predict",
-        "-i", str(fasta),
-        "-o", str(output_dir)
-    ])
+    result = runner.invoke(app, ["predict", "-i", str(fasta), "-o", str(output_dir)])
 
     assert result.exit_code == 0
 

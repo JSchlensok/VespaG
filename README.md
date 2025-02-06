@@ -3,9 +3,9 @@
 
 <img align="right" src="images/vespag.png" alt="image" height="20%" width="20%" />
 
-**VespaG** is a blazingly fast single amino acid variant effect predictor, leveraging embeddings of the protein language model [ESM-2](https://github.com/facebookresearch/esm) ([Lin et al. 2022](https://www.science.org/doi/abs/10.1126/science.ade2574)) as input to a minimal deep learning model. 
+**VespaG** is a blazingly fast single amino acid variant effect predictor, leveraging embeddings of the protein language model [ESM-2](https://github.com/facebookresearch/esm) ([Lin et al. 2022](https://www.science.org/doi/abs/10.1126/science.ade2574)) as input to a minimal deep learning model.
 
-To overcome the sparsity of experimental training data, we created a dataset of 39 million single amino acid variants from a subset of the Human proteome, which we then annotated using predictions from the multiple sequence alignment-based effect predictor [GEMME](http://www.lcqb.upmc.fr/GEMME/Home.html) ([Laine et al. 2019](https://doi.org/10.1093/molbev/msz179)) as a proxy for experimental scores. 
+To overcome the sparsity of experimental training data, we created a dataset of 39 million single amino acid variants from a subset of the Human proteome, which we then annotated using predictions from the multiple sequence alignment-based effect predictor [GEMME](http://www.lcqb.upmc.fr/GEMME/Home.html) ([Laine et al. 2019](https://doi.org/10.1093/molbev/msz179)) as a proxy for experimental scores.
 
 Assessed on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://www.biorxiv.org/content/10.1101/2023.12.07.570727v1)) benchmark, **VespaG** matches state-of-the-art methods while being several orders of magnitude faster, predicting the entire single-site mutational landscape for a human proteome in under a half hour on a consumer-grade laptop.
 
@@ -18,9 +18,9 @@ More details on **VespaG** can be found in the corresponding [preprint](https://
 4. `poetry install`
 
 ### Quick Start: Running Inference with VespaG
-Run `python -m vespag predict` with the following options:  
+Run `python -m vespag predict` with the following options:
 **Required:**
-- `--input/-i`: Path to FASTA-formatted file containing protein sequence(s).  
+- `--input/-i`: Path to FASTA-formatted file containing protein sequence(s).
 **Optional:**
 - `--output/-o`:Path for saving created CSV and/or H5 files. Defaults to `./output`.
 - `--embeddings/-e`: Path to pre-computed ESM2 (`esm2_t36_3B_UR50D`) input embeddings. Embeddings will be generated from scratch if no path is provided and saved in `./output`. Please note that embedding generation on CPU can be slow.
@@ -35,13 +35,13 @@ Run `python -m vespag predict` with the following options:
 
 ### Examples
 After installing the dependencies above and cloning the **VespaG** repo, you can try out the following examples:
-- Run VespaG without precomputed embeddings for the example fasta file with 3 sequences in `data/example/example.fasta`: 
+- Run VespaG without precomputed embeddings for the example fasta file with 3 sequences in `data/example/example.fasta`:
     - `python -m vespag predict -i data/example/example.fasta`. This will save a CSV file for each sequence in the folder `./output`
-- Run VespaG with precomputed embeddings for the example fasta file with 3 sequences in `data/example/example.fasta`: 
+- Run VespaG with precomputed embeddings for the example fasta file with 3 sequences in `data/example/example.fasta`:
     - `python -m vespag predict -i data/example/example.fasta -e output/esm2_embeddings.h5 --single-csv`. This will save a single CSV file for all sequences in the folder `./output`
 
 ### Re-training VespaG
-VespaG uses [DVC](https://dvc.org/) for pipeline orchestration and [WandB](https://wandb.ai/) for experiment tracking. 
+VespaG uses [DVC](https://dvc.org/) for pipeline orchestration and [WandB](https://wandb.ai/) for experiment tracking.
 
 Using WandB is optional; a username and project for WandB can be specified in `params.yaml`.
 

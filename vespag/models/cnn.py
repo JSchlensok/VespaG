@@ -1,5 +1,6 @@
 import torch
 from jaxtyping import Float
+from typeguard import typeguard_ignore
 
 from .utils import construct_fnn
 
@@ -39,14 +40,12 @@ class MinimalCNN(torch.nn.Module):
         fnn_hidden_layers: list[int] = [256, 64],
         activation_function: torch.nn.Module = torch.nn.LeakyReLU,
         output_activation_function: torch.nn.Module = None,
-        cnn_dropout_rate: float = None,
-        fnn_dropout_rate: float = None,
+        cnn_dropout_rate: float | None = None,
+        fnn_dropout_rate: float | None = None,
     ):
-        super(MinimalCNN, self).__init__()
+        super().__init__()
         conv_layers = [
-            torch.nn.Conv1d(
-                input_dim, n_channels, kernel_size=kernel_size, padding=padding
-            ),
+            torch.nn.Conv1d(input_dim, n_channels, kernel_size=kernel_size, padding=padding),
             activation_function(),
         ]
 
@@ -64,6 +63,7 @@ class MinimalCNN(torch.nn.Module):
             fnn_dropout_rate,
         )
 
+    @typeguard_ignore # https://docs.kidger.site/jaxtyping/faq/#is-jaxtyping-compatible-with-static-type-checkers-like-mypypyrightpytype
     def forward(
         self, X: Float[torch.Tensor, "batch_size length input_dim"]
     ) -> Float[torch.Tensor, "batch_size length output_dim"]:
@@ -91,12 +91,12 @@ class CombinedCNN(torch.nn.Module):
         fnn_hidden_layers: list[int] = [256, 64],
         shared_hidden_layers: list[int] = [64],
         activation_function: torch.nn.Module = torch.nn.LeakyReLU,
-        output_activation_function: torch.nn.Module = None,
-        shared_dropout_rate: float = None,
-        cnn_dropout_rate: float = None,
-        fnn_dropout_rate: float = None,
+        output_activation_function: torch.nn.Module | None = None,
+        shared_dropout_rate: float | None = None,
+        cnn_dropout_rate: float | None = None,
+        fnn_dropout_rate: float | None = None,
     ):
-        super(CombinedCNN, self).__init__()
+        super().__init__()
         self.conv = MinimalCNN(
             input_dim=input_dim,
             output_dim=cnn_hidden_layers[-1],

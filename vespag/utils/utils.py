@@ -20,7 +20,7 @@ from .type_hinting import Architecture, EmbeddingType
 
 GEMME_ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
 VESPA_ALPHABET = "ALGVSREDTIPKFQNYMHWC"
-AMINO_ACIDS = sorted(list(set(GEMME_ALPHABET)))
+AMINO_ACIDS = sorted(GEMME_ALPHABET)
 
 DEFAULT_MODEL_PARAMETERS = {
     "architecture": "fnn",
@@ -37,9 +37,7 @@ def save_async(obj, pool: mp.Pool, path: Path, mkdir: bool = True):
     pool.apply_async(torch.save, (obj, path))
 
 
-def load_model_from_config(
-    architecture: str, model_parameters: dict, embedding_type: str
-):
+def load_model_from_config(architecture: str, model_parameters: dict, embedding_type: str):
     if architecture == "fnn":
         model = FNN(
             hidden_layer_sizes=model_parameters["hidden_dims"],
@@ -63,21 +61,16 @@ def load_model(
     architecture: Architecture,
     model_parameters: dict,
     embedding_type: EmbeddingType,
-    checkpoint_file: Path = None,
+    checkpoint_file: Path | None = None,
 ) -> torch.nn.Module:
-    checkpoint_file = (
-        checkpoint_file
-        or Path.cwd() / f"model_weights/{MODEL_VERSION}/{embedding_type}.pt"
-    )
+    checkpoint_file = checkpoint_file or Path.cwd() / f"model_weights/{MODEL_VERSION}/{embedding_type}.pt"
     model = load_model_from_config(architecture, model_parameters, embedding_type)
     model.load_state_dict(torch.load(checkpoint_file))
     return model
 
 
 def setup_logger() -> logging.Logger:
-    logging.basicConfig(
-        level="NOTSET", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
-    )
+    logging.basicConfig(level="NOTSET", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()])
     logger = logging.getLogger("rich")
     logger.setLevel(logging.INFO)
     return logger
@@ -106,17 +99,18 @@ def get_precision() -> Literal["half", "float"]:
         return "float"
 
 
-def download(
-    url: str, path: Path, progress_description: str, remove_bar: bool = False
-) -> None:
+def download(url: str, path: Path, progress_description: str, remove_bar: bool = False) -> None:
     path.parent.mkdir(exist_ok=True, parents=True)
-    with progress.Progress(
-        progress.TextColumn("[progress.description]{task.description}"),
-        progress.BarColumn(),
-        progress.TaskProgressColumn(),
-        progress.DownloadColumn(),
-        progress.TransferSpeedColumn(),
-    ) as pbar, open(path, "wb") as f:
+    with (
+        progress.Progress(
+            progress.TextColumn("[progress.description]{task.description}"),
+            progress.BarColumn(),
+            progress.TaskProgressColumn(),
+            progress.DownloadColumn(),
+            progress.TransferSpeedColumn(),
+        ) as pbar,
+        open(path, "wb") as f,
+    ):
         response = requests.get(url, stream=True)
         total_size = int(response.headers.get("content-length", 0))
         download_progress = pbar.add_task(progress_description, total=total_size)
@@ -128,16 +122,10 @@ def download(
             pbar.remove_task(download_progress)
 
 
-def unzip(
-    zip_path: Path, out_path: Path, progress_description: str, remove_bar: bool = False
-) -> None:
+def unzip(zip_path: Path, out_path: Path, progress_description: str, remove_bar: bool = False) -> None:
     out_path.mkdir(exist_ok=True, parents=True)
-    with progress.Progress(
-        *progress.Progress.get_default_columns()
-    ) as pbar, zipfile.ZipFile(zip_path, "r") as zip:
-        extraction_progress = pbar.add_task(
-            progress_description, total=len(zip.infolist())
-        )
+    with progress.Progress(*progress.Progress.get_default_columns()) as pbar, zipfile.ZipFile(zip_path, "r") as zip:
+        extraction_progress = pbar.add_task(progress_description, total=len(zip.infolist()))
         for member in zip.infolist():
             zip.extract(member, out_path)
             pbar.advance(extraction_progress)
@@ -152,17 +140,13 @@ def read_gemme_table(txt_file: Path) -> np.ndarray:
 
 
 raw_score_cdf = np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=",")
-sorted_gemme_scores = np.loadtxt(
-    "data/score_transformation/sorted_gemme_scores.csv", delimiter=","
-)
+sorted_gemme_scores = np.loadtxt("data/score_transformation/sorted_gemme_scores.csv", delimiter=",")
 
 
 def transform_score(score: float) -> float:
     """Transform VespaG score distribution by mapping it to a known distribution of GEMME scores through its quantile"""
     quantile = (raw_score_cdf <= score).mean()
-    score = np.interp(
-        quantile, np.linspace(0, 1, len(sorted_gemme_scores)), sorted_gemme_scores
-    )
+    score = np.interp(quantile, np.linspace(0, 1, len(sorted_gemme_scores)), sorted_gemme_scores)
     return score
 
 

@@ -1,5 +1,6 @@
 import torch
 from jaxtyping import Float
+from typeguard import typeguard_ignore
 
 from .utils import construct_fnn
 
@@ -27,10 +28,10 @@ class FNN(torch.nn.Module):
         input_dim: int = 2560,
         output_dim: int = 20,
         activation_function: torch.nn.Module = torch.nn.LeakyReLU,
-        output_activation_function: torch.nn.Module = None,
-        dropout_rate: float = None,
+        output_activation_function: torch.nn.Module | None = None,
+        dropout_rate: float | None = None,
     ):
-        super(FNN, self).__init__()
+        super().__init__()
         self.net = construct_fnn(
             hidden_layer_sizes,
             input_dim,
@@ -44,6 +45,7 @@ class FNN(torch.nn.Module):
                 torch.nn.init.kaiming_normal_(layer.weight.data, a=1e-2)
                 torch.nn.init.zeros_(layer.bias.data)
 
+    @typeguard_ignore # https://docs.kidger.site/jaxtyping/faq/#is-jaxtyping-compatible-with-static-type-checkers-like-mypypyrightpytype
     def forward(
         self, X: Float[torch.Tensor, "batch_size length input_dim"]
     ) -> Float[torch.Tensor, "batch_size length output_dim"]:
