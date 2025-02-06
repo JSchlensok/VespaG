@@ -14,6 +14,7 @@
 /output/
 /plots/
 /workflows/
+dist/
 
 # Large data
 # The default needs to ignore all files with an extension instead of folders as it is not possible to re-include a file if a parent directory of that file is excluded.
@@ -24,8 +25,7 @@ data/**/*.*
 !data/test/*.fasta
 
 # Python artifacts
-vespag/**/__pycache__
-tests/**/__pycache__
+**/__pycache__
 
 # macOS clutter
 **/.DS_store
