@@ -1,6 +1,7 @@
 # Local stuff
 .dvc/
 .esm2_cache/
+.nox/
 .prott5_cache/
 .vscode/
 .wandb/
