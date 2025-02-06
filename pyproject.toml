@@ -38,6 +38,8 @@ ruff = "^0.9.4"
 optional = true
 
 [tool.pytest.ini_options]
+testpaths = "tests"
+pythonpath = "."
 addopts = "--cov --cov-report term-missing"
 
 [tool.ruff]

@@ -4,9 +4,6 @@ from pathlib import Path
 import pytest
 from Bio import SeqIO
 
-root_dir = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(root_dir))
-
 test_data_dir = Path("tests/test_data")
 
 @pytest.fixture()
