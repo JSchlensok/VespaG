@@ -23,9 +23,12 @@ data/**/*.*
 !data/test/*.fasta
 
 # Python artifacts
-src/vespag/**/__pycache__
 vespag/**/__pycache__
+tests/**/__pycache__
 
 # macOS clutter
 **/.DS_store
 **/_MACOSX/
+
+# Code cov report
+.coverage

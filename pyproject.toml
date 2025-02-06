@@ -22,10 +22,42 @@ polars = "0.20.21"
 rich = "13.7.1"
 seaborn = "0.13.2"
 sentencepiece = "^0.2.0"
-torch = "2.1.1"
+torch = "^2.6.0"
 tqdm = "^4.66.2"
 typer = "0.12.3"
 transformers = "^4.40.1"
-wandb = "^0.16.5"
+wandb = "0.19.6"
 
-[tools.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+pytest-cov = "^6.0.0"
+pytest-mock = "^3.14.0"
+ruff = "^0.9.4"
+
+[tools.poetry.group.dev]
+optional = true
+
+[tool.pytest.ini_options]
+addopts = "--cov --cov-report term-missing"
+
+[tool.ruff]
+include = [
+    "*.py",
+    "pyproject.toml",
+    "README.md",
+]
+
+line-length = 88
+line-width = 4
+target-version = "py10"
+
+[tool.ruff.lint]
+select = ["C4", "I", "UP", "YTT", "RUF"]
+
+[tool.ruff.format]
+quate-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
