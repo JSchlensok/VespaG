@@ -23,8 +23,11 @@ jobs:
       - name: Create virtual environment
         run: uv venv .venv
 
-      - name: Install dependencies
-        run: uv pip install -e .[dev]
+      - name: Install package
+        run: uv pip install .
+
+      - name: Install dev dependencies
+        run: uv pip install -r pyproject.toml --extra dev
 
       - name: Run nox sessions
         run: nox
