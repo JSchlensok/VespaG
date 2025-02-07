@@ -18,10 +18,7 @@ repos:
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.5.29
     hooks:
-      - id: uv-lock
-      - id: uv-export
       - id: pip-compile
-        args: [requirements.in, -o, requirements.txt]
+        args: [pyproject.toml, -o, requirements.txt, --no-annotate, --no-deps, --no-header]
       - id: pip-compile
-        args: [requirements-dev.in, -o, requirements-dev.txt]
-        files: ^requirements-dev\.(in|txt)$
+        args: [pyproject.toml, --extra, dev, -o, requirements-dev.txt, --no-annotate, --no-deps, --no-header]
