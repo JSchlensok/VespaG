@@ -12,13 +12,11 @@ Assessed on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https:
 More details on **VespaG** can be found in the corresponding [preprint](https://doi.org/10.1101/2024.04.24.590982).
 
 ### Installation
-1. `conda env create -n vespag python==3.10 poetry==1.8.3` (exchange `conda` for `mamba`, `miniconda` or `micromamba` as you like)
-2. `conda activate vespag`
-3. `export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring`
-4. `poetry install`
+1. `git clone`
+2. `uv pip install .`
 
 ### Quick Start: Running Inference with VespaG
-Run `python -m vespag predict` with the following options:
+Run `vespag predict` with the following options:
 **Required:**
 - `--input/-i`: Path to FASTA-formatted file containing protein sequence(s).
 **Optional:**
@@ -36,9 +34,9 @@ Run `python -m vespag predict` with the following options:
 ### Examples
 After installing the dependencies above and cloning the **VespaG** repo, you can try out the following examples:
 - Run VespaG without precomputed embeddings for the example fasta file with 3 sequences in `data/example/example.fasta`:
-    - `python -m vespag predict -i data/example/example.fasta`. This will save a CSV file for each sequence in the folder `./output`
+    - `vespag predict -i data/example/example.fasta`. This will save a CSV file for each sequence in the folder `./output`
 - Run VespaG with precomputed embeddings for the example fasta file with 3 sequences in `data/example/example.fasta`:
-    - `python -m vespag predict -i data/example/example.fasta -e output/esm2_embeddings.h5 --single-csv`. This will save a single CSV file for all sequences in the folder `./output`
+    - `vespag predict -i data/example/example.fasta -e output/esm2_embeddings.h5 --single-csv`. This will save a single CSV file for all sequences in the folder `./output`
 
 ### Re-training VespaG
 VespaG uses [DVC](https://dvc.org/) for pipeline orchestration and [WandB](https://wandb.ai/) for experiment tracking.
@@ -51,7 +49,7 @@ Using DVC is non-optional. There is a `dvc.yaml` file in place that contains sta
 You can reproduce our evaluation using the `eval` subcommand, which pre-processes data into a format usable by VespaG, runs `predict`, and computes performance metrics.
 
 #### ProteinGym217
-Based on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://www.biorxiv.org/content/10.1101/2023.12.07.570727v1)) DMS substitutions benchmark, dubbed _ProteinGym217_ by us. Run it with `python -m vespag eval proteingym`, with the following options:
+Based on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://www.biorxiv.org/content/10.1101/2023.12.07.570727v1)) DMS substitutions benchmark, dubbed _ProteinGym217_ by us. Run it with `vespag eval proteingym`, with the following options:
 **Optional:**
 - `--reference-file`: Path to ProteinGym reference file. Will download to `data/test/proteingym217/reference.csv` or `data/test/proteingym87/reference.csv` if not provided.
 - `--dms-directory`: Path to directory containing per-DMS score files in CSV format. Will download to `data/test/proteingym217/raw_dms_files/` or `data/test/proteingym87/raw_dms_files/` if not provided.

@@ -162,4 +162,4 @@ def train(
 
 
 if __name__ == "__main__":
-    app()
+    app(prog_name="vespag")

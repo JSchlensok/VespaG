@@ -1,6 +1,7 @@
 import torch
 from jaxtyping import Float
-from typeguard import typeguard_ignore
+
+from vespag.utils.type_hinting import typeguard_ignore
 
 from .utils import construct_fnn
 
@@ -63,7 +64,7 @@ class MinimalCNN(torch.nn.Module):
             fnn_dropout_rate,
         )
 
-    @typeguard_ignore # https://docs.kidger.site/jaxtyping/faq/#is-jaxtyping-compatible-with-static-type-checkers-like-mypypyrightpytype
+    @typeguard_ignore()
     def forward(
         self, X: Float[torch.Tensor, "batch_size length input_dim"]
     ) -> Float[torch.Tensor, "batch_size length output_dim"]:

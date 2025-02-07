@@ -9,7 +9,8 @@ import polars as pl
 import rich
 import torch
 from jaxtyping import Float
-from typeguard import typeguard_ignore
+
+from vespag.utils.type_hinting import typeguard_ignore
 
 from .utils import GEMME_ALPHABET, normalize_score, transform_score
 
@@ -62,7 +63,7 @@ class Mutation:
         yield from self.savs
 
 
-@typeguard_ignore # https://docs.kidger.site/jaxtyping/faq/#is-jaxtyping-compatible-with-static-type-checkers-like-mypypyrightpytype
+@typeguard_ignore()
 def mask_non_mutations(
     gemme_prediction: Float[torch.Tensor, "length 20"], wildtype_sequence
 ) -> Float[torch.Tensor, "length 20"]:
@@ -85,7 +86,7 @@ def read_mutation_file(mutation_file: Path, one_indexed: bool = False) -> dict[s
     return mutations_per_protein
 
 
-@typeguard_ignore # https://docs.kidger.site/jaxtyping/faq/#is-jaxtyping-compatible-with-static-type-checkers-like-mypypyrightpytype
+@typeguard_ignore()
 def compute_mutation_score(
     substitution_score_matrix: Float[torch.Tensor, "length 20"],
     mutation: Mutation | SAV,
