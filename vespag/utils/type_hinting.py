@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from enum import Enum
-from typing import Any, Callable, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from typeguard import typeguard_ignore
@@ -24,8 +25,10 @@ class EmbeddingType(str, Enum):
 
 # https://docs.kidger.site/jaxtyping/faq/#is-jaxtyping-compatible-with-static-type-checkers-like-mypypyrightpytype
 if TYPE_CHECKING:
+
     def typeguard_ignore() -> Callable[[Any], Any]:
         return typeguard.typeguard_ignore
 else:
+
     def typeguard_ignore() -> Callable[[Any], Any]:
-        return (lambda func: func)
+        return lambda func: func
