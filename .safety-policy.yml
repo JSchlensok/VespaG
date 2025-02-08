@@ -52,5 +52,3 @@ installation:
         cvss-severity: []
       block-on-any-of:
         cvss-severity: []
-
-
