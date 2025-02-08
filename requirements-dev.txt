@@ -2,6 +2,7 @@ bandit==1.8.2
 biopython==1.83
 dvc==3.52.0
 h5py==3.11.0
+ipykernel==6.29.5
 jaxtyping==0.2.37
 matplotlib==3.8.4
 mkl==2024.0.0
