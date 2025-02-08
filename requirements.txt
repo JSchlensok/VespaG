@@ -4,7 +4,7 @@ h5py==3.11.0
 jaxtyping==0.2.37
 matplotlib==3.8.4
 mkl==2024.0.0
-numpy==1.26.4
+numpy==2.2.2
 pandas==2.2.2
 pingouin==0.5.5
 polars==0.20.21
@@ -12,7 +12,7 @@ rich==13.7.1
 seaborn==0.13.2
 sentencepiece==0.2.0
 torch==2.6.0
-tqdm==4.66.6
-transformers==4.40.2
+tqdm==4.67.1
+transformers==4.48.3
 typer==0.15.1
 wandb==0.19.6

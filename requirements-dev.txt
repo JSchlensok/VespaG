@@ -7,7 +7,7 @@ matplotlib==3.8.4
 mkl==2024.0.0
 mypy==1.15.0
 nox==2024.10.9
-numpy==1.26.4
+numpy==2.2.2
 pandas==2.2.2
 pingouin==0.5.5
 polars==0.20.21
@@ -22,8 +22,8 @@ safety==3.2.14
 seaborn==0.13.2
 sentencepiece==0.2.0
 torch==2.6.0
-tqdm==4.66.6
-transformers==4.40.2
+tqdm==4.67.1
+transformers==4.48.3
 typeguard==4.4.1
 typer==0.15.1
 types-pyyaml==6.0.12.20241230
