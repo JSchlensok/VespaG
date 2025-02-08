@@ -58,5 +58,4 @@ def bandit(session: nox.Session) -> None:
 def safety(session: nox.Session) -> None:
     session.install("uv")
     session.run("uv", "pip", "install", "safety")
-    requirements = session.poetry.export_requirements()
-    session.run("safety", "scan", "--full-report", f"--file={requirements}")
+    session.run("safety", "scan", "--policy-file", ".safety-policy.yml")
