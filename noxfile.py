@@ -16,7 +16,7 @@ def precommit(session: nox.Session) -> None:
 @nox.session(python=python_versions)
 def tests(session: nox.Session) -> None:
     session.install("uv")
-    session.run("uv", "pip", "install", "-e", ".")
+    session.run("uv", "pip", "install", ".")
     session.run("uv", "pip", "install", "pytest", "coverage[toml]", "pygments")
     try:
         session.run("coverage", "run", "--parallel", "-m", "pytest")
@@ -43,6 +43,7 @@ def mypy(session: nox.Session) -> None:
 @nox.session(python=python_versions)
 def typeguard(session: nox.Session) -> None:
     session.install("uv")
+    session.run("uv", "pip", "install", ".")
     session.run("uv", "pip", "install", "pytest", "typeguard", "pygments")
     session.run("pytest", f"--typeguard-packages={package}")
 
