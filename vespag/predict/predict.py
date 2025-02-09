@@ -15,12 +15,14 @@ from vespag.utils import (
     AMINO_ACIDS,
     DEFAULT_MODEL_PARAMETERS,
     SAV,
+    ScoreNormalizer,
     compute_mutation_score,
     get_device,
     load_model,
     mask_non_mutations,
     read_mutation_file,
     setup_logger,
+    transform_scores,
 )
 from vespag.utils.type_hinting import *
 
@@ -98,12 +100,11 @@ def generate_predictions(
             for protein_id, sequence in tqdm(sequences.items(), leave=False)
         }
 
-    logger.info("Generating predictions")
     vespag_scores = {}
     scores_per_protein = {}
     with (
         progress.Progress(
-            progress.TextColumn("[progress.description]Generating predictions"),
+            progress.TextColumn("[progress.description]Computing"),
             progress.BarColumn(),
             progress.TaskProgressColumn(),
             progress.TimeElapsedColumn(),
@@ -111,31 +112,46 @@ def generate_predictions(
         ) as pbar,
         torch.no_grad(),
     ):
-        overall_progress = pbar.add_task(
+        logger.info("Generating predictions")
+        prediction_progress = pbar.add_task(
             "Generating predictions",
             total=sum([len(mutations) for mutations in mutations_per_protein.values()]),
         )
         for id, sequence in sequences.items():
-            pbar.update(overall_progress, description=id)
+            pbar.update(prediction_progress, description=id)
             embedding = embeddings[id].to(device)
             y = model(embedding)
             y = mask_non_mutations(y, sequence)
+            vespag_scores[id] = y.detach().numpy()
+            pbar.advance(prediction_progress, len(mutations_per_protein[id]))
 
+            if normalize_scores:
+                normalizer = ScoreNormalizer("sigmoid")
+            else:
+                normalizer = None
+
+        pbar.remove_task(prediction_progress)
+
+        logger.info("Scoring mutations")
+        scoring_progress = pbar.add_task(
+            "Scoring mutations",
+            total=sum([len(mutations) for mutations in mutations_per_protein.values()]),
+        )
+        for id, y in vespag_scores.items():
+            pbar.update(scoring_progress, description=id)
             scores_per_protein[id] = {
                 mutation: compute_mutation_score(
                     y,
                     mutation,
-                    pbar=pbar,
-                    progress_id=overall_progress,
                     transform=transform_scores,
-                    normalize=normalize_scores,
+                    normalizer=normalizer,
+                    pbar=pbar,
+                    progress_id=scoring_progress,
                 )
                 for mutation in mutations_per_protein[id]
             }
-            if h5_output:
-                vespag_scores[id] = y.detach().numpy()
+        pbar.remove_task(scoring_progress)
 
-        pbar.remove_task(overall_progress)
     if h5_output:
         h5_output_path = output_path / "vespag_scores_all.h5"
         logger.info(f"Serializing predictions to {h5_output_path}")

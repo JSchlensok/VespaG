@@ -12,7 +12,7 @@ from jaxtyping import Float
 
 from vespag.utils.type_hinting import typeguard_ignore
 
-from .utils import GEMME_ALPHABET, normalize_score, transform_score
+from .utils import GEMME_ALPHABET, ScoreNormalizer, transform_scores
 
 
 @dataclass
@@ -92,7 +92,7 @@ def compute_mutation_score(
     mutation: Mutation | SAV,
     alphabet: str = GEMME_ALPHABET,
     transform: bool = True,
-    normalize: bool = True,
+    normalizer: ScoreNormalizer | None = None,
     pbar: rich.progress.Progress | None = None,
     progress_id: int | None = None,
 ) -> float:
@@ -105,11 +105,11 @@ def compute_mutation_score(
         raw_scores = [substitution_score_matrix[mutation.position][alphabet.index(mutation.to_aa)].item()]
 
     if transform:
-        raw_scores = [transform_score(score) for score in raw_scores]
+        raw_scores = transform_scores(raw_scores)
 
     score = sum(raw_scores)
 
-    if normalize:
-        score = normalize_score(score)
+    if normalizer:
+        score = normalizer.normalize_score(score)
 
     return score

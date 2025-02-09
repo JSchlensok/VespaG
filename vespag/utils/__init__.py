@@ -8,6 +8,7 @@ __all__ = [
     "SAV",
     "VESPA_ALPHABET",
     "Mutation",
+    "ScoreNormalizer",
     "compute_mutation_score",
     "download",
     "get_deviceget_embedding_dim",
@@ -18,5 +19,6 @@ __all__ = [
     "read_mutation_file",
     "save_async",
     "setup_logger",
+    "transform_scores",
     "unzip",
 ]

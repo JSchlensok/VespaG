@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import math
 import zipfile
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Literal
 
@@ -143,13 +144,39 @@ raw_score_cdf = np.loadtxt("data/score_transformation/vespag_scores.csv", delimi
 sorted_gemme_scores = np.loadtxt("data/score_transformation/sorted_gemme_scores.csv", delimiter=",")
 
 
-def transform_score(score: float) -> float:
+def transform_scores(scores: Sequence[float]) -> list[float]:
     """Transform VespaG score distribution by mapping it to a known distribution of GEMME scores through its quantile"""
-    quantile = (raw_score_cdf <= score).mean()
-    score = np.interp(quantile, np.linspace(0, 1, len(sorted_gemme_scores)), sorted_gemme_scores)
-    return score
+    # TODO vectorize, this is quick and dirty
+    transformed_scores = []
+    for score in scores:
+        quantile = (raw_score_cdf <= score).mean()
+        transformed_scores.append(np.interp(quantile, np.linspace(0, 1, len(sorted_gemme_scores)), sorted_gemme_scores))
+    return transformed_scores
 
 
-def normalize_score(score: float) -> float:
-    """Normalize VespaG score to [0, 1] range."""
-    return 1 / (1 + math.exp(-score))
+class ScoreNormalizer:
+    def __init__(self, type: Literal["sigmoid", "minmax"]) -> None:
+        self.type = type
+        if type == "minmax":
+            self.scaler = sklearn.preprocessing.MinMaxScaler()
+        else:
+            self.scaler = None
+
+    def fit(self, all_scores: np.ndarray | Iterable[float]) -> None:
+        if type(all_scores) != np.ndarray:
+            all_scores = np.array(all_scores)
+        if self.type == "minmax":
+            self.scaler.fit(all_scores.reshape(-1, 1))
+        else:
+            pass
+
+    def normalize_score(self, score: float) -> float:
+        """Normalize VespaG score to range."""
+        return self.normalize_scores([score])[0]
+
+    def normalize_scores(self, scores: Sequence[float]) -> list[float]:
+        """Normalize VespaG scores to range."""
+        if self.type == "sigmoid":
+            return [1 / (1 + math.exp(-score)) for score in scores]
+        elif self.type == "minmax":
+            return list(self.scaler.transform(scores.reshape(-1, 1)).reshape(-1))
