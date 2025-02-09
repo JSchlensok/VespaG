@@ -22,7 +22,8 @@ class TestUtils(unittest.TestCase):
 
     def test_normalize_scores(self) -> None:
         """Test whether score normalization leads to a change in correlation with experimental scores."""
-        normalizer = ScoreNormalizer("sigmoid")
+        normalizer = ScoreNormalizer("minmax")
+        normalizer.fit(self.raw_vespag_scores)
         normalized_vespag_scores = normalizer.normalize_scores(self.raw_vespag_scores)
         spearman_raw = stats.spearmanr(self.dms_scores, self.raw_vespag_scores).statistic
         spearman_normalized = stats.spearmanr(self.dms_scores, normalized_vespag_scores).statistic

@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import requests
 import rich.progress as progress
+import sklearn.preprocessing
 import torch
 import torch.multiprocessing as mp
 from rich.logging import RichHandler
@@ -140,6 +141,8 @@ def read_gemme_table(txt_file: Path) -> np.ndarray:
     return df.to_numpy()
 
 
+# TODO make this more elegant, e.g. through .npz file
+# write test that Spearman on PG stays the same
 raw_score_cdf = np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=",")
 sorted_gemme_scores = np.loadtxt("data/score_transformation/sorted_gemme_scores.csv", delimiter=",")
 
@@ -174,9 +177,11 @@ class ScoreNormalizer:
         """Normalize VespaG score to range."""
         return self.normalize_scores([score])[0]
 
-    def normalize_scores(self, scores: Sequence[float]) -> list[float]:
+    def normalize_scores(self, scores: np.ndarray | Sequence[float]) -> list[float]:
         """Normalize VespaG scores to range."""
         if self.type == "sigmoid":
             return [1 / (1 + math.exp(-score)) for score in scores]
         elif self.type == "minmax":
+            if type(scores) != np.ndarray:
+                scores = np.array(scores)
             return list(self.scaler.transform(scores.reshape(-1, 1)).reshape(-1))

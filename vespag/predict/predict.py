@@ -125,10 +125,11 @@ def generate_predictions(
             vespag_scores[id] = y.detach().numpy()
             pbar.advance(prediction_progress, len(mutations_per_protein[id]))
 
-            if normalize_scores:
-                normalizer = ScoreNormalizer("sigmoid")
-            else:
-                normalizer = None
+        if normalize_scores:
+            normalizer = ScoreNormalizer("minmax")
+            normalizer.fit(np.concatenate([y.flatten() for y in vespag_scores.values()]))
+        else:
+            normalizer = None
 
         pbar.remove_task(prediction_progress)
 
