@@ -12,8 +12,9 @@ Assessed on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https:
 More details on **VespaG** can be found in the corresponding [preprint](https://doi.org/10.1101/2024.04.24.590982).
 
 ### Installation
-1. `git clone`
-2. `uv pip install .`
+0. create virtual environment
+1. `git clone https://github.com/jschlensok/vespag.git`
+2. `pip install .` or `uv pip install .`
 
 ### Quick Start: Running Inference with VespaG
 Run `vespag predict` with the following options:
