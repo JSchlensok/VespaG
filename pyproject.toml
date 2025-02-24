@@ -1,31 +1,104 @@
-[tool.poetry]
+[project]
 name = "vespag"
 version = "0.1.0"
 description = "Accurate and blazingly fast protein fitness prediction using protein language models"
-authors = ["Julius Schlensok <julius@schlensok.org>"]
+authors = [
+    {name = "Julius Schlensok", email = "julius@schlensok.org"}
+]
 license = "GPL-3.0"
 readme = "README.md"
-package-mode = false
+requires-python = ">=3.10"
+dependencies = [
+    "beartype~=0.20.0",
+    "biopython==1.83",
+    "dvc==3.52.0",
+    "h5py==3.11.0",
+    "jaxtyping~=0.2.28",
+    "matplotlib==3.8.4",
+    "mkl==2024.0; sys_platform != 'darwin'",
+    "numpy==2.2.2",
+    "pandas==2.2.2",
+    "polars==0.20.21",
+    "rich==13.7.1",
+    "seaborn==0.13.2",
+    "sentencepiece~=0.2.0",
+    "torch~=2.6.0",
+    "tqdm~=4.67",
+    "typer~=0.15.1",
+    "transformers~=4.48",
+    "wandb==0.19.6",
+    "pingouin~=0.5.5"
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
+[project.scripts]
+vespag = "vespag.__main__:app"
 
-biopython = "1.83"
-dvc = "3.52.0"
-h5py = "3.11.0"
-jaxtyping = "^0.2.28"
-matplotlib = "3.8.4"
-MKL = {markers = "sys_platform != 'darwin'", version = "2024.0"}
-numpy = "1.26.4"
-pandas = "2.2.2"
-polars = "0.20.21"
-rich = "13.7.1"
-seaborn = "0.13.2"
-sentencepiece = "^0.2.0"
-torch = "2.1.1"
-tqdm = "^4.66.2"
-typer = "0.12.3"
-transformers = "^4.40.1"
-wandb = "^0.16.5"
+[project.optional-dependencies]
+dev = [
+    "bandit~=1.8.2",
+    "ipykernel~=6.29.5",
+    "mypy~=1.15.0",
+    "nox~=2024.10.9",
+    "pre-commit~=4.1.0",
+    "pre-commit-hooks~=5.0.0",
+    "pytest~=8.3.4",
+    "pytest-cov~=6.0.0",
+    "pytest-mock~=3.14.0",
+    "ruff~=0.9.4",
+    "safety~=3.2.14",
+    "pytest-beartype~=0.2.0",
+    "types-pyyaml~=6.0.12.20241230",
+    "types-seaborn~=0.13.2.20250111",
+    "types-tqdm~=4.67.0.20241221"
+]
 
-[tools.poetry.dev-dependencies]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+pythonpath = "."
+filterwarnings = [
+    "ignore:beartype.roar.BeartypeDecorHintNonpepException"
+]
+
+[tool.coverage.paths]
+source = ["vespag", "*/site-packages"]
+
+[tool.coverage.run]
+branch = true
+source = ["vespag"]
+
+[tool.coverage.report]
+show_missing = true
+exclude_also = [
+    "if TYPE_CHECKING:"
+]
+
+[tool.ruff]
+include = [
+    "*.py",
+    "pyproject.toml",
+    "README.md",
+]
+
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["C4", "I", "UP", "YTT", "RUF"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+]

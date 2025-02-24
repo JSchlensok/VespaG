@@ -1,13 +1,8 @@
 import torch
+from beartype.typing import Type
 from jaxtyping import Float
 
 from .utils import construct_fnn
-
-"""
-batch_size x L x 1536
-- transform ->
-batch_size x 1536 x L x 1
-"""
 
 
 class MinimalCNN(torch.nn.Module):
@@ -37,16 +32,14 @@ class MinimalCNN(torch.nn.Module):
         kernel_size=7,
         padding=3,
         fnn_hidden_layers: list[int] = [256, 64],
-        activation_function: torch.nn.Module = torch.nn.LeakyReLU,
+        activation_function: Type[torch.nn.Module] = torch.nn.LeakyReLU,
         output_activation_function: torch.nn.Module = None,
-        cnn_dropout_rate: float = None,
-        fnn_dropout_rate: float = None,
+        cnn_dropout_rate: float | None = None,
+        fnn_dropout_rate: float | None = None,
     ):
-        super(MinimalCNN, self).__init__()
+        super().__init__()
         conv_layers = [
-            torch.nn.Conv1d(
-                input_dim, n_channels, kernel_size=kernel_size, padding=padding
-            ),
+            torch.nn.Conv1d(input_dim, n_channels, kernel_size=kernel_size, padding=padding),
             activation_function(),
         ]
 
@@ -91,12 +84,12 @@ class CombinedCNN(torch.nn.Module):
         fnn_hidden_layers: list[int] = [256, 64],
         shared_hidden_layers: list[int] = [64],
         activation_function: torch.nn.Module = torch.nn.LeakyReLU,
-        output_activation_function: torch.nn.Module = None,
-        shared_dropout_rate: float = None,
-        cnn_dropout_rate: float = None,
-        fnn_dropout_rate: float = None,
+        output_activation_function: torch.nn.Module | None = None,
+        shared_dropout_rate: float | None = None,
+        cnn_dropout_rate: float | None = None,
+        fnn_dropout_rate: float | None = None,
     ):
-        super(CombinedCNN, self).__init__()
+        super().__init__()
         self.conv = MinimalCNN(
             input_dim=input_dim,
             output_dim=cnn_hidden_layers[-1],

@@ -25,9 +25,9 @@ def train(
     datasets: list[str],
     output_dir: Path,
     embedding_type: str,
+    wandb_config: tuple[str, str] | None = None,
     compute_full_train_loss: bool = False,
     sampling_strategy: str = "basic",
-    wandb_config: tuple[str, str] = None,
     limit_cache: bool = False,
     use_full_dataset: bool = False,
 ):
@@ -36,7 +36,7 @@ def train(
     wandb_logger.setLevel(logging.INFO)
     device = get_device()
     precision = get_precision()
-    logger.info(f"Using device {str(device)} with precision {precision}")
+    logger.info(f"Using device {device!s} with precision {precision}")
 
     params = params_show()
 
@@ -71,9 +71,7 @@ def train(
     big_train_dataset = torch.utils.data.ConcatDataset(list(train_datasets.values()))
 
     if sampling_strategy == "basic":
-        train_dl = torch.utils.data.DataLoader(
-            big_train_dataset, batch_size=training_batch_size, shuffle=True
-        )
+        train_dl = torch.utils.data.DataLoader(big_train_dataset, batch_size=training_batch_size, shuffle=True)
     else:
         # TODO implement properly
         # TODO factor out
@@ -87,17 +85,13 @@ def train(
         train_dl = torch.utils.data.DataLoader(
             big_train_dataset,
             batch_size=training_batch_size,
-            sampler=torch.utils.data.WeightedRandomSampler(
-                train_weights, epoch_size, replacement=True
-            ),
+            sampler=torch.utils.data.WeightedRandomSampler(train_weights, epoch_size, replacement=True),
             shuffle=True,
         )
 
     train_eval_dls = (
         {
-            name: torch.utils.data.DataLoader(
-                dataset, batch_size=validation_batch_size, shuffle=False
-            )
+            name: torch.utils.data.DataLoader(dataset, batch_size=validation_batch_size, shuffle=False)
             for name, dataset in train_datasets.items()
         }
         if not use_full_dataset
@@ -119,9 +113,7 @@ def train(
             for dataset in datasets
         }
         val_dls = {
-            name: torch.utils.data.DataLoader(
-                dataset, batch_size=validation_batch_size, shuffle=False
-            )
+            name: torch.utils.data.DataLoader(dataset, batch_size=validation_batch_size, shuffle=False)
             for name, dataset in val_datasets.items()
         }
     else:
@@ -129,18 +121,14 @@ def train(
 
     architecture = params["models"][model_config_key]["architecture"]
     model_parameters = params["models"][model_config_key]["model_parameters"]
-    model = load_model_from_config(architecture, model_parameters, embedding_type).to(
-        device
-    )
+    model = load_model_from_config(architecture, model_parameters, embedding_type).to(device)
 
     # TODO parametrize
     criterion = torch.nn.MSELoss()
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
 
     # TODO pull out to param file
-    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, patience=epochs / 25, factor=0.33
-    )
+    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=epochs / 25, factor=0.33)
 
     if wandb_config:
         logger.info("Setting up WandB")
@@ -163,19 +151,11 @@ def train(
 
         wandb.define_metric("epoch")
         wandb.define_metric("learning_rate", step_metric="epoch")
-        for dataset in datasets + ["overall"]:
-            wandb.define_metric(
-                f"train/{dataset}/loss", step_metric="epoch", summary="min"
-            )
-            wandb.define_metric(
-                f"train/{dataset}/spearman", step_metric="epoch", summary="max"
-            )
-            wandb.define_metric(
-                f"val/{dataset}/loss", step_metric="epoch", summary="min"
-            )
-            wandb.define_metric(
-                f"val/{dataset}/spearman", step_metric="epoch", summary="max"
-            )
+        for dataset in [*datasets, "overall"]:
+            wandb.define_metric(f"train/{dataset}/loss", step_metric="epoch", summary="min")
+            wandb.define_metric(f"train/{dataset}/spearman", step_metric="epoch", summary="max")
+            wandb.define_metric(f"val/{dataset}/loss", step_metric="epoch", summary="min")
+            wandb.define_metric(f"val/{dataset}/spearman", step_metric="epoch", summary="max")
         wandb_cache_dir = Path.cwd() / ".wandb/cache"
         wandb_cache_dir.mkdir(exist_ok=True, parents=True)
         os.environ["WANDB_CACHE_DIR"] = str(wandb_cache_dir)
@@ -183,9 +163,10 @@ def train(
     threads = mp.cpu_count()
     mp.set_start_method("spawn", force=True)
 
-    with progress.Progress(
-        *progress.Progress.get_default_columns(), progress.TimeElapsedColumn()
-    ) as pbar, mp.Pool(threads) as pool:
+    with (
+        progress.Progress(*progress.Progress.get_default_columns(), progress.TimeElapsedColumn()) as pbar,
+        mp.Pool(threads) as pool,
+    ):
         print()
         progress_task_id = pbar.add_task("Training", total=epochs)
         trainer = Trainer(

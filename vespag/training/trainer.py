@@ -25,7 +25,7 @@ class Trainer:
         criterion,
         progress_bar: progress.Progress,
         output_dir: Path,
-        logger: logging.Logger = None,
+        logger: logging.Logger | None = None,
         use_wandb: bool = True,
     ):
         self.run = run
@@ -54,9 +54,7 @@ class Trainer:
         self.best_metadata = None
 
     def train_epoch(self):
-        progress_id = self.progress_bar.add_task(
-            f"Train epoch: {self.epoch + 1:4d}", total=len(self.train_dl)
-        )
+        progress_id = self.progress_bar.add_task(f"Train epoch: {self.epoch + 1:4d}", total=len(self.train_dl))
         self.model.train()
         for embeddings, annotations in self.train_dl:
             self.total_steps += embeddings.shape[0]
@@ -119,9 +117,7 @@ class Trainer:
     def train_eval_epoch(self, save_predictions: bool = False):
         self.model.eval()
         n_train_batches = int(sum(len(dl) for dl in self.train_eval_dls.values()))
-        progress_id = self.progress_bar.add_task(
-            f"Train eval epoch: {self.epoch:4d}", total=n_train_batches
-        )
+        progress_id = self.progress_bar.add_task(f"Train eval epoch: {self.epoch:4d}", total=n_train_batches)
 
         all_annotations = []
         all_preds = []
@@ -181,9 +177,7 @@ class Trainer:
     def val_epoch(self, save_predictions: bool = False):
         self.model.eval()
         n_val_batches = int(sum(len(dl) for dl in self.val_dls.values()))
-        progress_id = self.progress_bar.add_task(
-            f"Val epoch: {self.epoch:4d}", total=n_val_batches
-        )
+        progress_id = self.progress_bar.add_task(f"Val epoch: {self.epoch:4d}", total=n_val_batches)
         all_annotations = []
         all_preds = []
 
@@ -256,9 +250,7 @@ class Trainer:
 
     def save_state_dict(self, alias: str) -> None:
         if self.logger:
-            self.logger.info(
-                f"Saving checkpoint to {self.output_dir}/{alias}/state_dict.pt"
-            )
+            self.logger.info(f"Saving checkpoint to {self.output_dir}/{alias}/state_dict.pt")
         checkpoint_path = self.output_dir / f"{alias}/state_dict.pt"
         save_async(
             {key: value.cpu() for key, value in self.model.state_dict().items()},
@@ -278,8 +270,6 @@ class Trainer:
                 wandb.log_artifact(latest_artifact, aliases=["latest", "best"])
             else:
                 wandb.log_artifact(latest_artifact, aliases=["latest"])
-                best_artifact = wandb.Artifact(
-                    name=f"model-{self.run}", type="model", metadata=self.best_metadata
-                )
+                best_artifact = wandb.Artifact(name=f"model-{self.run}", type="model", metadata=self.best_metadata)
                 best_artifact.add_dir(self.output_dir / f"epoch-{self.best_epoch}")
                 wandb.log_artifact(best_artifact, aliases=["best"])

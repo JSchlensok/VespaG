@@ -1,22 +1,24 @@
+import itertools
 from copy import deepcopy
 
 import torch
+from beartype.typing import Type
 
 
 def construct_fnn(
     hidden_layer_sizes: list[int],
     input_dim: int = 1024,
     output_dim: int = 20,
-    activation_function: torch.nn.Module = torch.nn.LeakyReLU,
-    output_activation_function: torch.nn.Module = None,
-    dropout_rate: float = None,
+    activation_function: Type[torch.nn.Module] = torch.nn.LeakyReLU,
+    output_activation_function: Type[torch.nn.Module] | None = None,
+    dropout_rate: float | None = None,
 ):
     layer_sizes = deepcopy(hidden_layer_sizes)
 
     layer_sizes.insert(0, input_dim)
     layer_sizes.append(output_dim)
-    layers = []
-    for in_size, out_size in zip(layer_sizes, layer_sizes[1:]):
+    layers: list[torch.nn.Module] = []
+    for in_size, out_size in itertools.pairwise(layer_sizes):
         layers.append(torch.nn.Linear(in_size, out_size))
         if dropout_rate:
             layers.append(torch.nn.Dropout(dropout_rate))
@@ -37,7 +39,7 @@ def construct_fnn(
 
 class MeanModel(torch.nn.Module):
     def __init__(self, *models: torch.nn.Module):
-        super(MeanModel, self).__init__()
+        super().__init__()
         self.models = list(models)
 
     def forward(self, x):

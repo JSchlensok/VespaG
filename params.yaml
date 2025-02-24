@@ -5,7 +5,7 @@ datasets:
       embeddings:
         prott5: data/train/human/prott5_embeddings.h5
         esm2: data/train/human/esm2_embeddings.h5
-      gemme: 
+      gemme:
         raw: data/train/human5k/gemme_predictions/
         processed: data/train/human5k/gemme_predictions.h5
       splits:
@@ -16,7 +16,7 @@ datasets:
       embeddings:
         prott5: data/train/droso/prott5_embeddings.h5
         esm2: data/train/droso/esm2_embeddings.h5
-      gemme: 
+      gemme:
         raw: data/train/droso4k/gemme_predictions/
         processed: data/train/droso4k/gemme_predictions.h5
       splits:
@@ -49,7 +49,7 @@ datasets:
       embeddings:
         prott5: data/train/all/prott5_embeddings.h5
         esm2: data/train/all/esm2_embeddings.h5
-      gemme: 
+      gemme:
         raw: data/train/all9k/gemme_predictions/
         processed: data/train/all9k/gemme_predictions.h5
       splits:

@@ -1,6 +1,7 @@
 # Local stuff
 .dvc/
 .esm2_cache/
+.nox/
 .prott5_cache/
 .vscode/
 .wandb/
@@ -13,6 +14,7 @@
 /output/
 /plots/
 /workflows/
+dist/
 
 # Large data
 # The default needs to ignore all files with an extension instead of folders as it is not possible to re-include a file if a parent directory of that file is excluded.
@@ -21,11 +23,14 @@ data/**/*.*
 !data/train/*.fasta
 !data/test/*.csv
 !data/test/*.fasta
+!data/score_transformation/*
 
 # Python artifacts
-src/vespag/**/__pycache__
-vespag/**/__pycache__
+**/__pycache__
 
 # macOS clutter
 **/.DS_store
 **/_MACOSX/
+
+# Code cov report
+.coverage

@@ -22,9 +22,7 @@ def store_gemme_as_h5(gemme_folder: Path, output_file: Path) -> None:
 
 @app.command()
 def load(
-    gemme_folder: Annotated[
-        Path, typer.Argument(help="Directory with raw GEMME predictions as txt files")
-    ],
+    gemme_folder: Annotated[Path, typer.Argument(help="Directory with raw GEMME predictions as txt files")],
     output_file: Annotated[Path, typer.Argument(help="Path of output H5 file")],
 ):
     store_gemme_as_h5(gemme_folder, output_file)

@@ -31,7 +31,7 @@ import seaborn as sns
 @pl.api.register_lazyframe_namespace("sns")
 @dataclass
 class SeabornPlotting:
-    df: Union[pl.DataFrame, pl.LazyFrame]
+    df: pl.DataFrame | pl.LazyFrame
 
     def pipe(self, func, /, **kwargs):
         def maybe_collect(df):
@@ -48,12 +48,7 @@ class SeabornPlotting:
             exprs[expr.meta.output_name()] = expr
             kwargs[key] = expr.meta.output_name()
 
-        return (
-            self.df.select(list(exprs.values()))
-            .pipe(maybe_collect)
-            .to_pandas()
-            .pipe(func, **kwargs)
-        )
+        return self.df.select(list(exprs.values())).pipe(maybe_collect).to_pandas().pipe(func, **kwargs)
 
     relplot = ft.partialmethod(pipe, sns.relplot)
     scatterplot = ft.partialmethod(pipe, sns.scatterplot)

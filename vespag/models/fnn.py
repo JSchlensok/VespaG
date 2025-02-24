@@ -27,10 +27,10 @@ class FNN(torch.nn.Module):
         input_dim: int = 2560,
         output_dim: int = 20,
         activation_function: torch.nn.Module = torch.nn.LeakyReLU,
-        output_activation_function: torch.nn.Module = None,
-        dropout_rate: float = None,
+        output_activation_function: torch.nn.Module | None = None,
+        dropout_rate: float | None = None,
     ):
-        super(FNN, self).__init__()
+        super().__init__()
         self.net = construct_fnn(
             hidden_layer_sizes,
             input_dim,

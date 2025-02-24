@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 
@@ -25,7 +25,7 @@ def predict(
         ),
     ],
     output_path: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "-o",
             "--output",
@@ -33,7 +33,7 @@ def predict(
         ),
     ] = None,
     embedding_file: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "-e",
             "--embeddings",
@@ -41,20 +41,18 @@ def predict(
         ),
     ] = None,
     mutation_file: Annotated[
-        Path,
-        typer.Option(
-            "--mutation-file", help="CSV file specifying specific mutations to score"
-        ),
+        Path | None,
+        typer.Option("--mutation-file", help="CSV file specifying specific mutations to score"),
     ] = None,
     id_map_file: Annotated[
-        Path,
+        Path | None,
         typer.Option(
             "--id-map",
             help="CSV file mapping embedding IDs to FASTA IDs if they're different",
         ),
     ] = None,
     single_csv: Annotated[
-        Optional[bool],
+        bool,
         typer.Option(
             "--single-csv/--multi-csv",
             help="Whether to return one CSV file for all proteins instead of a single file for each protein",
@@ -62,9 +60,7 @@ def predict(
     ] = False,
     no_csv: Annotated[
         bool,
-        typer.Option(
-            "--no-csv/--csv", help="Whether no CSV output should be produced at all"
-        ),
+        typer.Option("--no-csv/--csv", help="Whether no CSV output should be produced at all"),
     ] = False,
     h5_output: Annotated[
         bool,
@@ -96,38 +92,32 @@ def predict(
     ] = True,
     embedding_type: Annotated[
         EmbeddingType,
-        typer.Option(
-            "--embedding-type", help="Type of pLM used for generating embeddings"
-        ),
-    ] = "esm2",
+        typer.Option("--embedding-type", help="Type of pLM used for generating embeddings"),
+    ] = EmbeddingType.esm2,
 ) -> None:
     id_map_file = None
     generate_predictions(
-        fasta_file,
-        output_path,
-        embedding_file,
-        mutation_file,
-        id_map_file,
-        single_csv,
-        no_csv,
-        h5_output,
-        zero_based_mutations,
-        normalize_scores,
-        embedding_type,
+        fasta_file=fasta_file,
+        output_path=output_path,
+        embedding_file=embedding_file,
+        mutation_file=mutation_file,
+        id_map_file=id_map_file,
+        single_csv=single_csv,
+        no_csv=no_csv,
+        h5_output=h5_output,
+        zero_based_mutations=zero_based_mutations,
+        normalize_scores=normalize_scores,
+        embedding_type=embedding_type,
     )
 
 
 @app.command()
 def embed(
     input_fasta_file: Annotated[Path, typer.Argument(help="Path of input FASTA file")],
-    output_h5_file: Annotated[
-        Path, typer.Argument(help="Path for saving HDF5 file with computed embeddings")
-    ],
+    output_h5_file: Annotated[Path, typer.Argument(help="Path for saving HDF5 file with computed embeddings")],
     cache_dir: Annotated[
         Path,
-        typer.Option(
-            "-c", "--cache-dir", help="Custom path to download model checkpoints to"
-        ),
+        typer.Option("-c", "--cache-dir", help="Custom path to download model checkpoints to"),
     ],
     embedding_type: Annotated[
         EmbeddingType,
@@ -139,13 +129,11 @@ def embed(
         ),
     ] = EmbeddingType.esm2,
     pretrained_path: Annotated[
-        str,
+        str | None,
         typer.Option("--pretrained-path", help="Path or URL of pretrained transformer"),
     ] = None,
 ):
-    generate_embeddings(
-        input_fasta_file, output_h5_file, cache_dir, embedding_type, pretrained_path
-    )
+    generate_embeddings(input_fasta_file, output_h5_file, cache_dir, embedding_type, pretrained_path)
 
 
 @app.command()
@@ -156,22 +144,22 @@ def train(
     embedding_type: Annotated[str, typer.Option("--embedding-type", "-e")],
     compute_full_train_loss: Annotated[bool, typer.Option("--full-train-loss")] = False,
     sampling_strategy: Annotated[str, typer.Option("--sampling-strategy")] = "basic",
-    wandb_config: Annotated[tuple[str, str], typer.Option("--wandb")] = None,
+    wandb_config: Annotated[tuple[str, str] | None, typer.Option("--wandb")] = None,
     limit_cache: Annotated[bool, typer.Option("--limit-cache")] = False,
     use_full_dataset: Annotated[bool, typer.Option("--use-full-dataset")] = False,
 ):
     run_training(
-        model_config_key,
-        datasets,
-        output_dir,
-        embedding_type,
-        compute_full_train_loss,
-        sampling_strategy,
-        wandb_config,
-        limit_cache,
-        use_full_dataset,
+        model_config_key=model_config_key,
+        datasets=datasets,
+        output_dir=output_dir,
+        embedding_type=embedding_type,
+        compute_full_train_loss=compute_full_train_loss,
+        sampling_strategy=sampling_strategy,
+        wandb_config=wandb_config,
+        limit_cache=limit_cache,
+        use_full_dataset=use_full_dataset,
     )
 
 
 if __name__ == "__main__":
-    app()
+    app(prog_name="vespag")

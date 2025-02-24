@@ -10,7 +10,7 @@ import rich
 import torch
 from jaxtyping import Float
 
-from .utils import GEMME_ALPHABET, normalize_score, transform_score
+from .utils import GEMME_ALPHABET, ScoreNormalizer, transform_scores
 
 
 @dataclass
@@ -21,9 +21,7 @@ class SAV:
     one_indexed: bool = False
 
     @classmethod
-    def from_sav_string(
-        cls, sav_string: str, one_indexed: bool = False, offset: int = 0
-    ) -> SAV:
+    def from_sav_string(cls, sav_string: str, one_indexed: bool = False, offset: int = 0) -> SAV:
         from_aa, to_aa = sav_string[0], sav_string[-1]
         position = int(sav_string[1:-1]) - offset
         if one_indexed:
@@ -45,9 +43,7 @@ class Mutation:
     savs: list[SAV]
 
     @classmethod
-    def from_mutation_string(
-        cls, mutation_string: str, one_indexed: bool = False, offset: int = 0
-    ) -> Mutation:
+    def from_mutation_string(cls, mutation_string: str, one_indexed: bool = False, offset: int = 0) -> Mutation:
         return Mutation(
             [
                 SAV.from_sav_string(sav_string, one_indexed=one_indexed, offset=offset)
@@ -79,48 +75,37 @@ def mask_non_mutations(
     return gemme_prediction
 
 
-def read_mutation_file(
-    mutation_file: Path, one_indexed: bool = False
-) -> dict[str, list[SAV]]:
+def read_mutation_file(mutation_file: Path, one_indexed: bool = False) -> dict[str, list[SAV]]:
     mutations_per_protein = defaultdict(list)
     for row in pl.read_csv(mutation_file).iter_rows():
-        mutations_per_protein[row[0]].append(
-            Mutation.from_mutation_string(row[1], one_indexed)
-        )
+        mutations_per_protein[row[0]].append(Mutation.from_mutation_string(row[1], one_indexed))
 
     return mutations_per_protein
 
 
 def compute_mutation_score(
-    substitution_score_matrix: Float[torch.Tensor, "length 20"],
-    mutation: Union[Mutation, SAV],
+    substitution_score_matrix: Float[np.typing.ArrayLike, "length 20"],
+    mutation: Mutation | SAV,
     alphabet: str = GEMME_ALPHABET,
     transform: bool = True,
-    normalize: bool = True,
-    pbar: rich.progress.Progress = None,
-    progress_id: int = None,
+    normalizer: ScoreNormalizer | None = None,
+    pbar: rich.progress.Progress | None = None,
+    progress_id: int | None = None,
 ) -> float:
     if pbar:
         pbar.advance(progress_id)
 
     if isinstance(mutation, Mutation):
-        raw_scores = [
-            substitution_score_matrix[sav.position][alphabet.index(sav.to_aa)].item()
-            for sav in mutation
-        ]
+        raw_scores = [substitution_score_matrix[sav.position][alphabet.index(sav.to_aa)].item() for sav in mutation]
     else:
-        raw_scores = [
-            substitution_score_matrix[mutation.position][
-                alphabet.index(mutation.to_aa)
-            ].item()
-        ]
+        raw_scores = [substitution_score_matrix[mutation.position][alphabet.index(mutation.to_aa)].item()]
 
     if transform:
-        raw_scores = [transform_score(score) for score in raw_scores]
+        raw_scores = transform_scores(raw_scores)
 
     score = sum(raw_scores)
 
-    if normalize:
-        score = normalize_score(score)
+    if normalizer:
+        score = normalizer.normalize_score(score)
 
     return score
