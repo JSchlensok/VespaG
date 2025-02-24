@@ -72,7 +72,7 @@ def load_model(
 
 
 def setup_logger() -> logging.Logger:
-    logging.basicConfig(level="NOTSET", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()])
+    logging.basicConfig(level="INFO", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()])
     logger = logging.getLogger("rich")
     logger.setLevel(logging.INFO)
     return logger
