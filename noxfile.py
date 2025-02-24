@@ -9,7 +9,7 @@ nox.options.default_venv_backend = "uv"
 @nox.session(name="pre-commit", python=python_versions)
 def precommit(session: nox.Session) -> None:
     session.install("uv")
-    session.run("uv", "pip", "install", "-r", "pre-commit", "pre-commit-hooks", "ruff")
+    session.run("uv", "pip", "install", "pre-commit", "pre-commit-hooks", "ruff")
     session.run("pre-commit")
 
 
