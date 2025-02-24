@@ -2,7 +2,7 @@ import nox
 
 package = "vespag"
 python_versions = ["3.10"]
-nox.options.sessions = ["pre-commit", "tests", "coverage", "beartype", "bandit", "safety"]
+nox.options.sessions = ["pre-commit", "tests", "coverage", "mypy", "beartype", "bandit", "safety"]
 nox.options.default_venv_backend = "uv"
 
 
