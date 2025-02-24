@@ -33,6 +33,7 @@ def coverage(session: nox.Session) -> None:
     session.run("coverage", "report", "-i")
 
 
+# TODO fix issues
 @nox.session(python=python_versions)
 def mypy(session: nox.Session) -> None:
     session.install("uv")
