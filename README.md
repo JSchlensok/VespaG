@@ -59,14 +59,20 @@ Based on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://w
 - `--v1` if you want to get a result for the first iteration of ProteinGym with 87 assays.
 
 ## Preprint Citation
-If you find VespaG helpful in your work, please be so kind as to cite our pre-print:
+If you find VespaG helpful in your work, please be so kind as to cite our publication:
 ```
-@article{vespag,
-	author = {Celine Marquet and Julius Schlensok and Marina Abakarova and Burkhard Rost and Elodie Laine},
-	title = {VespaG: Expert-guided protein Language Models enable accurate and blazingly fast fitness prediction},
-	year = {2024},
-	doi = {10.1101/2024.04.24.590982},
-	publisher = {Cold Spring Harbor Laboratory},
-	URL = {https://www.biorxiv.org/content/early/2024/04/28/2024.04.24.590982},
-	journal = {bioRxiv}}
+@article{10.1093/bioinformatics/btae621,
+    author = {Marquet, Céline and Schlensok, Julius and Abakarova, Marina and Rost, Burkhard and Laine, Elodie},
+    title = {Expert-guided protein language models enable accurate and blazingly fast fitness prediction},
+    journal = {Bioinformatics},
+    volume = {40},
+    number = {11},
+    pages = {btae621},
+    year = {2024},
+    month = {11},
+    issn = {1367-4811},
+    doi = {10.1093/bioinformatics/btae621},
+    url = {https://doi.org/10.1093/bioinformatics/btae621},
+    eprint = {https://academic.oup.com/bioinformatics/article-pdf/40/11/btae621/60811415/btae621.pdf},
+}
 ```
