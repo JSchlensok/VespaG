@@ -9,6 +9,7 @@ license = "GPL-3.0"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "beartype~=0.20.0",
     "biopython==1.83",
     "dvc==3.52.0",
     "h5py==3.11.0",
@@ -45,7 +46,6 @@ dev = [
     "pytest-mock~=3.14.0",
     "ruff~=0.9.4",
     "safety~=3.2.14",
-    "beartype~=0.20.0",
     "pytest-beartype~=0.2.0",
     "types-pyyaml~=6.0.12.20241230",
     "types-seaborn~=0.13.2.20250111",
