@@ -9,7 +9,7 @@ import typer
 from Bio import SeqIO
 from transformers import AutoModel, AutoTokenizer, T5EncoderModel, T5Tokenizer
 
-from vespag.utils import get_device
+from vespag.utils import get_device, setup_logger
 from vespag.utils.type_hinting import EmbeddingType
 
 model_names = {
@@ -17,9 +17,10 @@ model_names = {
     "prott5": "Rostlab/prot_t5_xl_uniref50",
 }
 
+
+logger = setup_logger()
+
 # TODO implement generation of overlapping embeddings
-
-
 class Embedder:
     def __init__(self, pretrained_path: Path | str, cache_dir: Path | None = None) -> None:
         device = get_device()
@@ -112,12 +113,14 @@ def generate_embeddings(
         typer.Option("--pretrained-path", help="Path or URL of pretrained transformer"),
     ] = None,
 ):
+    logger.info(f"Generating {embedding_type} embeddings")
     if embedding_type and not pretrained_path:
         pretrained_path = model_names[embedding_type]
 
     sequences = {rec.id: str(rec.seq) for rec in SeqIO.parse(input_fasta_file, "fasta")}
     embedder = Embedder(pretrained_path, cache_dir)
     embeddings = embedder.embed(sequences)
+    logger.info(f"Saving generated {embedding_type.value} embeddings to {output_h5_file} for re-use")
     Embedder.save_embeddings(embeddings, output_h5_file)
 
 
