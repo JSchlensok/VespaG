@@ -4,12 +4,6 @@ from jaxtyping import Float
 
 from .utils import construct_fnn
 
-"""
-batch_size x L x 1536
-- transform ->
-batch_size x 1536 x L x 1
-"""
-
 
 class MinimalCNN(torch.nn.Module):
     """
