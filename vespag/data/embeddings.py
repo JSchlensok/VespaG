@@ -54,6 +54,7 @@ class Embedder:
 
         return batches
 
+    # TODO jaxtyping annotation
     def embed(self, sequences: dict[str, str], max_batch_length: int = 4096) -> dict[str, torch.tensor]:
         batches = self.batch(sequences, max_batch_length)
 

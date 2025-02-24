@@ -257,6 +257,15 @@ wheels = [
 ]
 
 [[package]]
+name = "beartype"
+version = "0.20.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/7d/48/fe1177f4272a1bc344f3371414aa5b76e19c30d7280d711ce90c5335a6f5/beartype-0.20.0.tar.gz", hash = "sha256:599ecc86b88549bcb6d1af626f44d85ffbb9151ace5d7f9f3b493dce2ffee529", size = 1390635 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/61/ce/9cf60b72e3fbd36a6dd16e31ecbe9ae137a8ead77cb24a5f75302adfc9a9/beartype-0.20.0-py3-none-any.whl", hash = "sha256:090d10e3540b3fca209a0ab5f1c15f9652a075da0a7249c2e6713011e9e5f6ef", size = 1139097 },
+]
+
+[[package]]
 name = "billiard"
 version = "4.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2748,6 +2757,19 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-beartype"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "beartype" },
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/63/69/954ee438f1c72f4247b09381cd07a7d776ebdb4f6c0359b3b971676a2eef/pytest_beartype-0.2.0.tar.gz", hash = "sha256:9eeec379f812e0e5c9c1bb7e95d90a33a79c387034f2d735e03bc9aa0fd7cf3f", size = 5871 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/81/69/87efc2482aab172a32e4147eb5666ebc2e4c875e17d3104878553720a83a/pytest_beartype-0.2.0-py3-none-any.whl", hash = "sha256:be6be04be4a143f965f21140d6661bab43dcd7c761d50cf6daa1b16848e5d2d0", size = 4940 },
+]
+
+[[package]]
 name = "pytest-cov"
 version = "6.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3775,18 +3797,6 @@ wheels = [
 ]
 
 [[package]]
-name = "typeguard"
-version = "4.4.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/62/c3/400917dd37d7b8c07e9723f3046818530423e1e759a56a22133362adab00/typeguard-4.4.1.tar.gz", hash = "sha256:0d22a89d00b453b47c49875f42b6601b961757541a2e1e0ef517b6e24213c21b", size = 74959 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f2/53/9465dedf2d69fe26008e7732cf6e0a385e387c240869e7d54eed49782a3c/typeguard-4.4.1-py3-none-any.whl", hash = "sha256:9324ec07a27ec67fc54a9c063020ca4c0ae6abad5e9f0f9804ca59aee68c6e21", size = 35635 },
-]
-
-[[package]]
 name = "typer"
 version = "0.15.1"
 source = { registry = "https://pypi.org/simple" }
@@ -3912,16 +3922,18 @@ dependencies = [
 [package.optional-dependencies]
 dev = [
     { name = "bandit" },
+    { name = "beartype" },
+    { name = "ipykernel" },
     { name = "mypy" },
     { name = "nox" },
     { name = "pre-commit" },
     { name = "pre-commit-hooks" },
     { name = "pytest" },
+    { name = "pytest-beartype" },
     { name = "pytest-cov" },
     { name = "pytest-mock" },
     { name = "ruff" },
     { name = "safety" },
-    { name = "typeguard" },
     { name = "types-pyyaml" },
     { name = "types-seaborn" },
     { name = "types-tqdm" },
@@ -3935,9 +3947,11 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "bandit", marker = "extra == 'dev'", specifier = "~=1.8.2" },
+    { name = "beartype", marker = "extra == 'dev'", specifier = "~=0.20.0" },
     { name = "biopython", specifier = "==1.83" },
     { name = "dvc", specifier = "==3.52.0" },
     { name = "h5py", specifier = "==3.11.0" },
+    { name = "ipykernel", marker = "extra == 'dev'", specifier = "~=6.29.5" },
     { name = "jaxtyping", specifier = "~=0.2.28" },
     { name = "matplotlib", specifier = "==3.8.4" },
     { name = "mkl", marker = "sys_platform != 'darwin'", specifier = "==2024.0" },
@@ -3950,6 +3964,7 @@ requires-dist = [
     { name = "pre-commit", marker = "extra == 'dev'", specifier = "~=4.1.0" },
     { name = "pre-commit-hooks", marker = "extra == 'dev'", specifier = "~=5.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "~=8.3.4" },
+    { name = "pytest-beartype", marker = "extra == 'dev'", specifier = "~=0.2.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = "~=6.0.0" },
     { name = "pytest-mock", marker = "extra == 'dev'", specifier = "~=3.14.0" },
     { name = "rich", specifier = "==13.7.1" },
@@ -3960,7 +3975,6 @@ requires-dist = [
     { name = "torch", specifier = "~=2.6.0" },
     { name = "tqdm", specifier = "~=4.67" },
     { name = "transformers", specifier = "~=4.48" },
-    { name = "typeguard", marker = "extra == 'dev'", specifier = "~=4.4.1" },
     { name = "typer", specifier = "~=0.15.1" },
     { name = "types-pyyaml", marker = "extra == 'dev'", specifier = "~=6.0.12.20241230" },
     { name = "types-seaborn", marker = "extra == 'dev'", specifier = "~=0.13.2.20250111" },

@@ -1,4 +1,5 @@
 bandit==1.8.2
+beartype==0.20.0
 biopython==1.83
 dvc==3.52.0
 h5py==3.11.0
@@ -15,6 +16,7 @@ polars==0.20.21
 pre-commit==4.1.0
 pre-commit-hooks==5.0.0
 pytest==8.3.4
+pytest-beartype==0.2.0
 pytest-cov==6.0.0
 pytest-mock==3.14.0
 rich==13.7.1
@@ -25,7 +27,6 @@ sentencepiece==0.2.0
 torch==2.6.0
 tqdm==4.67.1
 transformers==4.48.3
-typeguard==4.4.1
 typer==0.15.1
 types-pyyaml==6.0.12.20241230
 types-seaborn==0.13.2.20250111

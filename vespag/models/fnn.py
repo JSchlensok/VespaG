@@ -1,8 +1,6 @@
 import torch
 from jaxtyping import Float
 
-from vespag.utils.type_hinting import typeguard_ignore
-
 from .utils import construct_fnn
 
 
@@ -46,7 +44,6 @@ class FNN(torch.nn.Module):
                 torch.nn.init.kaiming_normal_(layer.weight.data, a=1e-2)
                 torch.nn.init.zeros_(layer.bias.data)
 
-    @typeguard_ignore()
     def forward(
         self, X: Float[torch.Tensor, "batch_size length input_dim"]
     ) -> Float[torch.Tensor, "batch_size length output_dim"]:

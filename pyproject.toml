@@ -45,7 +45,8 @@ dev = [
     "pytest-mock~=3.14.0",
     "ruff~=0.9.4",
     "safety~=3.2.14",
-    "typeguard~=4.4.1",
+    "beartype~=0.20.0",
+    "pytest-beartype~=0.2.0",
     "types-pyyaml~=6.0.12.20241230",
     "types-seaborn~=0.13.2.20250111",
     "types-tqdm~=4.67.0.20241221"
@@ -59,6 +60,9 @@ build-backend = "hatchling.build"
 [tool.pytest.ini_options]
 testpaths = "tests"
 pythonpath = "."
+filterwarnings = [
+    "ignore:beartype.roar.BeartypeDecorHintNonpepException"
+]
 
 [tool.coverage.paths]
 source = ["vespag", "*/site-packages"]

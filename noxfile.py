@@ -2,7 +2,7 @@ import nox
 
 package = "vespag"
 python_versions = ["3.10"]
-nox.options.sessions = ["pre-commit", "tests", "coverage", "mypy", "typeguard", "bandit", "safety"]
+nox.options.sessions = ["pre-commit", "tests", "coverage", "beartype", "bandit", "safety"]
 nox.options.default_venv_backend = "uv"
 
 
@@ -17,7 +17,7 @@ def precommit(session: nox.Session) -> None:
 def tests(session: nox.Session) -> None:
     session.install("uv")
     session.run("uv", "pip", "install", ".")
-    session.run("uv", "pip", "install", "pytest", "coverage[toml]", "pygments")
+    session.run("uv", "pip", "install", "pytest", "beartype", "coverage[toml]", "pygments")
     try:
         session.run("coverage", "run", "--parallel", "-m", "pytest")
     finally:
@@ -36,16 +36,16 @@ def coverage(session: nox.Session) -> None:
 @nox.session(python=python_versions)
 def mypy(session: nox.Session) -> None:
     session.install("uv")
-    session.run("uv", "pip", "install", "mypy", "pytest", "typeguard")
+    session.run("uv", "pip", "install", "beartype", "mypy", "pytest")
     session.run("mypy", "vespag", "tests")
 
 
 @nox.session(python=python_versions)
-def typeguard(session: nox.Session) -> None:
+def beartype(session: nox.Session) -> None:
     session.install("uv")
     session.run("uv", "pip", "install", ".")
-    session.run("uv", "pip", "install", "pytest", "typeguard", "pygments")
-    session.run("pytest", f"--typeguard-packages={package}")
+    session.run("uv", "pip", "install", "beartype", "pytest", "pytest-beartype", "pygments")
+    session.run("pytest", f"--beartype-packages={package}")
 
 
 @nox.session(python=python_versions)

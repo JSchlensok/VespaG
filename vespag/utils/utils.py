@@ -25,9 +25,9 @@ VESPA_ALPHABET = "ALGVSREDTIPKFQNYMHWC"
 AMINO_ACIDS = sorted(GEMME_ALPHABET)
 
 DEFAULT_MODEL_PARAMETERS = {
-    "architecture": "fnn",
+    "architecture": Architecture.fnn,
     "model_parameters": {"hidden_dims": [256], "dropout_rate": 0.2},
-    "embedding_type": "esm2",
+    "embedding_type": EmbeddingType.esm2,
 }
 
 MODEL_VERSION = "v2"
@@ -65,8 +65,8 @@ def load_model(
     embedding_type: EmbeddingType,
     checkpoint_file: Path | None = None,
 ) -> torch.nn.Module:
-    checkpoint_file = checkpoint_file or Path.cwd() / f"model_weights/{MODEL_VERSION}/{embedding_type}.pt"
-    model = load_model_from_config(architecture, model_parameters, embedding_type)
+    checkpoint_file = checkpoint_file or Path.cwd() / f"model_weights/{MODEL_VERSION}/{embedding_type.value}.pt"
+    model = load_model_from_config(architecture.value, model_parameters, embedding_type)
     model.load_state_dict(torch.load(checkpoint_file))
     return model
 
@@ -147,7 +147,7 @@ raw_score_cdf = np.loadtxt("data/score_transformation/vespag_scores.csv", delimi
 sorted_gemme_scores = np.loadtxt("data/score_transformation/sorted_gemme_scores.csv", delimiter=",")
 
 
-def transform_scores(scores: Sequence[float]) -> list[float]:
+def transform_scores(scores: np.typing.ArrayLike[float]) -> list[float]:
     """Transform VespaG score distribution by mapping it to a known distribution of GEMME scores through its quantile"""
     # TODO vectorize, this is quick and dirty
     transformed_scores = []

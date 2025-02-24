@@ -2,14 +2,15 @@ import itertools
 from copy import deepcopy
 
 import torch
+from beartype.typing import Type
 
 
 def construct_fnn(
     hidden_layer_sizes: list[int],
     input_dim: int = 1024,
     output_dim: int = 20,
-    activation_function: torch.nn.Module = torch.nn.LeakyReLU,
-    output_activation_function: torch.nn.Module | None = None,
+    activation_function: Type[torch.nn.Module] = torch.nn.LeakyReLU,
+    output_activation_function: Type[torch.nn.Module] | None = None,
     dropout_rate: float | None = None,
 ):
     layer_sizes = deepcopy(hidden_layer_sizes)

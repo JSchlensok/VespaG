@@ -7,7 +7,7 @@ import rich.progress as progress
 import torch
 from jaxtyping import Float
 
-from vespag.utils.type_hinting import PrecisionType, typeguard_ignore
+from vespag.utils.type_hinting import PrecisionType
 
 
 class PerResidueDataset(torch.utils.data.Dataset):
@@ -67,7 +67,6 @@ class PerResidueDataset(torch.utils.data.Dataset):
             ]
         )
 
-    @typeguard_ignore()
     def __getitem__(self, idx) -> tuple[Float[torch.Tensor, "length embedding_dim"], Float[torch.Tensor, "length 20"]]:
         embedding = self.residue_embeddings[idx]
         annotation = self.residue_annotations[idx]

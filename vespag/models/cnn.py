@@ -1,7 +1,6 @@
 import torch
+from beartype.typing import Type
 from jaxtyping import Float
-
-from vespag.utils.type_hinting import typeguard_ignore
 
 from .utils import construct_fnn
 
@@ -39,7 +38,7 @@ class MinimalCNN(torch.nn.Module):
         kernel_size=7,
         padding=3,
         fnn_hidden_layers: list[int] = [256, 64],
-        activation_function: torch.nn.Module = torch.nn.LeakyReLU,
+        activation_function: Type[torch.nn.Module] = torch.nn.LeakyReLU,
         output_activation_function: torch.nn.Module = None,
         cnn_dropout_rate: float | None = None,
         fnn_dropout_rate: float | None = None,
@@ -64,7 +63,6 @@ class MinimalCNN(torch.nn.Module):
             fnn_dropout_rate,
         )
 
-    @typeguard_ignore()
     def forward(
         self, X: Float[torch.Tensor, "batch_size length input_dim"]
     ) -> Float[torch.Tensor, "batch_size length output_dim"]:

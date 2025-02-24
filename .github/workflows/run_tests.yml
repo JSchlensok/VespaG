@@ -29,7 +29,7 @@ jobs:
         run: uv pip install -r pyproject.toml --extra dev
 
       - name: Run nox sessions
-        run: uv run nox -s pre-commit tests coverage mypy typeguard bandit
+        run: uv run nox -s pre-commit tests coverage mypy beartype bandit
   security:
     runs-on: ubuntu-latest
     steps:
