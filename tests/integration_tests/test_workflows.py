@@ -1,5 +1,6 @@
 import polars as pl
 import polars.testing
+import pytest
 from typer.testing import CliRunner
 
 from vespag.__main__ import app
@@ -7,12 +8,13 @@ from vespag.__main__ import app
 runner = CliRunner()
 
 
-def test_predict(output_dir, fasta, score_files):
-    result = runner.invoke(app, ["predict", "-i", str(fasta), "-o", str(output_dir)])
+@pytest.mark.parametrize("embedding_type", ["esm2", "prott5"])
+def test_predict(output_dir, fasta, score_files, embedding_type):
+    result = runner.invoke(app, ["predict", "-i", str(fasta), "-o", str(output_dir), "--embedding-type", embedding_type])
 
     assert result.exit_code == 0
 
-    for score_file in score_files:
+    for score_file in score_files[embedding_type]:
         assert score_file.exists()
 
         ground_truth_df = pl.read_csv(score_file)
