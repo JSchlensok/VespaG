@@ -22,7 +22,6 @@ from vespag.utils import (
     mask_non_mutations,
     read_mutation_file,
     setup_logger,
-    transform_scores,
 )
 from vespag.utils.type_hinting import *
 
