@@ -143,6 +143,7 @@ def generate_predictions(
                     y,
                     mutation,
                     transform=transform_scores,
+                    embedding_type=embedding_type,
                     normalizer=normalizer,
                     pbar=pbar,
                     progress_id=scoring_progress,
