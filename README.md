@@ -13,7 +13,7 @@ To overcome the sparsity of experimental training data, we created a dataset of 
 
 Assessed on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://www.biorxiv.org/content/10.1101/2023.12.07.570727v1)) benchmark, **VespaG** matches state-of-the-art methods while being several orders of magnitude faster, predicting the entire single-site mutational landscape for a human proteome in under a half hour on a consumer-grade laptop.
 
-More details on **VespaG** can be found in the corresponding [preprint](https://doi.org/10.1101/2024.04.24.590982).
+More details on **VespaG** can be found in the corresponding [publication](https://doi.org/10.1093/bioinformatics/btae621)
 
 ### Installation
 0. create virtual environment
