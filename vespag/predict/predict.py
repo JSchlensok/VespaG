@@ -40,10 +40,11 @@ def generate_predictions(
     transform_scores: bool = True,
     normalize_scores: bool = True,
     embedding_type: EmbeddingType = "esm2",
+    onnx_model_path: str=""
 ) -> None:
     logger = setup_logger()
     warnings.filterwarnings("ignore", message="rich is experimental/alpha")
-
+    use_onnx_model = True if onnx_model_path else False
     output_path = output_path or Path.cwd() / "output"
     if not output_path.exists():
         logger.info(f"Creating output directory {output_path}")
@@ -52,7 +53,10 @@ def generate_predictions(
     device = get_device()
     params = DEFAULT_MODEL_PARAMETERS
     params["embedding_type"] = embedding_type
-    model = load_model(**params).eval().to(device, dtype=torch.float)
+    params["onnx_model_path"] = onnx_model_path
+    model = load_model(**params)
+    if not use_onnx_model:
+        model = model.eval().to(device, dtype=torch.float)
 
     sequences = {rec.id: str(rec.seq) for rec in SeqIO.parse(fasta_file, "fasta")}
 
@@ -120,7 +124,12 @@ def generate_predictions(
         for id, sequence in sequences.items():
             pbar.update(prediction_progress, description=id)
             embedding = embeddings[id].to(device).unsqueeze(0)
-            y = model(embedding).squeeze(0)
+            if use_onnx_model:
+                ort_inputs = {'input': embedding.numpy()}
+                y = model.run(None, ort_inputs)
+                y = torch.from_numpy(np.float32(np.stack(y[0]))).squeeze(0)
+            else:
+                y = model(embedding).squeeze(0)
             y = mask_non_mutations(y, sequence)
             vespag_scores[id] = y.detach().numpy()
             pbar.advance(prediction_progress, len(mutations_per_protein[id]))

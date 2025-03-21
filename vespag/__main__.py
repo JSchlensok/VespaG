@@ -94,6 +94,14 @@ def predict(
         EmbeddingType,
         typer.Option("--embedding-type", help="Type of pLM used for generating embeddings"),
     ] = EmbeddingType.esm2,
+    onnx_path: Annotated[
+        Path | None,
+        typer.Option(
+            "-x",
+            "--onnx",
+            help="Path to onnx model. If a path is given, the onnx model will be used",
+        ),
+    ] = None,
 ) -> None:
     id_map_file = None
     generate_predictions(
@@ -108,6 +116,7 @@ def predict(
         zero_based_mutations=zero_based_mutations,
         normalize_scores=normalize_scores,
         embedding_type=embedding_type,
+        onnx_model_path=onnx_path
     )
 
 

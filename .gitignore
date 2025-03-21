@@ -5,6 +5,7 @@
 .prott5_cache/
 .vscode/
 .wandb/
+venv/
 **temp**
 
 # Local outputs
@@ -34,3 +35,4 @@ data/**/*.*
 
 # Code cov report
 .coverage
+output_fnn/proteingym_217_esm2.h5

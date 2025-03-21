@@ -20,6 +20,11 @@ from vespag.models import FNN, MinimalCNN
 
 from .type_hinting import Architecture, EmbeddingType
 
+import onnx
+from pathlib import Path
+from onnx2pytorch import ConvertModel
+import onnxruntime as ort
+
 GEMME_ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
 VESPA_ALPHABET = "ALGVSREDTIPKFQNYMHWC"
 AMINO_ACIDS = sorted(GEMME_ALPHABET)
@@ -28,10 +33,15 @@ DEFAULT_MODEL_PARAMETERS = {
     "architecture": Architecture.fnn,
     "model_parameters": {"hidden_dims": [256], "dropout_rate": 0.2},
     "embedding_type": EmbeddingType.esm2,
+    "onnx_model_path": ""
 }
 
 MODEL_VERSION = "v2"
 
+
+def load_onnx_model(model_path):
+    onnx_runtime = ort.InferenceSession(model_path)
+    return onnx_runtime
 
 def save_async(obj, pool: mp.Pool, path: Path, mkdir: bool = True):
     if mkdir:
@@ -63,11 +73,17 @@ def load_model(
     architecture: Architecture,
     model_parameters: dict,
     embedding_type: EmbeddingType,
+    onnx_model_path: str,
     checkpoint_file: Path | None = None,
 ) -> torch.nn.Module:
-    checkpoint_file = checkpoint_file or Path.cwd() / f"model_weights/{MODEL_VERSION}/{embedding_type.value}.pt"
-    model = load_model_from_config(architecture.value, model_parameters, embedding_type)
-    model.load_state_dict(torch.load(checkpoint_file))
+    if onnx_model_path:
+        if not Path(onnx_model_path).exists():
+            raise FileNotFoundError(f"onnx model does not exist at the given path {onnx_model_path}")
+        model = load_onnx_model(model_path=onnx_model_path)
+    else:
+        checkpoint_file = checkpoint_file or Path.cwd() / f"model_weights/{MODEL_VERSION}/{embedding_type.value}.pt"
+        model = load_model_from_config(architecture.value, model_parameters, embedding_type)
+        model.load_state_dict(torch.load(checkpoint_file))
     return model
 
 
