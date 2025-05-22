@@ -1,5 +1,6 @@
 from .mutations import *
 from .utils import *
+from .generate_mutations import generate_protein_mutations
 
 __all__ = [
     "AMINO_ACIDS",
@@ -11,7 +12,8 @@ __all__ = [
     "ScoreNormalizer",
     "compute_mutation_score",
     "download",
-    "get_deviceget_embedding_dim",
+    "get_device",
+    "get_embedding_dim",
     "get_precision",
     "load_model",
     "mask_non_mutations",
@@ -21,4 +23,5 @@ __all__ = [
     "setup_logger",
     "transform_scores",
     "unzip",
+    "generate_protein_mutations"
 ]
