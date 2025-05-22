@@ -1,5 +1,6 @@
 from .mutations import *
 from .utils import *
+from .generate_mutations import generate_protein_mutations
 
 __all__ = [
     "AMINO_ACIDS",
@@ -22,4 +23,5 @@ __all__ = [
     "setup_logger",
     "transform_scores",
     "unzip",
+    "generate_protein_mutations"
 ]
