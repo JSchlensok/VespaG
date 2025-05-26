@@ -38,7 +38,7 @@ def coverage(session: nox.Session) -> None:
 def mypy(session: nox.Session) -> None:
     session.install("uv")
     session.run("uv", "pip", "install", "beartype", "mypy", "pytest")
-    session.run("mypy", "vespag", "tests")
+    session.run("uv", "run", "mypy", "vespag", "tests")
 
 
 @nox.session(python=python_versions)
