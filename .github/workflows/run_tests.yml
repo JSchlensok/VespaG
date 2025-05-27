@@ -1,6 +1,9 @@
 name: Run tests and quality checks
 
-on: [push, pull_request]
+on:
+  pull_request:
+    types: [opened, reopened]
+  push:
 
 jobs:
   tests:
