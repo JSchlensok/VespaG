@@ -1,3 +1,4 @@
+import shutil
 import sys
 from pathlib import Path
 
@@ -20,6 +21,13 @@ def score_files(fasta) -> dict[str, list[Path]]:
         "esm2": [test_data_dir / f"scores_esm2/{rec.id}.csv" for rec in SeqIO.parse(str(fasta), "fasta")],
         "prott5": [test_data_dir / f"scores_prott5/{rec.id}.csv" for rec in SeqIO.parse(str(fasta), "fasta")]
     }
+
+@pytest.fixture()
+def embedding_cache_dir(tmp_path) -> Path:
+    embedding_cache_dir = tmp_path / ".plm_cache"
+    embedding_cache_dir.mkdir()
+    os.environ["HF_HOME"] = str(embedding_cache_dir)
+    return embedding_cache_dir
 
 @pytest.fixture()
 def output_dir(tmp_path) -> Path:
