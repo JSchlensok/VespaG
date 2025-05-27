@@ -9,14 +9,13 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - run: df -h
-
       - name: Clean up container disk
         run: |
+          df -h
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
           sudo docker image prune --all --force
           sudo docker builder prune -a
-      - run: df -h
+          df -h
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,17 +36,12 @@ jobs:
       - name: Install package
         run: uv pip install .
 
-      - run: df -h
-
       - name: Install dev dependencies
         run: uv pip install -r pyproject.toml --extra dev
-
-      - run: df -h
 
       - name: Run nox sessions
         run: uv run nox -s pre-commit tests coverage beartype bandit
 
-      - run: df -h
   security:
     runs-on: ubuntu-latest
     steps:
