@@ -6,6 +6,11 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
+      - name: Clean up container disk
+        uses: easimon/maximize-build-space@master
+        with:
+          remove-dotnet: true
+          remove-android: true
       - name: Checkout code
         uses: actions/checkout@v4
 
