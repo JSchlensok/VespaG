@@ -8,8 +8,6 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_ACTIONS: true
     steps:
       - name: Clean up container disk
         run: |
@@ -43,8 +41,8 @@ jobs:
 
       - name: Run nox sessions
         run: uv run nox -s pre-commit tests coverage beartype bandit
-        with:
-          github_actions: ${{env.GITHUB_ACTIONS}}
+        env:
+          GITHUB_ACTIONS: true
 
   security:
     runs-on: ubuntu-latest
