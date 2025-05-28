@@ -28,13 +28,15 @@ def embedding_cache_dir(tmp_path) -> Path:
     embedding_cache_dir = tmp_path / ".plm_cache"
     embedding_cache_dir.mkdir()
     os.environ["HF_HOME"] = str(embedding_cache_dir)
-    return embedding_cache_dir
+    yield embedding_cache_dir
+    shutil.rmtree(embedding_cache_dir)
 
 @pytest.fixture()
 def output_dir(tmp_path) -> Path:
     output_dir = tmp_path / "output"
     output_dir.mkdir()
-    return output_dir
+    yield output_dir
+    shutil.rmtree(output_dir)
 
 @pytest.fixture(scope="module")
 def dms_vespag_scores() -> dict[str, ScoreList]:
