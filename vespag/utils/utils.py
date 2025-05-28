@@ -72,7 +72,7 @@ def load_model(
 
 
 def setup_logger() -> logging.Logger:
-    logging.basicConfig(level="NOTSET", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()])
+    logging.basicConfig(level="INFO", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()])
     logger = logging.getLogger("rich")
     logger.setLevel(logging.INFO)
     return logger
@@ -142,19 +142,18 @@ def read_gemme_table(txt_file: Path) -> np.ndarray:
 
 
 # TODO make this more elegant, e.g. through .npz file
-# write test that Spearman on PG stays the same
-raw_score_cdf = np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=",")
-sorted_gemme_scores = np.loadtxt("data/score_transformation/sorted_gemme_scores.csv", delimiter=",")
+raw_vespag_scores = {
+    "esm2": np.sort(np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=",")),
+    "prott5": np.sort(np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=","))
+}
+gemme_scores = np.sort(np.loadtxt("data/score_transformation/sorted_gemme_scores.csv", delimiter=","))
+target_space = np.linspace(0, 1, len(gemme_scores))
 
 
-def transform_scores(scores: np.typing.ArrayLike[float]) -> list[float]:
+def transform_scores(scores: np.typing.ArrayLike[float], embedding_type: EmbeddingType = "esm2") -> list[float]:
     """Transform VespaG score distribution by mapping it to a known distribution of GEMME scores through its quantile"""
-    # TODO vectorize, this is quick and dirty
-    transformed_scores = []
-    for score in scores:
-        quantile = (raw_score_cdf <= score).mean()
-        transformed_scores.append(np.interp(quantile, np.linspace(0, 1, len(sorted_gemme_scores)), sorted_gemme_scores))
-    return transformed_scores
+    quantiles = np.searchsorted(raw_vespag_scores[embedding_type], scores, side="right") / len(raw_vespag_scores[embedding_type])
+    return np.interp(quantiles, target_space, gemme_scores)
 
 
 class ScoreNormalizer:
