@@ -17,7 +17,7 @@ jobs:
           remove-haskell: true
           remove-codeql: true
           remove-docker-images: true
-          build-mount-path: /home/runner
+          build-mount-path: '/home/runner'
 
       - name: Checkout code
         uses: actions/checkout@v4
