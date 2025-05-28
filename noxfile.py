@@ -21,10 +21,7 @@ def tests(session: nox.Session) -> None:
     session.run("uv", "pip", "install", ".")
     session.run("uv", "pip", "install", "pytest", "beartype", "coverage[toml]", "pygments")
     try:
-        if os.getenv("GITHUB_ACTIONS"):
-            session.run("coverage", "run", "-m", "pytest")
-        else:
-            session.run("coverage", "run", "--parallel", "-m", "pytest")
+        session.run("coverage", "run", "--parallel", "-m", "pytest")
     finally:
         if session.interactive:
             session.notify("coverage")
