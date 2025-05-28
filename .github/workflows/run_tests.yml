@@ -8,6 +8,7 @@ on:
 env:
   GITHUB_ACTIONS: true
   UV_CACHE_DIR: '$GITHUB_WORKSPACE/uv_cache'
+  HF_HOME: '$GITHUB_WORKSPACE/huggingface_cache'
 
 jobs:
   tests:
