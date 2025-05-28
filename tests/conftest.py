@@ -25,11 +25,15 @@ def score_files(fasta) -> dict[str, list[Path]]:
 
 @pytest.fixture()
 def embedding_cache_dir(tmp_path) -> Path:
-    embedding_cache_dir = tmp_path / ".plm_cache"
-    embedding_cache_dir.mkdir()
-    os.environ["HF_HOME"] = str(embedding_cache_dir)
-    yield embedding_cache_dir
-    shutil.rmtree(embedding_cache_dir)
+    if (embedding_cache_dir := os.getenv("HF_HOME")) is not None:
+        yield Path(embedding_cache_dir)
+    else:
+        embedding_cache_dir = tmp_path / ".plm_cache"
+        embedding_cache_dir.mkdir()
+        os.environ["HF_HOME"] = str(embedding_cache_dir)
+        yield embedding_cache_dir
+        shutil.rmtree(embedding_cache_dir)
+        del os.environ["HF_HOME"]
 
 @pytest.fixture()
 def output_dir(tmp_path) -> Path:
