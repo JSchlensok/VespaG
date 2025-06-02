@@ -10,7 +10,7 @@ import torch
 from Bio import SeqIO
 from tqdm.rich import tqdm
 
-from vespag.data.embeddings import Embedder
+from vespag.data.embeddings import generate_embeddings
 from vespag.utils import (
     AMINO_ACIDS,
     DEFAULT_MODEL_PARAMETERS,
@@ -23,7 +23,6 @@ from vespag.utils import (
     mask_non_mutations,
     read_mutation_file,
     setup_logger,
-    transform_scores,
 )
 from vespag.utils.type_hinting import *
 
@@ -59,32 +58,30 @@ def generate_predictions(
 
     if embedding_file:
         logger.info(f"Loading pre-computed embeddings from {embedding_file}")
-        embeddings = {
-            id: torch.from_numpy(np.array(emb[()], dtype=np.float32))
-            for id, emb in tqdm(
-                h5py.File(embedding_file).items(),
-                desc="Loading embeddings",
-                leave=False,
-            )
-        }
-        if id_map_file:
-            id_map = {row[0]: row[1] for row in csv.reader(id_map_file.open("r"))}
-            for from_id, to_id in id_map.items():
-                embeddings[to_id] = embeddings[from_id]
-                del embeddings[from_id]
-
+    
     else:
-        logger.info("Generating ESM2 embeddings")
+        embedding_file = output_path / f"{embedding_type.value}_embeddings.h5"
         if "HF_HOME" in os.environ:
             plm_cache_dir = Path(os.environ["HF_HOME"])
         else:
-            plm_cache_dir = Path.cwd() / ".esm2_cache"
+            plm_cache_dir = Path.cwd() / f".{embedding_type.value}_cache"
             plm_cache_dir.mkdir(exist_ok=True)
-        embedder = Embedder("facebook/esm2_t36_3B_UR50D", plm_cache_dir)
-        embeddings = embedder.embed(sequences)
-        embedding_output_path = output_path / "esm2_embeddings.h5"
-        logger.info(f"Saving generated ESM2 embeddings to {embedding_output_path} for re-use")
-        Embedder.save_embeddings(embeddings, embedding_output_path)
+        generate_embeddings(fasta_file, embedding_file, embedding_type=embedding_type, cache_dir=plm_cache_dir)
+
+    embeddings = {
+        id: torch.from_numpy(np.array(emb[()], dtype=np.float32))
+        for id, emb in tqdm(
+            h5py.File(embedding_file).items(),
+            desc="Loading embeddings",
+            leave=False,
+        )
+    }
+
+    if id_map_file:
+        id_map = {row[0]: row[1] for row in csv.reader(id_map_file.open("r"))}
+        for from_id, to_id in id_map.items():
+            embeddings[to_id] = embeddings[from_id]
+            del embeddings[from_id]
 
     if mutation_file:
         logger.info("Parsing mutational landscape")
@@ -140,6 +137,7 @@ def generate_predictions(
                     y,
                     mutation,
                     transform=transform_scores,
+                    embedding_type=embedding_type,
                     normalizer=normalizer,
                     pbar=pbar,
                     progress_id=scoring_progress,

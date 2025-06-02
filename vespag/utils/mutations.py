@@ -88,6 +88,7 @@ def compute_mutation_score(
     mutation: Mutation | SAV,
     alphabet: str = GEMME_ALPHABET,
     transform: bool = True,
+    embedding_type: EmbeddingType = "esm2",
     normalizer: ScoreNormalizer | None = None,
     pbar: rich.progress.Progress | None = None,
     progress_id: int | None = None,
@@ -101,7 +102,7 @@ def compute_mutation_score(
         raw_scores = [substitution_score_matrix[mutation.position][alphabet.index(mutation.to_aa)].item()]
 
     if transform:
-        raw_scores = transform_scores(raw_scores)
+        raw_scores = transform_scores(raw_scores, embedding_type)
 
     score = sum(raw_scores)
 

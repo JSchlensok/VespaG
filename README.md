@@ -62,8 +62,7 @@ Based on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://w
 - `--embeddings/-e`, `--id-map`, `--normalize-scores`: identical to `predict`, used for the internal call to it.
 - `--v1` if you want to get a result for the first iteration of ProteinGym with 87 assays.
 
-## Preprint Citation
-If you find VespaG helpful in your work, please be so kind as to cite our publication:
+### How to cite
 ```
 @article{10.1093/bioinformatics/btae621,
     author = {Marquet, Céline and Schlensok, Julius and Abakarova, Marina and Rost, Burkhard and Laine, Elodie},
