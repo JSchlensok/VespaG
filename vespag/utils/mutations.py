@@ -113,8 +113,8 @@ def compute_mutation_score(
 
 
 def generate_sav_landscape(
-    sequences: Dict[str, str], zero_based_mutations: bool = False, tqdm: bool = True
-) -> Dict[str, List[SAV]]:
+    sequences: dict[str, str], zero_based_mutations: bool = False, tqdm: bool = True
+) -> dict[str, list[SAV]]:
     """
     Generates all possible SAVs for the given protein sequences.
 
