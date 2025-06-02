@@ -10,7 +10,7 @@ import rich
 import torch
 from jaxtyping import Float
 
-from .utils import GEMME_ALPHABET, ScoreNormalizer, transform_scores
+from .utils import AMINO_ACIDS, GEMME_ALPHABET, ScoreNormalizer, transform_scores
 
 
 @dataclass
@@ -110,3 +110,35 @@ def compute_mutation_score(
         score = normalizer.normalize_score(score)
 
     return score
+
+
+def generate_sav_landscape(
+    sequences: dict[str, str], zero_based_mutations: bool = False, tqdm: bool = True
+) -> dict[str, list[SAV]]:
+    """
+    Generates all possible SAVs for the given protein sequences.
+
+    Args:
+        sequences: Protein ID - protein sequence dict.
+        zero_based_mutations: Whether to return zero indices (e.g. A0M) or one indices (e.g. A1M).
+        tqdm: If True, the generation is wrapped in a tqdm progress bar.
+
+    Returns:
+        A dictionary with sequence_id as key and SAVs as values.
+    """
+    if tqdm:
+        from tqdm.rich import tqdm
+
+        wrap_function = tqdm
+    else:
+        wrap_function = lambda d: d
+
+    return {
+        protein_id: [
+            SAV(i, wildtype_aa, other_aa, not zero_based_mutations)
+            for i, wildtype_aa in enumerate(sequence)
+            for other_aa in AMINO_ACIDS
+            if other_aa != wildtype_aa
+        ]
+        for protein_id, sequence in wrap_function(sequences.items())
+    }

@@ -17,6 +17,7 @@ from vespag.utils import (
     SAV,
     ScoreNormalizer,
     compute_mutation_score,
+    generate_sav_landscape,
     get_device,
     load_model,
     mask_non_mutations,
@@ -24,7 +25,6 @@ from vespag.utils import (
     setup_logger,
 )
 from vespag.utils.type_hinting import *
-from vespag.utils import generate_protein_mutations
 
 
 def generate_predictions(
@@ -88,9 +88,9 @@ def generate_predictions(
         mutations_per_protein = read_mutation_file(mutation_file, one_indexed=not zero_based_mutations)
     else:
         logger.info("Generating mutational landscape")
-        mutations_per_protein = generate_protein_mutations(sequences=sequences,
-                                                           zero_based_mutations=zero_based_mutations,
-                                                           tqdm=True)
+        mutations_per_protein = generate_sav_landscape(
+            sequences=sequences, zero_based_mutations=zero_based_mutations, tqdm=True
+        )
 
     vespag_scores = {}
     scores_per_protein = {}
