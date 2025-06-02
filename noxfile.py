@@ -30,6 +30,7 @@ def tests(session: nox.Session) -> None:
 def coverage(session: nox.Session) -> None:
     session.install("uv")
     session.run("uv", "pip", "install", "coverage[toml]")
+    session.run("coverage", "combine")
     session.run("coverage", "report")
 
 
