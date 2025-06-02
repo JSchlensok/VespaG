@@ -1,3 +1,5 @@
+import os
+
 import nox
 
 package = "vespag"
@@ -21,8 +23,7 @@ def tests(session: nox.Session) -> None:
     try:
         session.run("coverage", "run", "--parallel", "-m", "pytest")
     finally:
-        if session.interactive:
-            session.notify("coverage")
+        session.notify("coverage")
 
 
 @nox.session
@@ -30,7 +31,7 @@ def coverage(session: nox.Session) -> None:
     session.install("uv")
     session.run("uv", "pip", "install", "coverage[toml]")
     session.run("coverage", "combine")
-    session.run("coverage", "report", "-i")
+    session.run("coverage", "report")
 
 
 # TODO fix issues

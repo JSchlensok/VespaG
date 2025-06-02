@@ -22,10 +22,10 @@ dependencies = [
     "rich==13.7.1",
     "seaborn==0.13.2",
     "sentencepiece~=0.2.0",
-    "torch~=2.6.0",
+    "torch~=2.7.0",
     "tqdm~=4.67",
     "typer~=0.15.1",
-    "transformers~=4.48",
+    "transformers~=4.52",
     "wandb==0.19.6",
     "pingouin~=0.5.5"
 ]
