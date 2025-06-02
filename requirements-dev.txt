@@ -24,9 +24,9 @@ ruff==0.9.5
 safety==3.2.14
 seaborn==0.13.2
 sentencepiece==0.2.0
-torch==2.6.0
+torch==2.7.0
 tqdm==4.67.1
-transformers==4.48.3
+transformers==4.52.4
 typer==0.15.1
 types-pyyaml==6.0.12.20241230
 types-seaborn==0.13.2.20250111
