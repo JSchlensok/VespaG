@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import math
 import zipfile
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from pathlib import Path
 from typing import Literal
 
@@ -15,33 +15,34 @@ import sklearn.preprocessing
 import torch
 import torch.multiprocessing as mp
 from rich.logging import RichHandler
+from torch.multiprocessing.pool import Pool
 
 from vespag.models import FNN, MinimalCNN
 
-from .type_hinting import Architecture, EmbeddingType
+from .type_hinting import Architecture, EmbeddingType, Precision
 
 GEMME_ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
 VESPA_ALPHABET = "ALGVSREDTIPKFQNYMHWC"
 AMINO_ACIDS = sorted(GEMME_ALPHABET)
 
+DEFAULT_ARCHITECTURE: Architecture = "fnn"
 DEFAULT_MODEL_PARAMETERS = {
-    "architecture": Architecture.fnn,
-    "model_parameters": {"hidden_dims": [256], "dropout_rate": 0.2},
-    "embedding_type": EmbeddingType.esm2,
+    "hidden_dims": [256],
+    "dropout_rate": 0.2
 }
 
 MODEL_VERSION = "v2"
 
 
-def save_async(obj, pool: mp.Pool, path: Path, mkdir: bool = True):
+def save_async(obj, pool: Pool, path: Path, mkdir: bool = True):
     if mkdir:
         path.parent.mkdir(parents=True, exist_ok=True)
     pool.apply_async(torch.save, (obj, path))
 
 
-def load_model_from_config(architecture: str, model_parameters: dict, embedding_type: str):
+def load_model_from_config(architecture: Architecture, model_parameters: dict, embedding_type: EmbeddingType) -> torch.nn.Module:
     if architecture == "fnn":
-        model = FNN(
+        model: torch.nn.Module = FNN(
             hidden_layer_sizes=model_parameters["hidden_dims"],
             input_dim=get_embedding_dim(embedding_type),
             dropout_rate=model_parameters["dropout_rate"],
@@ -65,8 +66,8 @@ def load_model(
     embedding_type: EmbeddingType,
     checkpoint_file: Path | None = None,
 ) -> torch.nn.Module:
-    checkpoint_file = checkpoint_file or Path.cwd() / f"model_weights/{MODEL_VERSION}/{embedding_type.value}.pt"
-    model = load_model_from_config(architecture.value, model_parameters, embedding_type)
+    checkpoint_file = checkpoint_file or Path.cwd() / f"model_weights/{MODEL_VERSION}/{embedding_type}.pt"
+    model = load_model_from_config(architecture, model_parameters, embedding_type)
     model.load_state_dict(torch.load(checkpoint_file))
     return model
 
@@ -94,7 +95,7 @@ def get_device() -> torch.device:
         return torch.device("cpu")
 
 
-def get_precision() -> Literal["half", "float"]:
+def get_precision() -> Precision:
     if "cuda" in str(get_device()):
         return "half"
     else:

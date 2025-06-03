@@ -5,11 +5,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Union
 
+import numpy.typing as npt
 import polars as pl
 import rich
 import torch
 from jaxtyping import Float
 
+from .type_hinting import EmbeddingType
 from .utils import AMINO_ACIDS, GEMME_ALPHABET, ScoreNormalizer, transform_scores
 
 
@@ -84,7 +86,7 @@ def read_mutation_file(mutation_file: Path, one_indexed: bool = False) -> dict[s
 
 
 def compute_mutation_score(
-    substitution_score_matrix: Float[np.typing.ArrayLike, "length 20"],
+    substitution_score_matrix: Float[npt.ArrayLike, "length 20"],
     mutation: Mutation | SAV,
     alphabet: str = GEMME_ALPHABET,
     transform: bool = True,
@@ -113,7 +115,7 @@ def compute_mutation_score(
 
 
 def generate_sav_landscape(
-    sequences: dict[str, str], zero_based_mutations: bool = False, tqdm: bool = True
+    sequences: dict[str, str], zero_based_mutations: bool = False, use_tqdm: bool = True
 ) -> dict[str, list[SAV]]:
     """
     Generates all possible SAVs for the given protein sequences.
@@ -126,7 +128,7 @@ def generate_sav_landscape(
     Returns:
         A dictionary with sequence_id as key and SAVs as values.
     """
-    if tqdm:
+    if use_tqdm:
         from tqdm.rich import tqdm
 
         wrap_function = tqdm

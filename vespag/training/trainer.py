@@ -6,6 +6,7 @@ import rich.progress as progress
 import torch
 import torch.multiprocessing as mp
 import wandb
+from torch.multiprocessing.pool import Pool
 
 from vespag.utils import save_async
 
@@ -16,7 +17,7 @@ class Trainer:
         run: str,
         model: torch.nn.Module,
         device: torch.device,
-        pool: mp.Pool,
+        pool: Pool,
         train_dl: torch.utils.data.DataLoader,
         train_eval_dls: dict[str, torch.utils.data.DataLoader],
         val_dls: dict[str, torch.utils.data.DataLoader],
