@@ -7,7 +7,7 @@ from .data.embeddings import generate_embeddings
 from .eval import eval
 from .predict import generate_predictions
 from .training.train import train as run_training
-from .utils.type_hinting import EmbeddingType
+from .utils.type_hinting import ClickEmbeddingType
 
 app = typer.Typer()
 
@@ -91,9 +91,13 @@ def predict(
         ),
     ] = True,
     embedding_type: Annotated[
-        EmbeddingType,
-        typer.Option("--embedding-type", help="Type of pLM used for generating embeddings"),
-    ] = EmbeddingType.esm2,
+        str,
+        typer.Option(
+            "--embedding-type",
+            click_type=ClickEmbeddingType,
+            help="Type of pLM used for generating embeddings"
+        ),
+    ] = "esm2"
 ) -> None:
     id_map_file = None
     generate_predictions(
@@ -107,7 +111,7 @@ def predict(
         h5_output=h5_output,
         zero_based_mutations=zero_based_mutations,
         normalize_scores=normalize_scores,
-        embedding_type=embedding_type,
+        embedding_type=embedding_type,  # type: ignore[arg-type]
     )
 
 
@@ -120,14 +124,15 @@ def embed(
         typer.Option("-c", "--cache-dir", help="Custom path to download model checkpoints to"),
     ],
     embedding_type: Annotated[
-        EmbeddingType,
+        str,
         typer.Option(
             "-e",
             "--embedding-type",
+            click_type=ClickEmbeddingType,
             case_sensitive=False,
             help="Type of embeddings to generate",
         ),
-    ] = EmbeddingType.esm2,
+    ] = "esm2",
     pretrained_path: Annotated[
         str | None,
         typer.Option("--pretrained-path", help="Path or URL of pretrained transformer"),
@@ -141,7 +146,7 @@ def train(
     model_config_key: Annotated[str, typer.Option("--model")],
     datasets: Annotated[list[str], typer.Option("--dataset")],
     output_dir: Annotated[Path, typer.Option("--output-dir", "-o")],
-    embedding_type: Annotated[str, typer.Option("--embedding-type", "-e")],
+    embedding_type: Annotated[str, typer.Option("--embedding-type", "-e", click_type=ClickEmbeddingType)],
     compute_full_train_loss: Annotated[bool, typer.Option("--full-train-loss")] = False,
     sampling_strategy: Annotated[str, typer.Option("--sampling-strategy")] = "basic",
     wandb_config: Annotated[tuple[str, str] | None, typer.Option("--wandb")] = None,
@@ -152,7 +157,7 @@ def train(
         model_config_key=model_config_key,
         datasets=datasets,
         output_dir=output_dir,
-        embedding_type=embedding_type,
+        embedding_type=embedding_type,  # type: ignore[arg-type]
         compute_full_train_loss=compute_full_train_loss,
         sampling_strategy=sampling_strategy,
         wandb_config=wandb_config,

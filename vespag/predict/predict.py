@@ -24,7 +24,7 @@ from vespag.utils import (
     read_mutation_file,
     setup_logger,
 )
-from vespag.utils.type_hinting import *
+from vespag.utils.type_hinting import EmbeddingType
 
 
 def generate_predictions(
@@ -58,13 +58,13 @@ def generate_predictions(
 
     if embedding_file:
         logger.info(f"Loading pre-computed embeddings from {embedding_file}")
-    
+
     else:
-        embedding_file = output_path / f"{embedding_type.value}_embeddings.h5"
+        embedding_file = output_path / f"{embedding_type}_embeddings.h5"
         if "HF_HOME" in os.environ:
             plm_cache_dir = Path(os.environ["HF_HOME"])
         else:
-            plm_cache_dir = Path.cwd() / f".{embedding_type.value}_cache"
+            plm_cache_dir = Path.cwd() / f".{embedding_type}_cache"
             plm_cache_dir.mkdir(exist_ok=True)
         generate_embeddings(fasta_file, embedding_file, embedding_type=embedding_type, cache_dir=plm_cache_dir)
 

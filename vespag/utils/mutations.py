@@ -10,6 +10,7 @@ import rich
 import torch
 from jaxtyping import Float
 
+from .type_hinting import EmbeddingType
 from .utils import AMINO_ACIDS, GEMME_ALPHABET, ScoreNormalizer, transform_scores
 
 

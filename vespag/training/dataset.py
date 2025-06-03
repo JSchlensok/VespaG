@@ -7,7 +7,7 @@ import rich.progress as progress
 import torch
 from jaxtyping import Float
 
-from vespag.utils.type_hinting import PrecisionType
+from vespag.utils.type_hinting import Precision
 
 
 class PerResidueDataset(torch.utils.data.Dataset):
@@ -16,7 +16,7 @@ class PerResidueDataset(torch.utils.data.Dataset):
         embedding_file: Path,
         annotation_file: Path,
         cluster_file: Path,
-        precision: PrecisionType,
+        precision: Precision,
         device: torch.device,
         max_len: int,
         limit_cache: bool = False,

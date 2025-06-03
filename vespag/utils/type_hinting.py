@@ -1,19 +1,14 @@
-from collections.abc import Callable
-from enum import Enum
+import typing
+from typing import Literal
+
+import click
+
+Architecture = Literal["fnn", "cnn", "combined", "mean"]
+EmbeddingType = Literal["esm2", "prott5"]
+Precision = Literal["half", "float"]
 
 
-class PrecisionType(str, Enum):
-    half = "half"
-    float = "float"
-
-
-class Architecture(str, Enum):
-    fnn = "fnn"
-    cnn = "cnn"
-    combined = "combined"
-    mean = "mean"
-
-
-class EmbeddingType(str, Enum):
-    esm2 = "esm2"
-    prott5 = "prott5"
+# https://github.com/fastapi/typer/pull/429#issuecomment-2780948253
+ClickArchitectureType = click.Choice(typing.get_args(Architecture))
+ClickEmbeddingType = click.Choice(typing.get_args(EmbeddingType))
+ClickPrecisionType = click.Choice(typing.get_args(Precision))
