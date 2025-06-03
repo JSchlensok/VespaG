@@ -144,7 +144,7 @@ def read_gemme_table(txt_file: Path) -> np.ndarray:
 # TODO make this more elegant, e.g. through .npz file
 raw_vespag_scores = {
     "esm2": np.sort(np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=",")),
-    "prott5": np.sort(np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=","))
+    "prott5": np.sort(np.loadtxt("data/score_transformation/vespag_scores_prott5.csv", delimiter=","))
 }
 gemme_scores = np.sort(np.loadtxt("data/score_transformation/sorted_gemme_scores.csv", delimiter=","))
 target_space = np.linspace(0, 1, len(gemme_scores))
