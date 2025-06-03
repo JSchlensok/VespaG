@@ -26,7 +26,10 @@ class Embedder:
         device = get_device()
         self.device = device
 
-        if "t5" in pretrained_path:
+        tokenizer_class: type[T5Tokenizer] | type[AutoTokenizer]
+        encoder_class: type[T5EncoderModel] | type[AutoModel]
+
+        if "t5" in str(pretrained_path):
             tokenizer_class = T5Tokenizer
             encoder_class = T5EncoderModel
         else:

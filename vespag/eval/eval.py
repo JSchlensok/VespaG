@@ -157,5 +157,5 @@ def proteingym(
     result_df = pl.from_records(records)
     logger.info(f"Writing results to {result_csv_path}")
     mean = result_df["spearman"].mean()
-    logger.info(f"Mean Spearman r: {mean:.5f}")
+    logger.info(f"Mean Spearman r: {mean:.5f}")  # type: ignore[str-bytes-safe]
     result_df.write_csv(result_csv_path)

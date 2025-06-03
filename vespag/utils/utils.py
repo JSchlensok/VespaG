@@ -25,10 +25,10 @@ GEMME_ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
 VESPA_ALPHABET = "ALGVSREDTIPKFQNYMHWC"
 AMINO_ACIDS = sorted(GEMME_ALPHABET)
 
+DEFAULT_ARCHITECTURE: Architecture = "fnn"
 DEFAULT_MODEL_PARAMETERS = {
-    "architecture": Architecture.fnn,
-    "model_parameters": {"hidden_dims": [256], "dropout_rate": 0.2},
-    "embedding_type": EmbeddingType.esm2,
+    "hidden_dims": [256],
+    "dropout_rate": 0.2
 }
 
 MODEL_VERSION = "v2"
