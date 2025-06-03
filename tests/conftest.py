@@ -1,3 +1,5 @@
+import os
+import shutil
 import sys
 from pathlib import Path
 
@@ -25,7 +27,8 @@ def score_files(fasta) -> dict[str, list[Path]]:
 def output_dir(tmp_path) -> Path:
     output_dir = tmp_path / "output"
     output_dir.mkdir()
-    return output_dir
+    yield output_dir
+    shutil.rmtree(output_dir)
 
 @pytest.fixture(scope="module")
 def dms_vespag_scores() -> dict[str, ScoreList]:
