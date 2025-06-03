@@ -9,8 +9,8 @@ def construct_fnn(
     hidden_layer_sizes: list[int],
     input_dim: int = 1024,
     output_dim: int = 20,
-    activation_function: Type[torch.nn.Module] = torch.nn.LeakyReLU,
-    output_activation_function: Type[torch.nn.Module] | None = None,
+    activation_function: torch.nn.Module = torch.nn.LeakyReLU(),
+    output_activation_function: torch.nn.Module | None = None,
     dropout_rate: float | None = None,
 ):
     layer_sizes = deepcopy(hidden_layer_sizes)
@@ -22,7 +22,7 @@ def construct_fnn(
         layers.append(torch.nn.Linear(in_size, out_size))
         if dropout_rate:
             layers.append(torch.nn.Dropout(dropout_rate))
-        layers.append(activation_function())
+        layers.append(activation_function)
 
     # remove last activation function
     layers = layers[:-1]
@@ -32,7 +32,7 @@ def construct_fnn(
         layers = layers[:-1]
 
     if output_activation_function:
-        layers.append(output_activation_function())
+        layers.append(output_activation_function)
 
     return torch.nn.Sequential(*layers)
 
