@@ -114,7 +114,7 @@ def generate_predictions(
             embedding = embeddings[id].to(device).unsqueeze(0)
             y = model(embedding).squeeze(0)
             y = mask_non_mutations(y, sequence)
-            vespag_scores[id] = y.detach().numpy()
+            vespag_scores[id] = y.detach().cpu().numpy()
             pbar.advance(prediction_progress, len(mutations_per_protein[id]))
 
         if normalize_scores:
