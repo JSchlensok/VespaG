@@ -11,10 +11,11 @@
 
 To overcome the sparsity of experimental training data, we created a dataset of 39 million single amino acid variants from a subset of the Human proteome, which we then annotated using predictions from the multiple sequence alignment-based effect predictor [GEMME](http://www.lcqb.upmc.fr/GEMME/Home.html) ([Laine et al. 2019](https://doi.org/10.1093/molbev/msz179)) as a proxy for experimental scores.
 
-Assessed on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://www.biorxiv.org/content/10.1101/2023.12.07.570727v1)) benchmark, **VespaG** matches state-of-the-art methods while being several orders of magnitude faster, predicting the entire single-site mutational landscape for a human proteome in under a half hour on a consumer-grade laptop.
+Assessed on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://www.biorxiv.org/content/10.1101/2023.12.07.570727v1)) substitution benchmark, **VespaG** matches state-of-the-art methods while being several orders of magnitude faster, predicting the entire single-site mutational landscape for a human proteome in under a half hour on a consumer-grade laptop.
 
 More details on **VespaG** can be found in the corresponding [publication](https://doi.org/10.1093/bioinformatics/btae621)
 
+## Usage
 ### Installation
 0. create virtual environment
 1. `git clone https://github.com/jschlensok/vespag.git`
@@ -61,7 +62,17 @@ Based on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://w
 - `--embeddings/-e`, `--id-map`, `--normalize-scores`: identical to `predict`, used for the internal call to it.
 - `--v1` if you want to get a result for the first iteration of ProteinGym with 87 assays.
 
-### How to cite
+## Contributing
+We appreciate contributions from the community! Please follow these basic guidelines to keep things neat:
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/name`)
+3. Make sure tests & checks run
+    - run `uv run nox -r`
+    - fix anything that `uv` is complaining about, except `mypy` (WIP)
+4. Push (`git push origin feature/name`)
+5. Open a PR **to the `dev` branch**
+
+## How to Cite
 ```
 @article{10.1093/bioinformatics/btae621,
     author = {Marquet, Céline and Schlensok, Julius and Abakarova, Marina and Rost, Burkhard and Laine, Elodie},
