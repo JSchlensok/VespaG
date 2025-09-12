@@ -42,13 +42,6 @@ def proteingym(
             help="Path to pre-generated input embeddings. Embeddings will be generated from scratch if no path is provided",
         ),
     ] = None,
-    id_map_file: Annotated[
-        Path | None,
-        typer.Option(
-            "--id-map",
-            help="CSV file mapping embedding IDs to FASTA IDs if they're different",
-        ),
-    ] = None,
     transform_scores: Annotated[
         bool,
         typer.Option(
@@ -131,7 +124,6 @@ def proteingym(
         output_path=output_path,
         embedding_file=embedding_file,
         mutation_file=mutation_file,
-        id_map_file=id_map_file,
         single_csv=True,
         transform_scores=transform_scores,
         normalize_scores=normalize_scores,

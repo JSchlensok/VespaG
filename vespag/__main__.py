@@ -44,13 +44,6 @@ def predict(
         Path | None,
         typer.Option("--mutation-file", help="CSV file specifying specific mutations to score"),
     ] = None,
-    id_map_file: Annotated[
-        Path | None,
-        typer.Option(
-            "--id-map",
-            help="CSV file mapping embedding IDs to FASTA IDs if they're different",
-        ),
-    ] = None,
     single_csv: Annotated[
         bool,
         typer.Option(
@@ -95,13 +88,11 @@ def predict(
         typer.Option("--embedding-type", help="Type of pLM used for generating embeddings"),
     ] = EmbeddingType.esm2,
 ) -> None:
-    id_map_file = None
     generate_predictions(
         fasta_file=fasta_file,
         output_path=output_path,
         embedding_file=embedding_file,
         mutation_file=mutation_file,
-        id_map_file=id_map_file,
         single_csv=single_csv,
         no_csv=no_csv,
         h5_output=h5_output,
