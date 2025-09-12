@@ -18,7 +18,7 @@ More details on **VespaG** can be found in the corresponding [publication](https
 ### Installation
 0. create virtual environment
 1. `git clone https://github.com/jschlensok/vespag.git`
-2. `pip install .` or `uv pip install .`
+2. `pip install vespag` or `uv pip install vespag`
 
 ### Quick Start: Running Inference with VespaG
 Run `vespag predict` with the following options:
