@@ -113,9 +113,9 @@ def generate_embeddings(
         typer.Option("--pretrained-path", help="Path or URL of pretrained transformer"),
     ] = None,
 ):
-    logger.info(f"Generating {embedding_type} embeddings")
+    logger.info(f"Generating {embedding_type.value} embeddings")
     if embedding_type and not pretrained_path:
-        pretrained_path = model_names[embedding_type]
+        pretrained_path = model_names[embedding_type.value]
 
     sequences = {rec.id: str(rec.seq) for rec in SeqIO.parse(input_fasta_file, "fasta")}
     embedder = Embedder(pretrained_path, cache_dir)
