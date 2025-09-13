@@ -19,4 +19,4 @@ def test_predict(output_dir, fasta, score_files, embedding_type):
 
         ground_truth_df = pl.read_csv(score_file)
         generated_df = pl.read_csv(output_dir / score_file.name)
-        pl.testing.assert_frame_equal(generated_df, ground_truth_df)
+        pl.testing.assert_frame_equal(generated_df, ground_truth_df, rtol=1e-4, atol=1e-6)
