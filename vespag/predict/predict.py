@@ -32,7 +32,6 @@ def generate_predictions(
     output_path: Path | None,
     embedding_file: Path | None = None,
     mutation_file: Path | None = None,
-    id_map_file: Path | None = None,
     single_csv: bool = False,
     no_csv: bool = False,
     h5_output: bool = False,
@@ -76,12 +75,6 @@ def generate_predictions(
             leave=False,
         )
     }
-
-    if id_map_file:
-        id_map = {row[0]: row[1] for row in csv.reader(id_map_file.open("r"))}
-        for from_id, to_id in id_map.items():
-            embeddings[to_id] = embeddings[from_id]
-            del embeddings[from_id]
 
     if mutation_file:
         logger.info("Parsing mutational landscape")

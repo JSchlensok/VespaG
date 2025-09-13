@@ -62,17 +62,17 @@ class Mutation:
 
 
 def mask_non_mutations(
-    gemme_prediction: Float[torch.Tensor, "length 20"], wildtype_sequence
+    prediction: Float[torch.Tensor, "length 20"], wildtype_sequence
 ) -> Float[torch.Tensor, "length 20"]:
     """
     Simply set the predicted effect of the wildtype amino acid at each position (i.e. all non-mutations) to 0
     """
-    gemme_prediction[
-        torch.arange(len(wildtype_sequence)),
-        torch.tensor([GEMME_ALPHABET.index(aa) for aa in wildtype_sequence]),
+    prediction[
+        torch.tensor([i for i in range(len(wildtype_sequence)) if wildtype_sequence[i] != 'X']),
+        torch.tensor([GEMME_ALPHABET.index(aa) for aa in wildtype_sequence if aa != 'X']),
     ] = 0.0
 
-    return gemme_prediction
+    return prediction
 
 
 def read_mutation_file(mutation_file: Path, one_indexed: bool = False) -> dict[str, list[SAV]]:
