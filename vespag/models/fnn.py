@@ -26,7 +26,7 @@ class FNN(torch.nn.Module):
         hidden_layer_sizes: list[int],
         input_dim: int = 2560,
         output_dim: int = 20,
-        activation_function: torch.nn.Module = torch.nn.LeakyReLU,
+        activation_function: torch.nn.Module = torch.nn.LeakyReLU(),
         output_activation_function: torch.nn.Module | None = None,
         dropout_rate: float | None = None,
     ):

@@ -11,12 +11,13 @@ import wandb
 from dvc.api import params_show
 
 from vespag.utils import get_device, get_precision, load_model_from_config, setup_logger
+from vespag.utils.type_hinting import EmbeddingType
 
 from .dataset import PerResidueDataset
 from .trainer import Trainer
 
 
-def capitalize_embedding_type(embedding_type: str) -> str:
+def capitalize_embedding_type(embedding_type: EmbeddingType) -> str:
     return {"prott5": "ProtT5", "esm2": "ESM2"}[embedding_type]
 
 
@@ -24,7 +25,7 @@ def train(
     model_config_key: str,
     datasets: list[str],
     output_dir: Path,
-    embedding_type: str,
+    embedding_type: EmbeddingType,
     wandb_config: tuple[str, str] | None = None,
     compute_full_train_loss: bool = False,
     sampling_strategy: str = "basic",

@@ -13,6 +13,7 @@ from tqdm.rich import tqdm
 from vespag.data.embeddings import generate_embeddings
 from vespag.utils import (
     AMINO_ACIDS,
+    DEFAULT_ARCHITECTURE,
     DEFAULT_MODEL_PARAMETERS,
     SAV,
     ScoreNormalizer,
@@ -24,7 +25,7 @@ from vespag.utils import (
     read_mutation_file,
     setup_logger,
 )
-from vespag.utils.type_hinting import *
+from vespag.utils.type_hinting import EmbeddingType
 
 
 def generate_predictions(
@@ -49,21 +50,25 @@ def generate_predictions(
         output_path.mkdir(parents=True)
 
     device = get_device()
-    params = DEFAULT_MODEL_PARAMETERS
-    params["embedding_type"] = embedding_type
-    model = load_model(**params).eval().to(device, dtype=torch.float)
+    model = (
+        load_model(
+            architecture=DEFAULT_ARCHITECTURE, model_parameters=DEFAULT_MODEL_PARAMETERS, embedding_type=embedding_type
+        )
+        .eval()
+        .to(device, dtype=torch.float)
+    )
 
     sequences = {rec.id: str(rec.seq) for rec in SeqIO.parse(fasta_file, "fasta")}
 
     if embedding_file:
         logger.info(f"Loading pre-computed embeddings from {embedding_file}")
-    
+
     else:
-        embedding_file = output_path / f"{embedding_type.value}_embeddings.h5"
+        embedding_file = output_path / f"{embedding_type}_embeddings.h5"
         if "HF_HOME" in os.environ:
             plm_cache_dir = Path(os.environ["HF_HOME"])
         else:
-            plm_cache_dir = Path.cwd() / f".{embedding_type.value}_cache"
+            plm_cache_dir = Path.cwd() / f".{embedding_type}_cache"
             plm_cache_dir.mkdir(exist_ok=True)
         generate_embeddings(fasta_file, embedding_file, embedding_type=embedding_type, cache_dir=plm_cache_dir)
 
@@ -82,7 +87,7 @@ def generate_predictions(
     else:
         logger.info("Generating mutational landscape")
         mutations_per_protein = generate_sav_landscape(
-            sequences=sequences, zero_based_mutations=zero_based_mutations, tqdm=True
+            sequences=sequences, zero_based_mutations=zero_based_mutations, use_tqdm=True
         )
 
     vespag_scores = {}
