@@ -34,8 +34,9 @@ BATCH_SIZE = 100  # TODO parametrize
 
 def chunk_dict(d: dict, chunk_size: int) -> list[dict]:
     """Yield successive n-sized chunks from d."""
+    it = iter(d)
     for i in range(0, len(d), chunk_size):
-        yield {k: d[k] for k in islice(iter(d), chunk_size)}
+        yield {k: d[k] for k in islice(it, chunk_size)}
 
 
 def generate_predictions(
