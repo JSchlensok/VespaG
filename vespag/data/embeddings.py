@@ -21,6 +21,8 @@ model_names = {
 logger = setup_logger()
 
 # TODO implement generation of overlapping embeddings
+# TODO refactor to get rid of unnecessary class structure
+# TODO get rid of cache dir as parameter and just use HF_HOME
 class Embedder:
     def __init__(self, pretrained_path: Path | str, cache_dir: Path | None = None) -> None:
         device = get_device()
@@ -56,15 +58,15 @@ class Embedder:
         return batches
 
     # TODO jaxtyping annotation
-    def embed(self, sequences: dict[str, str], max_batch_length: int = 4096) -> dict[str, torch.tensor]:
+    def embed(self, sequences: dict[str, str], output_h5_file: Path, max_batch_length: int = 4096) -> dict[str, torch.tensor]:
         batches = self.batch(sequences, max_batch_length)
 
         with (
             progress.Progress(*progress.Progress.get_default_columns(), progress.TimeElapsedColumn()) as pbar,
             torch.no_grad(),
+            h5py.File(output_h5_file, "w") as h5_file
         ):
             embedding_progress = pbar.add_task("Computing embeddings", total=sum(map(len, sequences.values())))
-            embeddings = {}
             for batch in batches:
                 input_sequences = [" ".join(list(re.sub(r"[UZOB]", "X", seq))) for seq in batch.values()]
                 input_tokens = self.tokenizer.batch_encode_plus(
@@ -75,21 +77,10 @@ class Embedder:
                     max_length=max_batch_length,
                 ).to(self.device)
                 raw_embeddings = self.encoder(**input_tokens)
-                embeddings.update(
-                    {
-                        id: raw_embeddings.last_hidden_state[i, 1 : len(seq) + 1].detach().float().cpu()
-                        for i, (id, seq) in enumerate(batch.items())
-                    }
-                )
+                for i, (id, seq) in enumerate(batch.items()):
+                    emb = raw_embeddings.last_hidden_state[i, 1 : len(seq) + 1].detach().float().cpu()
+                    h5_file.create_dataset(id, data=emb.numpy())
                 pbar.advance(embedding_progress, sum(map(len, batch.values())))
-            return embeddings
-
-    @staticmethod
-    def save_embeddings(embeddings: dict[str, torch.tensor], h5_path: Path) -> None:
-        h5_path.parent.mkdir(exist_ok=True, parents=True)
-        with h5py.File(h5_path, "w") as f:
-            for id, emb in embeddings.items():
-                f.create_dataset(id, data=emb.numpy())
 
 
 def generate_embeddings(
@@ -117,11 +108,11 @@ def generate_embeddings(
     if embedding_type and not pretrained_path:
         pretrained_path = model_names[embedding_type.value]
 
+    output_h5_file.parent.mkdir(exist_ok=True, parents=True)
+
     sequences = {rec.id: str(rec.seq) for rec in SeqIO.parse(input_fasta_file, "fasta")}
     embedder = Embedder(pretrained_path, cache_dir)
-    embeddings = embedder.embed(sequences)
-    logger.info(f"Saving generated {embedding_type.value} embeddings to {output_h5_file} for re-use")
-    Embedder.save_embeddings(embeddings, output_h5_file)
+    embeddings = embedder.embed(sequences, output_h5_file)
 
 
 if __name__ == "__main__":
