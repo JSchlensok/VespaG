@@ -83,9 +83,7 @@ def generate_predictions(
 
     with (
         progress.Progress(
-            progress.TextColumn("[progress.description]Computing"),
-            progress.BarColumn(),
-            progress.TaskProgressColumn(),
+            *progress.Progress.get_default_columns(),
             progress.TimeElapsedColumn(),
             progress.TextColumn("Current protein: {task.description}"),
         ) as pbar,
@@ -93,7 +91,7 @@ def generate_predictions(
         h5py.File(h5_output_path, "w") as h5_file
     ):
         prediction_progress = pbar.add_task(
-            "Generating predictions",
+            "Computing predictions",
             total = sum(map(len, sequences.values()))
         )
         for batch_sequences in chunk_dict(sequences, BATCH_SIZE):
@@ -103,6 +101,7 @@ def generate_predictions(
                 if id in batch_sequences.keys()
             }
             for protein_id, sequence in batch_sequences.items():
+                pbar.update(prediction_progress, description=protein_id)
                 embedding = embeddings[protein_id].to(device).unsqueeze(0)
                 y = model(embedding).squeeze(0)
                 y = mask_non_mutations(y, sequence).cpu().numpy()
