@@ -1,10 +1,12 @@
 import csv
 import os
 import warnings
+from itertools import islice
 from pathlib import Path
 
 import h5py
 import numpy as np
+import polars as pl
 import rich.progress as progress
 import torch
 from Bio import SeqIO
@@ -14,17 +16,26 @@ from vespag.data.embeddings import generate_embeddings
 from vespag.utils import (
     AMINO_ACIDS,
     DEFAULT_MODEL_PARAMETERS,
+    GEMME_ALPHABET,
     SAV,
-    ScoreNormalizer,
     compute_mutation_score,
     generate_sav_landscape,
     get_device,
     load_model,
     mask_non_mutations,
+    normalize_scores,
     read_mutation_file,
     setup_logger,
 )
 from vespag.utils.type_hinting import *
+
+BATCH_SIZE = 100  # TODO parametrize
+
+
+def chunk_dict(d: dict, chunk_size: int) -> list[dict]:
+    """Yield successive n-sized chunks from d."""
+    for i in range(0, len(d), chunk_size):
+        yield {k: d[k] for k in islice(iter(d), chunk_size)}
 
 
 def generate_predictions(
@@ -43,6 +54,7 @@ def generate_predictions(
     logger = setup_logger()
     warnings.filterwarnings("ignore", message="rich is experimental/alpha")
 
+    # Set default output path
     output_path = output_path or Path.cwd() / "output"
     if not output_path.exists():
         logger.info(f"Creating output directory {output_path}")
@@ -67,15 +79,57 @@ def generate_predictions(
             plm_cache_dir.mkdir(exist_ok=True)
         generate_embeddings(fasta_file, embedding_file, embedding_type=embedding_type, cache_dir=plm_cache_dir)
 
-    embeddings = {
-        id: torch.from_numpy(np.array(emb[()], dtype=np.float32))
-        for id, emb in tqdm(
-            h5py.File(embedding_file).items(),
-            desc="Loading embeddings",
-            leave=False,
-        )
-    }
+    h5_output_path = output_path / "vespag_scores.h5"
 
+    with (
+        progress.Progress(
+            progress.TextColumn("[progress.description]Computing"),
+            progress.BarColumn(),
+            progress.TaskProgressColumn(),
+            progress.TimeElapsedColumn(),
+            progress.TextColumn("Current protein: {task.description}"),
+        ) as pbar,
+        torch.no_grad(),
+        h5py.File(h5_output_path, "w") as h5_file
+    ):
+        prediction_progress = pbar.add_task(
+            "Generating predictions",
+            total = sum(map(len, sequences.values()))
+        )
+        for batch_sequences in chunk_dict(sequences, BATCH_SIZE):
+            embeddings = {
+                id: torch.from_numpy(np.array(emb[()], dtype=np.float32))
+                for id, emb in h5py.File(embedding_file).items()
+                if id in batch_sequences.keys()
+            }
+            for protein_id, sequence in batch_sequences.items():
+                embedding = embeddings[protein_id].to(device).unsqueeze(0)
+                y = model(embedding).squeeze(0)
+                y = mask_non_mutations(y, sequence)
+                if normalize:
+                    y = normalize_scores(y)
+                h5_file.create_dataset(protein_id, data=y.detach().numpy(), dtype=np.float16)
+                
+                # TODO parse mutation file
+                # TODO score multi-mutations
+                # TODO concatenate into one big file if requested
+                # TODO transform scores if necessary
+                pl.from_records(
+                    [
+                        {
+                        "Mutation": f"{wt_aa}{i+1}{GEMME_ALPHABET[j]}",
+                        "VespaG": score
+                        }
+                        for i, wt_aa in enumerate(sequence)
+                        for j, score in enumerate(y[i])
+                        if wt_aa != GEMME_ALPHABET[j]
+                    ]
+                ).write_csv(output_path / (protein_id + ".csv"))
+
+            pbar.advance(prediction_progress, sum(map(len, batch_sequences.values())))
+
+            # TODO remove h5 output if it's not needed
+"""
     if mutation_file:
         logger.info("Parsing mutational landscape")
         mutations_per_protein = read_mutation_file(mutation_file, one_indexed=not zero_based_mutations)
@@ -96,6 +150,7 @@ def generate_predictions(
             progress.TextColumn("Current protein: {task.description}"),
         ) as pbar,
         torch.no_grad(),
+        h5py.File(output_h5_file, "w") as h5_file
     ):
         logger.info("Generating predictions")
         prediction_progress = pbar.add_task(
@@ -139,8 +194,8 @@ def generate_predictions(
             }
         pbar.remove_task(scoring_progress)
 
-    if h5_output:
-        h5_output_path = output_path / "vespag_scores_all.h5"
+    if not h5_output:
+        # TODO delete h5 file
         logger.info(f"Serializing predictions to {h5_output_path}")
         with h5py.File(h5_output_path, "w") as f:
             for id, vespag_prediction in tqdm(vespag_scores.items(), leave=False):
@@ -170,3 +225,4 @@ def generate_predictions(
                         )
                     )
                 )
+"""
