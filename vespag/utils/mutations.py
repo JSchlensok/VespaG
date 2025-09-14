@@ -10,7 +10,7 @@ import rich
 import torch
 from jaxtyping import Float
 
-from .utils import AMINO_ACIDS, GEMME_ALPHABET, ScoreNormalizer, transform_scores
+from .utils import AMINO_ACIDS, GEMME_ALPHABET, normalize_scores, transform_scores
 
 
 @dataclass
@@ -89,7 +89,7 @@ def compute_mutation_score(
     alphabet: str = GEMME_ALPHABET,
     transform: bool = True,
     embedding_type: EmbeddingType = "esm2",
-    normalizer: ScoreNormalizer | None = None,
+    normalize: bool = False,
     pbar: rich.progress.Progress | None = None,
     progress_id: int | None = None,
 ) -> float:
@@ -106,8 +106,8 @@ def compute_mutation_score(
 
     score = sum(raw_scores)
 
-    if normalizer:
-        score = normalizer.normalize_score(score)
+    if normalize:
+        score = normalize_scores(score)
 
     return score
 

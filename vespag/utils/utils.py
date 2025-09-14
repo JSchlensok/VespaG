@@ -31,6 +31,7 @@ DEFAULT_MODEL_PARAMETERS = {
 }
 
 MODEL_VERSION = "v2"
+MAX_SCORE = 12
 
 
 def save_async(obj, pool: mp.Pool, path: Path, mkdir: bool = True):
@@ -155,32 +156,5 @@ def transform_scores(scores: np.typing.ArrayLike[float], embedding_type: Embeddi
     quantiles = np.searchsorted(raw_vespag_scores[embedding_type], scores, side="right") / len(raw_vespag_scores[embedding_type])
     return np.interp(quantiles, target_space, gemme_scores)
 
-
-class ScoreNormalizer:
-    def __init__(self, type: Literal["sigmoid", "minmax"]) -> None:
-        self.type = type
-        if type == "minmax":
-            self.scaler = sklearn.preprocessing.MinMaxScaler()
-        else:
-            self.scaler = None
-
-    def fit(self, all_scores: np.ndarray | Iterable[float]) -> None:
-        if type(all_scores) != np.ndarray:
-            all_scores = np.array(all_scores)
-        if self.type == "minmax":
-            self.scaler.fit(all_scores.reshape(-1, 1))
-        else:
-            pass
-
-    def normalize_score(self, score: float) -> float:
-        """Normalize VespaG score to range."""
-        return self.normalize_scores([score])[0]
-
-    def normalize_scores(self, scores: np.ndarray | Sequence[float]) -> list[float]:
-        """Normalize VespaG scores to range."""
-        if self.type == "sigmoid":
-            return [1 / (1 + math.exp(-score)) for score in scores]
-        elif self.type == "minmax":
-            if type(scores) != np.ndarray:
-                scores = np.array(scores)
-            return list(self.scaler.transform(scores.reshape(-1, 1)).reshape(-1))
+def normalize_scores(scores: np.typing.ArrayLike[float]) -> np.array[float]:
+    return np.clip((scores / MAX_SCORE) + 1, 0, 1.2)

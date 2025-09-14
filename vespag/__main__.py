@@ -97,7 +97,8 @@ def predict(
         no_csv=no_csv,
         h5_output=h5_output,
         zero_based_mutations=zero_based_mutations,
-        normalize_scores=normalize_scores,
+        normalize=normalize_scores,
+        transform=transform_scores,
         embedding_type=embedding_type,
     )
 

@@ -125,8 +125,8 @@ def proteingym(
         embedding_file=embedding_file,
         mutation_file=mutation_file,
         single_csv=True,
-        transform_scores=transform_scores,
-        normalize_scores=normalize_scores,
+        transform=transform_scores,
+        normalize=normalize_scores,
     )
 
     mutation_file.unlink()
