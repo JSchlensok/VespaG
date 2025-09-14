@@ -86,14 +86,15 @@ def generate_predictions(
         progress.Progress(
             *progress.Progress.get_default_columns(),
             progress.TimeElapsedColumn(),
-            progress.TextColumn("Current protein: {task.description}"),
+            progress.TextColumn("Current protein: {task.fields[current_protein]}"),
         ) as pbar,
         torch.no_grad(),
         h5py.File(h5_output_path, "w") as h5_file
     ):
         prediction_progress = pbar.add_task(
             "Computing predictions",
-            total = sum(map(len, sequences.values()))
+            total = sum(map(len, sequences.values())),
+            current_protein="None"
         )
         for batch_sequences in chunk_dict(sequences, BATCH_SIZE):
             embeddings = {
@@ -102,7 +103,7 @@ def generate_predictions(
                 if id in batch_sequences.keys()
             }
             for protein_id, sequence in batch_sequences.items():
-                pbar.update(prediction_progress, description=protein_id)
+                pbar.update(prediction_progress, current_protein=protein_id)
                 embedding = embeddings[protein_id].to(device).unsqueeze(0)
                 y = model(embedding).squeeze(0)
                 y = mask_non_mutations(y, sequence).cpu().numpy()
