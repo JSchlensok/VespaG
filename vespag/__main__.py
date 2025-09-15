@@ -75,7 +75,7 @@ def predict(
             "--transform/--dont-transform",
             help="Whether to transform scores to same distribution as GEMME scores",
         ),
-    ] = True,
+    ] = False,
     normalize_scores: Annotated[
         bool,
         typer.Option(
