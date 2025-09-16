@@ -129,7 +129,7 @@ def generate_predictions(
                 )
                 
                 if not no_csv:
-                    protein_df.write_csv(output_path / (protein_id + ".csv"))
+                    protein_df.write_csv(output_path / (protein_id + ".csv"), float_precision=4)
 
             pbar.advance(prediction_progress, sum(map(len, batch_sequences.values())))
 
@@ -139,7 +139,7 @@ def generate_predictions(
                 pl.scan_csv(output_path / (protein_id + ".csv"))
                 .with_columns(pl.lit(protein_id).alias("Protein"))
                 for protein_id in sequences.keys()
-            ]).write_csv(output_path / "vespag_scores_all.csv")
+            ]).sink_csv(output_path / "vespag_scores_all.csv", float_precision=4)
             logger.info("Tidying up")
             for protein_id in sequences.keys():
                 (output_path / (protein_id + ".csv")).unlink()
