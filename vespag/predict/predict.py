@@ -51,7 +51,7 @@ def generate_predictions(
     zero_based_mutations: bool = False,
     transform: bool = False,
     normalize: bool = True,
-    embedding_type: EmbeddingType = "esm2",
+    embedding_type: EmbeddingType = EmbeddingType.esm2
 ) -> None:
     logger = setup_logger()
     warnings.filterwarnings("ignore", message="rich is experimental/alpha")
