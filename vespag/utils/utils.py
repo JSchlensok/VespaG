@@ -66,7 +66,7 @@ def load_model(
     embedding_type: EmbeddingType,
     checkpoint_file: Path | None = None,
 ) -> torch.nn.Module:
-    checkpoint_file = checkpoint_file or Path.cwd() / f"model_weights/{MODEL_VERSION}/{embedding_type.value}.pt"
+    checkpoint_file = checkpoint_file or Path.cwd() / f"model_weights/{MODEL_VERSION}/{embedding_type}.pt"
     model = load_model_from_config(architecture.value, model_parameters, embedding_type)
     model.load_state_dict(torch.load(checkpoint_file))
     return model

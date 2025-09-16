@@ -1,3 +1,4 @@
+import contextlib
 import csv
 import os
 import warnings
@@ -89,7 +90,7 @@ def generate_predictions(
             progress.TextColumn("Current protein: {task.fields[current_protein]}"),
         ) as pbar,
         torch.no_grad(),
-        h5py.File(h5_output_path, "w") as h5_file
+        h5py.File(h5_output_path, "w") if h5_output else contextlib.nullcontext() as h5_file
     ):
         prediction_progress = pbar.add_task(
             "Computing predictions",
@@ -109,13 +110,13 @@ def generate_predictions(
                 y = mask_non_mutations(y, sequence).cpu().numpy()
                 if normalize:
                     y = normalize_scores(y)
-                h5_file.create_dataset(protein_id, data=y, dtype=np.float16)
+                if h5_output:
+                    h5_file.create_dataset(protein_id, data=y, dtype=np.float16)
                 
                 # TODO parse mutation file
                 # TODO score multi-mutations
-                # TODO concatenate into one big file if requested
                 # TODO transform scores if necessary
-                pl.from_records(
+                protein_df = pl.from_records(
                     [
                         {
                         "Mutation": f"{wt_aa}{i+1}{GEMME_ALPHABET[j]}",
@@ -125,11 +126,24 @@ def generate_predictions(
                         for j, score in enumerate(y[i])
                         if wt_aa != GEMME_ALPHABET[j]
                     ]
-                ).write_csv(output_path / (protein_id + ".csv"))
+                )
+                
+                if not no_csv:
+                    protein_df.write_csv(output_path / (protein_id + ".csv"))
 
             pbar.advance(prediction_progress, sum(map(len, batch_sequences.values())))
 
-            # TODO remove h5 output if it's not needed
+        if single_csv and not no_csv:
+            logger.info("Generating single CSV output")
+            pl.concat([
+                pl.scan_csv(output_path / (protein_id + ".csv"))
+                .with_columns(pl.lit(protein_id).alias("Protein"))
+                for protein_id in sequences.keys()
+            ]).write_csv(output_path / "vespag_scores_all.csv")
+            logger.info("Tidying up")
+            for protein_id in sequences.keys():
+                (output_path / (protein_id + ".csv")).unlink()
+
 """
     if mutation_file:
         logger.info("Parsing mutational landscape")
