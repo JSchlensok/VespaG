@@ -3,7 +3,7 @@
 [![Tests](https://github.com/JSchlensok/VespaG/actions/workflows/run_tests.yml/badge.svg)](https://github.com/JSchlensok/VespaG/actions/workflows/run_tests.yml)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
-# VespaG: Expert-Guided Protein Language Models enable Accurate and Blazingly Fast Fitness Prediction
+# VespaG: Expert-Guided Protein Language Models Enable Accurate and Blazingly Fast Fitness Prediction
 
 <img align="right" src="images/vespag.png" alt="image" height="20%" width="20%" />
 
