@@ -66,6 +66,7 @@ class Embedder:
             torch.no_grad(),
             h5py.File(output_h5_file, "w") as h5_file
         ):
+            # TODO either align with prediction progress bar or remove after completion
             embedding_progress = pbar.add_task("Computing embeddings", total=sum(map(len, sequences.values())))
             for batch in batches:
                 input_sequences = [" ".join(list(re.sub(r"[UZOB]", "X", seq))) for seq in batch.values()]
