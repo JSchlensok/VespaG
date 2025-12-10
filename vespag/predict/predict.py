@@ -51,6 +51,7 @@ def generate_predictions(
     zero_based_mutations: bool = False,
     transform: bool = False,
     normalize: bool = True,
+    clip_to_one: bool = True,
     embedding_type: EmbeddingType = EmbeddingType.esm2
 ) -> None:
     logger = setup_logger()
@@ -109,7 +110,7 @@ def generate_predictions(
                 y = model(embedding).squeeze(0)
                 y = mask_non_mutations(y, sequence).cpu().numpy()
                 if normalize:
-                    y = normalize_scores(y)
+                    y = normalize_scores(y, clip_to_one=clip_to_one)
                 if h5_output:
                     h5_file.create_dataset(protein_id, data=y, dtype=np.float16)
                 

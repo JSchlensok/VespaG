@@ -83,6 +83,13 @@ def predict(
             help="Whether to transform scores to [0, 1] range",
         ),
     ] = True,
+    clip_scores: Annotated[
+        bool,
+        typer.Option(
+            "--clip/--dont-clip",
+            help="Whether to clip scores to [0, 1] range",
+        ),
+    ] = True,
     embedding_type: Annotated[
         EmbeddingType,
         typer.Option("--embedding-type", help="Type of pLM used for generating embeddings"),
@@ -99,6 +106,7 @@ def predict(
         zero_based_mutations=zero_based_mutations,
         normalize=normalize_scores,
         transform=transform_scores,
+        clip_to_one=clip_scores,
         embedding_type=embedding_type,
     )
 

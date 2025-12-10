@@ -156,5 +156,7 @@ def transform_scores(scores: np.typing.ArrayLike[float], embedding_type: Embeddi
     quantiles = np.searchsorted(raw_vespag_scores[embedding_type], scores, side="right") / len(raw_vespag_scores[embedding_type])
     return np.interp(quantiles, target_space, gemme_scores)
 
-def normalize_scores(scores: np.typing.ArrayLike[float]) -> np.array[float]:
-    return np.clip((scores / MAX_SCORE) + 1, 0, 1.2)
+def normalize_scores(scores: np.typing.ArrayLike[float], clip_to_one: bool = True) -> np.array[float]:
+    normalized_scores = (scores / MAX_SCORE) + 1
+    clip_value = 1 if clip_to_one else 1.2
+    return np.clip(normalized_scores, 0, clip_value)
