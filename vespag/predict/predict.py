@@ -14,14 +14,14 @@ from Bio import SeqIO
 from vespag.data.embeddings import generate_embeddings
 from vespag.utils import (
     DEFAULT_MODEL_PARAMETERS,
-    compute_mutation_score,
-    generate_sav_landscape,
+    GEMME_ALPHABET,
     get_device,
     load_model,
     mask_non_mutations,
     normalize_scores,
     read_mutation_file,
     setup_logger,
+    transform_scores,
 )
 from vespag.utils.type_hinting import *
 
@@ -79,15 +79,15 @@ def generate_predictions(
 
     h5_output_path = output_path / "vespag_scores.h5"
 
+    # TODO parse multi-mutations
     if mutation_file:
         logger.info("Parsing mutational landscape")
         mutations_per_protein = read_mutation_file(mutation_file, one_indexed=not zero_based_mutations)
     else:
-        logger.info("Generating mutational landscape")
-        mutations_per_protein = generate_sav_landscape(
-            sequences=sequences, zero_based_mutations=zero_based_mutations, tqdm=True
-        )
+        mutations_per_protein = None
 
+    # TODO test if new implementation is really faster than old one since I ended up reusing most of the old code
+    # TODO check if progress bar is smooth enough
     with (
         progress.Progress(
             *progress.Progress.get_default_columns(),
@@ -111,8 +111,7 @@ def generate_predictions(
             for protein_id, sequence in batch_sequences.items():
                 pbar.update(prediction_progress, current_protein=protein_id)
                 embedding = embeddings[protein_id].to(device).unsqueeze(0)
-                y = model(embedding).squeeze(0)
-                y = mask_non_mutations(y, sequence).cpu().numpy()
+                y = model(embedding).squeeze(0).cpu().numpy()
                 if transform:
                     y = transform_scores(y, embedding_type)
                 if normalize:
@@ -120,22 +119,27 @@ def generate_predictions(
                 if h5_output:
                     h5_file.create_dataset(protein_id, data=y, dtype=np.float16)
                 
-                protein_df = pl.from_records([
-                    {
-                        "mutation": mutation,
-                        "VespaG": compute_mutation_score(
-                            y,
-                            mutation,
-                            transform=transform,
-                            normalize=normalize,
-                            clip_to_one=clip_to_one,
-                            embedding_type=embedding_type,
-                            pbar=pbar,
-                            progress_id=None
-                        )
-                    }
-                    for mutation in mutations_per_protein[protein_id]
-                ])
+                protein_df = pl.from_records(
+                    [
+                        {
+                        "Mutation": f"{wt_aa}{i+1}{GEMME_ALPHABET[j]}",
+                        "VespaG": score
+                        }
+                        for i, wt_aa in enumerate(sequence)
+                        for j, score in enumerate(y[i])
+                        if wt_aa != GEMME_ALPHABET[j]
+                    ]
+                )
+                if mutations_per_protein:
+                    savs = [str(mut.savs[0]) for mut in mutations_per_protein[protein_id] if len (mut) == 1]
+
+                    if len([mut for mut in mutations_per_protein.get(protein_id, []) if len(mut) > 1]) > 0:
+                        # TODO implement
+                        logger.warning(f"Multi-mutations found for protein {protein_id}, which are currently not supported and will be ignored.")
+
+                    protein_df = protein_df.filter(
+                        pl.col("Mutation").is_in(savs)
+                    )
                 
                 if not no_csv:
                     protein_df.write_csv(output_path / (protein_id + ".csv"), float_precision=4)
@@ -147,8 +151,9 @@ def generate_predictions(
             pl.concat([
                 pl.scan_csv(output_path / (protein_id + ".csv"))
                 .with_columns(pl.lit(protein_id).alias("Protein"))
-                .select(["Protein", "mutation", "VespaG"])
+                .select(["Protein", "Mutation", "VespaG"])
                 for protein_id in sequences.keys()
+                if os.stat(output_path / (protein_id + ".csv")).st_size > 16  # just header
             ]).sink_csv(output_path / "vespag_scores_all.csv", float_precision=4)
             logger.info("Tidying up")
             for protein_id in sequences.keys():
