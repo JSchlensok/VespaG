@@ -109,14 +109,15 @@ def generate_predictions(
                 embedding = embeddings[protein_id].to(device).unsqueeze(0)
                 y = model(embedding).squeeze(0)
                 y = mask_non_mutations(y, sequence).cpu().numpy()
+                if transform:
+                    y = transform_scores(y, embedding_type)
                 if normalize:
-                    y = normalize_scores(y, clip_to_one=clip_to_one)
+                    y = normalize_scores(y, transform, clip_to_one=clip_to_one)
                 if h5_output:
                     h5_file.create_dataset(protein_id, data=y, dtype=np.float16)
                 
                 # TODO parse mutation file
                 # TODO score multi-mutations
-                # TODO transform scores if necessary
                 protein_df = pl.from_records(
                     [
                         {
