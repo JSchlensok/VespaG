@@ -147,6 +147,7 @@ def generate_predictions(
             pl.concat([
                 pl.scan_csv(output_path / (protein_id + ".csv"))
                 .with_columns(pl.lit(protein_id).alias("Protein"))
+                .select(["Protein", "mutation", "VespaG"])
                 for protein_id in sequences.keys()
             ]).sink_csv(output_path / "vespag_scores_all.csv", float_precision=4)
             logger.info("Tidying up")
