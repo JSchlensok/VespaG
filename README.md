@@ -13,10 +13,12 @@ To overcome the sparsity of experimental training data, we created a dataset of 
 
 Assessed on the [ProteinGym](https://proteingym.org) ([Notin et al. 2023](https://www.biorxiv.org/content/10.1101/2023.12.07.570727v1)) substitution benchmark, **VespaG** matches state-of-the-art methods while being several orders of magnitude faster, predicting the entire single-site mutational landscape for a human proteome in under a half hour on a consumer-grade laptop.
 
-More details on **VespaG** can be found in the corresponding [publication](https://doi.org/10.1093/bioinformatics/btae621)
+More details on **VespaG** can be found in the corresponding [publication](https://doi.org/10.1093/bioinformatics/btae621).
 
 ## Usage
 ### Installation
+**Disclaimer: This codebase started out as a Bachelor's thesis, so naturally a lot of suboptimal design choices were made and never fixed for lack of time. The project is still actively supported, however, so feel free to reach out via GitHub or email.**
+
 0. create virtual environment
 1. `git clone https://github.com/jschlensok/vespag.git`
 2. `pip install vespag` or `uv pip install vespag`
