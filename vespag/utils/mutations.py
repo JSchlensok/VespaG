@@ -3,12 +3,13 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Union
 
 import polars as pl
 import rich
 import torch
 from jaxtyping import Float
+
+from vespag.utils.type_hinting import EmbeddingType
 
 from .utils import AMINO_ACIDS, GEMME_ALPHABET, normalize_scores, transform_scores
 
@@ -88,8 +89,9 @@ def compute_mutation_score(
     mutation: Mutation | SAV,
     alphabet: str = GEMME_ALPHABET,
     transform: bool = True,
-    embedding_type: EmbeddingType = "esm2",
     normalize: bool = False,
+    clip_to_one: bool = True,
+    embedding_type: EmbeddingType = "esm2",
     pbar: rich.progress.Progress | None = None,
     progress_id: int | None = None,
 ) -> float:
@@ -107,7 +109,7 @@ def compute_mutation_score(
     score = sum(raw_scores)
 
     if normalize:
-        score = normalize_scores(score)
+        score = normalize_scores(score, transformed=transform, clip_to_one=clip_to_one)
 
     return score
 
