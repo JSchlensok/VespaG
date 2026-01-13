@@ -131,16 +131,22 @@ def generate_predictions(
                     ]
                 )
                 if mutations_per_protein:
-                    savs = [str(mut.savs[0]) for mut in mutations_per_protein[protein_id] if len (mut) == 1]
+                    sav_df = protein_df.filter(~pl.col("Mutation").str.contains(":"))
 
-                    if len([mut for mut in mutations_per_protein.get(protein_id, []) if len(mut) > 1]) > 0:
-                        # TODO implement
-                        logger.warning(f"Multi-mutations found for protein {protein_id}, which are currently not supported and will be ignored.")
-
-                    protein_df = protein_df.filter(
-                        pl.col("Mutation").is_in(savs)
+                    multi_mutations_df = (
+                        protein_df.filter(pl.col("Mutation").str.contains(":"))
+                        .lazy()
+                        .with_columns(pl.col("Mutation").str.split(":").alias("single_mutations"))
+                        .explode("single_mutations")
+                        .join(sav_df.lazy(), left_on="single_mutations", right_on="Mutation", how="left")
+                        .group_by("Mutation")
+                        .agg(pl.col("VespaG").sum().alias("VespaG"))
+                        .sort("Mutation")
+                        .collect()
                     )
-                
+
+                    protein_df = pl.concat([sav_df, multi_mutations_df])
+
                 if not no_csv:
                     protein_df.write_csv(output_path / (protein_id + ".csv"), float_precision=4)
 
