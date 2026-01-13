@@ -28,7 +28,7 @@ Run `vespag predict` with the following options:
 **Optional:**
 - `--output/-o`:Path for saving created CSV and/or H5 files. Defaults to `./output`.
 - `--embeddings/-e`: Path to pre-computed ESM2 (`esm2_t36_3B_UR50D`) input embeddings. Embeddings will be generated from scratch if no path is provided and saved in `./output`. Please note that embedding generation on CPU can be slow.
-- `--mutation-file`: CSV file specifying specific mutations to score. If not provided, the whole single-site mutational landscape of all input proteins will be scored.
+- `--mutation-file`: CSV file specifying specific mutations to score. If not provided, the whole single-site mutational landscape of all input proteins will be scored. The file should have two columns (sequence ID and mutation string) and a header.
 - `--single-csv`: Whether to return one CSV file for all proteins instead of a single file for each protein.
 - `--no-csv`: Whether no CSV output should be produced.
 - `--h5-output`: Whether a file containing predictions in HDF5 format should be created.

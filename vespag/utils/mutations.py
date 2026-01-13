@@ -75,7 +75,7 @@ def mask_non_mutations(
 
 def read_mutation_file(mutation_file: Path, one_indexed: bool = False) -> dict[str, list[Mutation]]:
     mutations_per_protein = defaultdict(list)
-    for row in pl.read_csv(mutation_file, has_header=False).iter_rows():
+    for row in pl.read_csv(mutation_file, has_header=True).iter_rows():
         mutations_per_protein[row[0]].append(Mutation.from_mutation_string(row[1], one_indexed))
 
     return mutations_per_protein
