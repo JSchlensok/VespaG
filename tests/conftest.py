@@ -1,6 +1,7 @@
 import os
 import shutil
 import sys
+from collections.abc import Iterator
 from pathlib import Path
 
 import numpy as np
@@ -24,7 +25,7 @@ def score_files(fasta) -> dict[str, list[Path]]:
     }
 
 @pytest.fixture()
-def output_dir(tmp_path) -> Path:
+def output_dir(tmp_path) -> Iterator[Path]:
     output_dir = tmp_path / "output"
     output_dir.mkdir()
     yield output_dir

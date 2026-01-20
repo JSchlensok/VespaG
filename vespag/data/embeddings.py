@@ -10,7 +10,7 @@ from Bio import SeqIO
 from transformers import AutoModel, AutoTokenizer, T5EncoderModel, T5Tokenizer
 
 from vespag.utils import get_device, setup_logger
-from vespag.utils.type_hinting import EmbeddingType
+from vespag.utils.type_hinting import ClickEmbeddingType
 
 model_names = {
     "esm2": "facebook/esm2_t36_3B_UR50D",
@@ -26,7 +26,10 @@ class Embedder:
         device = get_device()
         self.device = device
 
-        if "t5" in pretrained_path:
+        tokenizer_class: type[T5Tokenizer] | type[AutoTokenizer]
+        encoder_class: type[T5EncoderModel] | type[AutoModel]
+
+        if "t5" in str(pretrained_path):
             tokenizer_class = T5Tokenizer
             encoder_class = T5EncoderModel
         else:
@@ -100,14 +103,15 @@ def generate_embeddings(
         typer.Option("-c", "--cache-dir", help="Custom path to download model checkpoints to"),
     ],
     embedding_type: Annotated[
-        EmbeddingType,
+        str,
         typer.Option(
             "-e",
             "--embedding-type",
+            click_type=ClickEmbeddingType,
             case_sensitive=False,
             help="Type of embeddings to generate",
         ),
-    ] = EmbeddingType.esm2,
+    ] = "esm2",
     pretrained_path: Annotated[
         str | None,
         typer.Option("--pretrained-path", help="Path or URL of pretrained transformer"),
@@ -120,7 +124,7 @@ def generate_embeddings(
     sequences = {rec.id: str(rec.seq) for rec in SeqIO.parse(input_fasta_file, "fasta")}
     embedder = Embedder(pretrained_path, cache_dir)
     embeddings = embedder.embed(sequences)
-    logger.info(f"Saving generated {embedding_type.value} embeddings to {output_h5_file} for re-use")
+    logger.info(f"Saving generated {embedding_type} embeddings to {output_h5_file} for re-use")
     Embedder.save_embeddings(embeddings, output_h5_file)
 
 
