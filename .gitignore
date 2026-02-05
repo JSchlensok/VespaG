@@ -23,7 +23,6 @@ data/**/*.*
 !data/train/*.fasta
 !data/test/*.csv
 !data/test/*.fasta
-!data/score_transformation/*
 
 # Python artifacts
 **/__pycache__

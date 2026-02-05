@@ -10,7 +10,10 @@ runner = CliRunner()
 
 @pytest.mark.parametrize("embedding_type", ["esm2", "prott5"])
 def test_predict(output_dir, fasta, score_files, embedding_type):
-    result = runner.invoke(app, ["predict", "-i", str(fasta), "-o", str(output_dir), "--embedding-type", embedding_type])
+    result = runner.invoke(
+        app,
+        ["predict", "-i", str(fasta), "-o", str(output_dir), "--embedding-type", embedding_type, "--dont-normalize"],
+    )
 
     assert result.exit_code == 0
 

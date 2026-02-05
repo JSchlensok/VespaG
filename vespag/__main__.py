@@ -69,13 +69,6 @@ def predict(
             help="Whether to enumerate the sequence starting at 0",
         ),
     ] = False,
-    transform_scores: Annotated[
-        bool,
-        typer.Option(
-            "--transform/--dont-transform",
-            help="Whether to transform scores to same distribution as GEMME scores",
-        ),
-    ] = True,
     normalize_scores: Annotated[
         bool,
         typer.Option(
@@ -97,7 +90,7 @@ def predict(
         no_csv=no_csv,
         h5_output=h5_output,
         zero_based_mutations=zero_based_mutations,
-        normalize_scores=normalize_scores,
+        normalize=normalize_scores,
         embedding_type=embedding_type,
     )
 

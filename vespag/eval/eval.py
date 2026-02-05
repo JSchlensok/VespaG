@@ -42,13 +42,6 @@ def proteingym(
             help="Path to pre-generated input embeddings. Embeddings will be generated from scratch if no path is provided",
         ),
     ] = None,
-    transform_scores: Annotated[
-        bool,
-        typer.Option(
-            "--transform/--dont-transform",
-            help="Whether to transform scores to same distribution as GEMME scores",
-        ),
-    ] = True,
     normalize_scores: Annotated[
         bool,
         typer.Option(
@@ -125,8 +118,7 @@ def proteingym(
         embedding_file=embedding_file,
         mutation_file=mutation_file,
         single_csv=True,
-        transform_scores=transform_scores,
-        normalize_scores=normalize_scores,
+        normalize=normalize_scores,
     )
 
     mutation_file.unlink()
