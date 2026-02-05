@@ -21,7 +21,6 @@ from vespag.utils import (
     normalize_scores,
     read_mutation_file,
     setup_logger,
-    transform_scores,
 )
 from vespag.utils.type_hinting import *
 
@@ -47,7 +46,7 @@ def generate_predictions(
     transform: bool = False,
     normalize: bool = True,
     clip_to_one: bool = True,
-    embedding_type: EmbeddingType = EmbeddingType.esm2
+    embedding_type: EmbeddingType = EmbeddingType.esm2,
 ) -> None:
     logger = setup_logger()
     warnings.filterwarnings("ignore", message="rich is experimental/alpha")
@@ -67,7 +66,7 @@ def generate_predictions(
 
     if embedding_file:
         logger.info(f"Loading pre-computed embeddings from {embedding_file}")
-    
+
     else:
         embedding_file = output_path / f"{embedding_type.value}_embeddings.h5"
         if "HF_HOME" in os.environ:
@@ -95,12 +94,10 @@ def generate_predictions(
             progress.TextColumn("Current protein: {task.fields[current_protein]}"),
         ) as pbar,
         torch.no_grad(),
-        h5py.File(h5_output_path, "w") if h5_output else contextlib.nullcontext() as h5_file
+        h5py.File(h5_output_path, "w") if h5_output else contextlib.nullcontext() as h5_file,
     ):
         prediction_progress = pbar.add_task(
-            "Computing predictions",
-            total = sum(map(len, sequences.values())),
-            current_protein="None"
+            "Computing predictions", total=sum(map(len, sequences.values())), current_protein="None"
         )
         for batch_sequences in chunk_dict(sequences, BATCH_SIZE):
             embeddings = {
@@ -112,19 +109,14 @@ def generate_predictions(
                 pbar.update(prediction_progress, current_protein=protein_id)
                 embedding = embeddings[protein_id].to(device).unsqueeze(0)
                 y = model(embedding).squeeze(0).cpu().numpy()
-                if transform:
-                    y = transform_scores(y, embedding_type)
                 if normalize:
                     y = normalize_scores(y, transform, clip_to_one=clip_to_one)
                 if h5_output:
                     h5_file.create_dataset(protein_id, data=y, dtype=np.float16)
-                
+
                 protein_df = pl.from_records(
                     [
-                        {
-                        "Mutation": f"{wt_aa}{i+1}{GEMME_ALPHABET[j]}",
-                        "VespaG": score
-                        }
+                        {"Mutation": f"{wt_aa}{i + 1}{GEMME_ALPHABET[j]}", "VespaG": score}
                         for i, wt_aa in enumerate(sequence)
                         for j, score in enumerate(y[i])
                         if wt_aa != GEMME_ALPHABET[j]
@@ -154,13 +146,15 @@ def generate_predictions(
 
         if single_csv and not no_csv:
             logger.info("Generating single CSV output")
-            pl.concat([
-                pl.scan_csv(output_path / (protein_id + ".csv"))
-                .with_columns(pl.lit(protein_id).alias("Protein"))
-                .select(["Protein", "Mutation", "VespaG"])
-                for protein_id in sequences.keys()
-                if os.stat(output_path / (protein_id + ".csv")).st_size > 16  # just header
-            ]).sink_csv(output_path / "vespag_scores_all.csv", float_precision=4)
+            pl.concat(
+                [
+                    pl.scan_csv(output_path / (protein_id + ".csv"))
+                    .with_columns(pl.lit(protein_id).alias("Protein"))
+                    .select(["Protein", "Mutation", "VespaG"])
+                    for protein_id in sequences.keys()
+                    if os.stat(output_path / (protein_id + ".csv")).st_size > 16  # just header
+                ]
+            ).sink_csv(output_path / "vespag_scores_all.csv", float_precision=4)
             logger.info("Tidying up")
             for protein_id in sequences.keys():
                 (output_path / (protein_id + ".csv")).unlink()

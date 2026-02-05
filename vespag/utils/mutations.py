@@ -27,7 +27,7 @@ class SAV:
         return SAV(position, from_aa, to_aa, one_indexed=one_indexed)
 
     def __str__(self) -> str:
-        return f"{self.from_aa}{self.position+1}{self.to_aa}"
+        return f"{self.from_aa}{self.position + 1}{self.to_aa}"
 
     def __hash__(self):
         return hash(str(self))
@@ -66,8 +66,8 @@ def mask_non_mutations(
     Simply set the predicted effect of the wildtype amino acid at each position (i.e. all non-mutations) to 0
     """
     prediction[
-        torch.tensor([i for i in range(len(wildtype_sequence)) if wildtype_sequence[i] != 'X']),
-        torch.tensor([GEMME_ALPHABET.index(aa) for aa in wildtype_sequence if aa != 'X']),
+        torch.tensor([i for i in range(len(wildtype_sequence)) if wildtype_sequence[i] != "X"]),
+        torch.tensor([GEMME_ALPHABET.index(aa) for aa in wildtype_sequence if aa != "X"]),
     ] = 0.0
 
     return prediction

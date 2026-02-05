@@ -27,8 +27,6 @@ DEFAULT_MODEL_PARAMETERS = {
     "embedding_type": EmbeddingType.esm2,
 }
 
-MAX_SCORE_GEMME = 12
-MAX_SCORE_VESPAG = 8
 MODEL_VERSION = "v2"
 
 
@@ -140,35 +138,15 @@ def read_gemme_table(txt_file: Path) -> np.ndarray:
     return df.to_numpy()
 
 
-# TODO make this more elegant, e.g. through .npz file
-raw_vespag_scores = {
-    "esm2": np.sort(np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=",")),
-    "prott5": np.sort(np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=","))
-}
-gemme_scores = np.sort(np.loadtxt("data/score_transformation/sorted_gemme_scores.csv", delimiter=","))
-target_space = np.linspace(0, 1, len(gemme_scores))
-
-
 # TODO fix typing
-def transform_scores(scores: np.typing.ArrayLike[float], embedding_type: EmbeddingType = "esm2") -> list[float]:
-    """Transform VespaG score distribution by mapping it to a known distribution of GEMME scores through its quantile"""
-    quantiles = np.searchsorted(raw_vespag_scores[embedding_type], scores, side="right") / len(raw_vespag_scores[embedding_type])
-    return np.interp(quantiles, target_space, gemme_scores)
-
-# TODO fix typing
-def normalize_scores(scores: np.typing.ArrayLike[float], transformed: bool, clip_to_one: bool = True) -> np.array[float]:
+def normalize_scores(scores: np.typing.ArrayLike[float]) -> np.array[float]:
     """
     Normalize scores to [0, 1] range based on maximum possible score.
 
     Args:
         scores (np.typing.ArrayLike[float]): Scores to normalize.
-        transformed (bool): Whether the scores have been transformed to GEMME distribution.
-        clip_to_one (bool): Whether to clip scores to [0, 1] range.
 
     Returns:
         Normalized scores.
     """
-    max_score = MAX_SCORE_GEMME if transformed else MAX_SCORE_VESPAG
-    normalized_scores = (scores / max_score) + 1
-    clip_value = 1 if clip_to_one else 1.2
-    return np.clip(normalized_scores, 0, clip_value)
+    return np.clip((scores - np.min(scores)) / (np.max(scores) - np.min(scores)), 0, 1)

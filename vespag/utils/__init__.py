@@ -21,6 +21,5 @@ __all__ = [
     "read_mutation_file",
     "save_async",
     "setup_logger",
-    "transform_scores",
     "unzip",
 ]
