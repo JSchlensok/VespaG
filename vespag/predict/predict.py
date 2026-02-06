@@ -92,8 +92,6 @@ def generate_predictions(
 
     h5_output_path = output_path / "vespag_scores.h5"
 
-    # TODO test if new implementation is really faster than old one since I ended up reusing most of the old code
-    # TODO check if progress bar is smooth enough
     with (
         progress.Progress(
             *progress.Progress.get_default_columns(),

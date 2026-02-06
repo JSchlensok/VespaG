@@ -138,7 +138,6 @@ def read_gemme_table(txt_file: Path) -> np.ndarray:
     return df.to_numpy()
 
 
-# TODO fix typing
 def normalize_scores(scores: np.typing.ArrayLike[float]) -> np.array[float]:
     """
     Normalize scores to [0, 1] range based on maximum possible score.
