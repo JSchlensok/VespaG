@@ -87,7 +87,7 @@ eval:
     reference_file:
       v1: https://raw.githubusercontent.com/OATML-Markslab/Tranception/main/proteingym/ProteinGym_reference_file_substitutions.csv
       v2: https://raw.githubusercontent.com/OATML-Markslab/ProteinGym/main/reference_files/DMS_substitutions.csv
-    dms_files: https://marks.hms.harvard.edu/proteingym/DMS_ProteinGym_substitutions.zip
+    dms_files: https://marks.hms.harvard.edu/proteingym/ProteinGym_v1.3/DMS_ProteinGym_substitutions.zip
 
 models:
   fnn:
